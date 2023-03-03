@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required
-from app.models import Food
+from app.models import Food, db
 from app.forms import FoodForm
 
 
@@ -15,8 +15,15 @@ def foods():
     if form.validate_on_submit():
         food = Food(
             calories=form.data['calories']
+
         )
+        db.session.add(food)
+        db.session.commit()
+        return food.to_dict()
+    
     foods = Food.query.all()
+    
+    
     return {food.id: food.to_dict() for food in foods}
 
 
