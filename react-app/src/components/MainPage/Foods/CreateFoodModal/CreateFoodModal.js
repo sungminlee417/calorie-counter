@@ -9,6 +9,10 @@ const CreateFoodModal = () => {
     setShowModal(true);
   };
 
+  const onClose = () => {
+    setShowModal(false);
+  };
+
   return (
     <>
       <button
@@ -18,8 +22,8 @@ const CreateFoodModal = () => {
         Create food
       </button>
       {showModal && (
-        <Modal onClose={() => setShowModal(false)}>
-          <CreateFood />
+        <Modal onClose={onClose}>
+          <CreateFood onClose={onClose} />
         </Modal>
       )}
     </>
