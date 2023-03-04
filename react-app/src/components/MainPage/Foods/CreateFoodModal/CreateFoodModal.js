@@ -16,7 +16,7 @@ const CreateFoodModal = () => {
   return (
     <>
       <button
-        className="p-2 bg-blue-500 rounded-md text-white"
+        className="p-2 bg-blue-500 rounded-md text-white hover:bg-blue-400"
         onClick={onClick}
       >
         Create food

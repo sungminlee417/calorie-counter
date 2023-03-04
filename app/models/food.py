@@ -9,7 +9,7 @@ class Food(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     brand_name = db.Column(db.String(255), nullable=True)
     food_desc = db.Column(db.String(255), nullable=False)
-    serving_size = db.Column(db.Integer, nullable=False)
+    serving_size = db.Column(db.String(255), nullable=False)
     calories = db.Column(db.Integer, nullable=False)
     total_fat = db.Column(db.Integer, nullable=True)
     saturated_fat = db.Column(db.Integer, nullable=True)
@@ -30,8 +30,8 @@ class Food(db.Model, UserMixin):
     calcium = db.Column(db.Integer, nullable=True)
     iron = db.Column(db.Integer, nullable=True)
     vitamin_d = db.Column(db.Integer, nullable=True)
-    
-    
+
+
     def to_dict(self):
         return {
             'id': self.id,

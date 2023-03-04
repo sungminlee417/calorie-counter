@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired
 class FoodForm(FlaskForm):
     brand_name = StringField('brand_name')
     food_desc = StringField('food_desc', validators=[DataRequired("Food description required.")])
-    serving_size = IntegerField('serving_size', validators=[DataRequired("Serving size required.")])
+    serving_size = StringField('serving_size', validators=[DataRequired("Serving size required.")])
     calories = IntegerField('calories', validators=[DataRequired("Calories required.")])
     total_fat = IntegerField('total_fat')
     saturated_fat = IntegerField('saturated_fat')
