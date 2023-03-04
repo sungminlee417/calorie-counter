@@ -1,30 +1,31 @@
 import { useState } from "react";
 import CreateFoodDescription from "./CreateFoodDescription";
+import CreateFoodNutritionFacts from "./CreateFoodNutritionFacts";
 
 const CreateFood = ({ onClose }) => {
-  const [brandName, setBrandName] = useState("");
-  const [foodDesc, setFoodDesc] = useState("");
-  const [servingSize, setServingSize] = useState("");
-  const [calories, setCalories] = useState(0);
-  const [totalFat, setTotalFat] = useState(0);
-  const [saturatedFat, setSaturatedFat] = useState(0);
-  const [polysaturatedFat, setPolysaturatedFat] = useState(0);
-  const [monounsaturatedFat, setMonounsaturatedFat] = useState(0);
-  const [transFat, setTransFat] = useState(0);
-  const [cholesterol, setCholesterol] = useState(0);
-  const [sodium, setSodium] = useState(0);
-  const [potassium, setPotassium] = useState(0);
-  const [totalCarbohydrates, setTotalCarbohydrates] = useState(0);
-  const [dietaryFiber, setDietaryFiber] = useState(0);
-  const [sugars, setSugars] = useState(0);
-  const [addedSugars, setAddedSugars] = useState(0);
-  const [sugarAlcohols, setSugarAlcohols] = useState(0);
-  const [protein, setProtein] = useState(0);
-  const [vitaminA, setVitaminA] = useState(0);
-  const [vitaminC, setVitaminC] = useState(0);
-  const [calcium, setCalcium] = useState(0);
-  const [iron, setIron] = useState(0);
-  const [vitaminD, setVitaminD] = useState(0);
+  const [brandName, setBrandName] = useState();
+  const [foodDescription, setFoodDescription] = useState();
+  const [servingSize, setServingSize] = useState();
+  const [calories, setCalories] = useState();
+  const [totalFat, setTotalFat] = useState();
+  const [saturatedFat, setSaturatedFat] = useState();
+  const [polysaturatedFat, setPolysaturatedFat] = useState();
+  const [monounsaturatedFat, setMonounsaturatedFat] = useState();
+  const [transFat, setTransFat] = useState();
+  const [cholesterol, setCholesterol] = useState();
+  const [sodium, setSodium] = useState();
+  const [potassium, setPotassium] = useState();
+  const [totalCarbohydrates, setTotalCarbohydrates] = useState();
+  const [dietaryFiber, setDietaryFiber] = useState();
+  const [sugars, setSugars] = useState();
+  const [addedSugars, setAddedSugars] = useState();
+  const [sugarAlcohols, setSugarAlcohols] = useState();
+  const [protein, setProtein] = useState();
+  const [vitaminA, setVitaminA] = useState();
+  const [vitaminC, setVitaminC] = useState();
+  const [calcium, setCalcium] = useState();
+  const [iron, setIron] = useState();
+  const [vitaminD, setVitaminD] = useState();
 
   const [step, setStep] = useState(1);
 
@@ -43,12 +44,11 @@ const CreateFood = ({ onClose }) => {
       onClick={(e) => e.stopPropagation()}
     >
       <header className="flex items-center justify-between p-3">
-        {step === 1 && (
+        {step === 1 ? (
           <button onClick={onClose}>
             <i className="fa-solid fa-xmark w-4 h-4"></i>
           </button>
-        )}
-        {step === 2 && (
+        ) : (
           <button onClick={onPrev}>
             <i
               className="fa-solid fa-arrow-left
@@ -64,12 +64,35 @@ const CreateFood = ({ onClose }) => {
           ></i>
         </button>
       </header>
-      {step === 1 && (
+      {step === 1 ? (
         <CreateFoodDescription
           brandName={brandName}
           setBrandName={setBrandName}
-          foodDesc={foodDesc}
-          setFoodDesc={setFoodDesc}
+          foodDescription={foodDescription}
+          setFoodDescription={setFoodDescription}
+          servingSize={servingSize}
+          setServingSize={setServingSize}
+        />
+      ) : (
+        <CreateFoodNutritionFacts
+          calories={calories}
+          setCalories={setCalories}
+          totalFat={totalFat}
+          setTotalFat={setTotalFat}
+          saturatedFat={saturatedFat}
+          setSaturatedFat={setSaturatedFat}
+          polysaturatedFat={polysaturatedFat}
+          setPolysaturatedFat={setPolysaturatedFat}
+          monounsaturatedFat={monounsaturatedFat}
+          setMonounsaturatedFat={setMonounsaturatedFat}
+          transFat={transFat}
+          setTransFat={setTransFat}
+          cholesterol={cholesterol}
+          setCholesterol={setCholesterol}
+          sodium={sodium}
+          setSodium={setSodium}
+          potassium={potassium}
+          setPotassium={setPotassium}
         />
       )}
     </section>
