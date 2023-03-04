@@ -93,6 +93,28 @@ const CreateFood = ({ onClose }) => {
           setSodium={setSodium}
           potassium={potassium}
           setPotassium={setPotassium}
+          totalCarbohydrates={totalCarbohydrates}
+          setTotalCarbohydrates={setTotalCarbohydrates}
+          dietaryFiber={dietaryFiber}
+          setDietaryFiber={setDietaryFiber}
+          sugars={sugars}
+          setSugars={setSugars}
+          addedSugars={addedSugars}
+          setAddedSugars={setAddedSugars}
+          sugarAlcohols={sugarAlcohols}
+          setSugarAlcohols={setSugarAlcohols}
+          protein={protein}
+          setProtein={setProtein}
+          vitaminA={vitaminA}
+          setVitaminA={setVitaminA}
+          vitaminC={vitaminC}
+          setVitaminC={setVitaminC}
+          calcium={calcium}
+          setCalcium={setCalcium}
+          iron={iron}
+          setIron={setIron}
+          vitaminD={vitaminD}
+          setVitaminD={setVitaminD}
         />
       )}
     </section>
