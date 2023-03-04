@@ -40,18 +40,6 @@ const CreateFoodNutritionFacts = ({
   vitaminD,
   setVitaminD,
 }) => {
-  const onChangeCalories = (caloriesInput) => {
-    setCalories(caloriesInput);
-  };
-
-  const onChangeTotalFat = (totalFatInput) => {
-    setTotalFat(totalFatInput);
-  };
-
-  const onChangeSaturatedFat = (saturatedFatInput) => {
-    setSaturatedFat(saturatedFatInput);
-  };
-
   return (
     <div className="flex flex-col gap-4 p-3">
       <div className="flex gap-4 justify-between items-center">
@@ -63,7 +51,7 @@ const CreateFoodNutritionFacts = ({
           placeholder="Required"
           className="text-right grow p-1"
           value={calories}
-          onChange={(e) => onChangeCalories(e.target.value)}
+          onChange={(e) => setCalories(e.target.value)}
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -75,7 +63,7 @@ const CreateFoodNutritionFacts = ({
           placeholder="Optional"
           className="text-right grow p-1"
           value={totalFat}
-          onChange={(e) => onChangeTotalFat(e.target.value)}
+          onChange={(e) => setTotalFat(e.target.value)}
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -87,67 +75,67 @@ const CreateFoodNutritionFacts = ({
           placeholder="Optional"
           className="text-right grow p-1"
           value={saturatedFat}
-          onChange={(e) => onChangeSaturatedFat(e.target.value)}
+          onChange={(e) => setSaturatedFat(e.target.value)}
         />
       </div>{" "}
       <div className="flex gap-4 justify-between items-center">
-        <label className="basis-5/12" htmlFor="total-fat">
-          Total Fat (g)
+        <label className="basis-5/12" htmlFor="polysaturated-fat">
+          Polysaturated Fat (g)
         </label>
         <input
-          id="total-fat"
+          id="polysaturated-fat"
           placeholder="Optional"
           className="text-right grow p-1"
-          value={totalFat}
-          onChange={(e) => onChangeTotalFat(e.target.value)}
+          value={polysaturatedFat}
+          onChange={(e) => setPolysaturatedFat(e.target.value)}
         />
       </div>{" "}
       <div className="flex gap-4 justify-between items-center">
-        <label className="basis-5/12" htmlFor="total-fat">
-          Total Fat (g)
+        <label className="basis-5/12" htmlFor="monounsaturated-fat">
+          Monounsaturated Fat (g)
         </label>
         <input
-          id="total-fat"
+          id="monounsaturated-fat"
           placeholder="Optional"
           className="text-right grow p-1"
-          value={totalFat}
-          onChange={(e) => onChangeTotalFat(e.target.value)}
+          value={monounsaturatedFat}
+          onChange={(e) => setMonounsaturatedFat(e.target.value)}
         />
       </div>{" "}
       <div className="flex gap-4 justify-between items-center">
-        <label className="basis-5/12" htmlFor="total-fat">
-          Total Fat (g)
+        <label className="basis-5/12" htmlFor="trans-fat">
+          Trans Fat (g)
         </label>
         <input
-          id="total-fat"
+          id="trans-fat"
           placeholder="Optional"
           className="text-right grow p-1"
-          value={totalFat}
-          onChange={(e) => onChangeTotalFat(e.target.value)}
+          value={transFat}
+          onChange={(e) => setTransFat(e.target.value)}
         />
       </div>{" "}
       <div className="flex gap-4 justify-between items-center">
-        <label className="basis-5/12" htmlFor="total-fat">
-          Total Fat (g)
+        <label className="basis-5/12" htmlFor="cholesterol-fat">
+          Cholesterol (g)
         </label>
         <input
-          id="total-fat"
+          id="cholesterol-fat"
           placeholder="Optional"
           className="text-right grow p-1"
-          value={totalFat}
-          onChange={(e) => onChangeTotalFat(e.target.value)}
+          value={cholesterol}
+          onChange={(e) => setCholesterol(e.target.value)}
         />
       </div>{" "}
       <div className="flex gap-4 justify-between items-center">
-        <label className="basis-5/12" htmlFor="total-fat">
-          Total Fat (g)
+        <label className="basis-5/12" htmlFor="sodium">
+          Sodium (g)
         </label>
         <input
-          id="total-fat"
+          id="sodium"
           placeholder="Optional"
           className="text-right grow p-1"
-          value={totalFat}
-          onChange={(e) => onChangeTotalFat(e.target.value)}
+          value={sodium}
+          onChange={(e) => setSodium(e.target.value)}
         />
       </div>
     </div>
