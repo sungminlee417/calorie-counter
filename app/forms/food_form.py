@@ -6,21 +6,21 @@ from wtforms.validators import DataRequired, ValidationError
 def number_followed_by_string(form, field):
     serving_size = field.data
     first_char_number = True
-    alpha_exists = True
+    non_number_exists = True
 
     # Check that the first character is a number
     if not serving_size[0].isnumeric():
-        valid = False
+        first_char_number = False
 
     # Check that an alpha exists in the string
     for char in range(len(serving_size)):
-        if not char.isalpha():
-            valid = False
+        if char.isnumeric():
+            non_number_exists = False
         else:
-            valid = True
+            non_number_exists = True
             break
 
-    if not first_char_number or not alpha_exists:
+    if not first_char_number or not non_number_exists:
         raise ValidationError('Please provide serving size in the proper format. Ex: 3 cups')
 
 

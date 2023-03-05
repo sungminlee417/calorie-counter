@@ -3,9 +3,9 @@ import CreateFoodDescription from "./CreateFoodDescription";
 import CreateFoodNutritionFacts from "./CreateFoodNutritionFacts";
 
 const CreateFood = ({ onClose }) => {
-  const [brandName, setBrandName] = useState();
-  const [foodDescription, setFoodDescription] = useState();
-  const [servingSize, setServingSize] = useState();
+  const [brandName, setBrandName] = useState("");
+  const [foodDescription, setFoodDescription] = useState("");
+  const [servingSize, setServingSize] = useState("");
   const [calories, setCalories] = useState();
   const [totalFat, setTotalFat] = useState();
   const [saturatedFat, setSaturatedFat] = useState();
@@ -28,9 +28,27 @@ const CreateFood = ({ onClose }) => {
   const [vitaminD, setVitaminD] = useState();
 
   const [step, setStep] = useState(1);
+  const [errors, setErrors] = useState([]);
 
   const onNext = () => {
-    setStep(2);
+    const elements = document.querySelectorAll(
+      `.create-food-description-error`
+    );
+    elements.forEach((element) => {
+      element.classList.add("invisible");
+    });
+
+    if (errors.length) {
+      errors.forEach((error) => {
+        const element = document.querySelector(
+          `.create-food-description-error-${error}`
+        );
+        element.classList.remove("invisible");
+        element.classList.add("visible");
+      });
+    } else {
+      setStep(2);
+    }
   };
 
   const onPrev = () => {
@@ -72,6 +90,8 @@ const CreateFood = ({ onClose }) => {
           setFoodDescription={setFoodDescription}
           servingSize={servingSize}
           setServingSize={setServingSize}
+          errors={errors}
+          setErrors={setErrors}
         />
       ) : (
         <CreateFoodNutritionFacts
