@@ -27,7 +27,7 @@ def number_followed_by_string(form, field):
 class FoodForm(FlaskForm):
     brand_name = StringField('brand_name')
     food_desc = StringField('food_desc', validators=[DataRequired("Food description required.")])
-    serving_size = StringField('serving_size', validators=[DataRequired("Serving size required.", number_followed_by_string)])
+    serving_size = StringField('serving_size', validators=[DataRequired("Serving size required."), number_followed_by_string])
     calories = IntegerField('calories', validators=[DataRequired("Calories required.")])
     total_fat = IntegerField('total_fat')
     saturated_fat = IntegerField('saturated_fat')
