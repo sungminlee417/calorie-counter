@@ -35,22 +35,19 @@ const CreateFoodDescription = ({
   };
 
   useEffect(() => {
-    const errorArr = [];
-    if (!brandName) errorArr.push("brandName");
-    if (!foodDescription) errorArr.push("foodDescription");
+    const errorArr = {};
+    if (!foodDescription) errorArr["foodDescription"] = "error";
     if (!servingSize || !servingSizeValid(servingSize))
-      errorArr.push("servingSize");
+      errorArr["servingSize"] = "error";
     setErrors(errorArr);
   }, [brandName, foodDescription, servingSize]);
 
   return (
     <div className="flex flex-col gap-4 p-3">
-      <div className="flex gap-4 justify-between items-center">
-        <label className="basis-4/12 flex gap-0.5" htmlFor="brand-name">
-          <span>Brand Name</span>
-          <span className="create-food-description-error create-food-description-error-brandName text-red-600 invisible">
-            *
-          </span>
+      <div className="flex gap-4 justify-between">
+        <label className="basis-4/12 gap-0.5" htmlFor="brand-name">
+          <div>Brand Name</div>
+          <div className="text-xs text-slate-500">Optional</div>
         </label>
         <input
           id="brand-name"
@@ -60,9 +57,10 @@ const CreateFoodDescription = ({
           onChange={(e) => setBrandName(e.target.value)}
         />
       </div>
-      <div className="flex gap-4 justify-between items-center">
-        <label className="basis-4/12 flex gap-0.5" htmlFor="brand-name">
-          <span>Description</span>
+      <div className="flex gap-4 justify-between">
+        <label className="basis-4/12 gap-0.5" htmlFor="brand-name">
+          <div>Description</div>
+          <div className="text-xs text-slate-500">Required</div>
           <span className="create-food-description-error create-food-description-error-foodDescription text-red-600 invisible">
             *
           </span>
@@ -75,9 +73,10 @@ const CreateFoodDescription = ({
           onChange={(e) => setFoodDescription(e.target.value)}
         />
       </div>
-      <div className="flex gap-4 justify-between items-center">
-        <label className="basis-4/12 flex gap-0.5" htmlFor="brand-name">
-          <span>Serving Size</span>
+      <div className="flex gap-4 justify-between">
+        <label className="basis-4/12" htmlFor="brand-name">
+          <div>Serving Size</div>
+          <div className="text-xs text-slate-500">Required</div>
           <span className="create-food-description-error create-food-description-error-servingSize text-red-600 invisible">
             *
           </span>
