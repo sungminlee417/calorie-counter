@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_login import login_required, current_user
 from app.models import Food, db
 from app.forms import FoodForm
@@ -13,16 +13,37 @@ def food_owned_by_user(food):
     return False
 
 
+def format_serving_size(serving_size):
+    amount = ""
+    unit = ""
+
+    for char in range(len(serving_size)):
+        # If a character exists in unit, only add to unit from then on
+        if unit:
+            unit += char
+            continue
+
+        # Only in the beginning if the character is numeric, add it onto the amount
+        if char.isnumeric():
+            amount += char
+        # The first character that is not numeric will be added onto unit
+        else:
+            unit += char
+
+    return amount + unit
+
+
 @food_routes.route('/', methods=['GET', 'POST'])
 @login_required
 def get_post_foods():
     form = FoodForm()
     form['csrf_token'].data = request.cookies['csrf_token']
     if form.validate_on_submit():
+        serving_size = form.data['serving_size']
         food = Food(
             brand_name=form.data['brand_name'],
             food_desc=form.data['food_desc'],
-            serving_size=form.data['serving_size'],
+            serving_size=format_serving_size(serving_size),
             calories=form.data['calories'],
             total_fat=form.data['total_fat'],
             saturated_fat=form.data['saturated_fat'],
