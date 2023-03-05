@@ -30,7 +30,7 @@ def format_serving_size(serving_size):
         else:
             unit += char
 
-    return amount + unit
+    return amount + " " + unit
 
 
 @food_routes.route('/', methods=['GET', 'POST'])
@@ -85,7 +85,7 @@ def edit_delete_food(food_id):
             if form.validate_on_submit():
                 food.brand_name = form.data['brand_name'],
                 food.food_desc = form.data['food_desc'],
-                food.serving_size = form.data['serving_size'],
+                food.serving_size = format_serving_size(form.data['serving_size']),
                 food.calories = form.data['calories'],
                 food.total_fat = form.data['total_fat'],
                 food.saturated_fat = form.data['saturated_fat'],
@@ -114,6 +114,6 @@ def edit_delete_food(food_id):
         if food_owned_by_user(food):
             db.session.delete(food)
             db.session.commit()
-            return {"message": "Post was successfully deleted"}
+            return {"message": "Food was successfully deleted"}
         else:
             return {"error": "Unauthorized"}
