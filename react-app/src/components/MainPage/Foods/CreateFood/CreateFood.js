@@ -28,24 +28,35 @@ const CreateFood = ({ onClose }) => {
   const [vitaminD, setVitaminD] = useState();
 
   const [step, setStep] = useState(1);
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const onNext = () => {
-    const elements = document.querySelectorAll(
-      `.create-food-description-error`
+    const secondaryLabels = document.querySelectorAll(
+      ".create-food-description-input-secondary-label"
     );
-    elements.forEach((element) => {
-      element.classList.add("invisible");
+    const errorLabels = document.querySelectorAll(
+      ".create-food-description-error"
+    );
+
+    secondaryLabels.forEach((label) => {
+      label.classList.remove("hidden");
     });
 
-    if (errors.length) {
-      errors.forEach((error) => {
-        const element = document.querySelector(
+    errorLabels.forEach((label) => {
+      label.classList.add("hidden");
+    });
+
+    if (Object.keys(errors).length) {
+      for (const error in errors) {
+        const secondaryLabel = document.querySelector(
+          `.create-food-description-input-secondary-label-${error}`
+        );
+        const errorLabel = document.querySelector(
           `.create-food-description-error-${error}`
         );
-        element.classList.remove("invisible");
-        element.classList.add("visible");
-      });
+        secondaryLabel.classList.add("hidden");
+        errorLabel.classList.remove("hidden");
+      }
     } else {
       setStep(2);
     }
@@ -57,8 +68,8 @@ const CreateFood = ({ onClose }) => {
 
   return (
     <section
-      className="bg-white rounded-md w-96
-      divide-y divide-slate-200"
+      className="bg-white rounded-md
+      divide-y divide-slate-200 w-128"
       onClick={(e) => e.stopPropagation()}
     >
       <header className="flex items-center justify-between p-3">
