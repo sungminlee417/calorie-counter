@@ -21,7 +21,7 @@ const FoodListItem = ({ food, index }) => {
       </li>
       {showModal && (
         <Modal onClose={onClose}>
-          <ViewEditDeleteFoodListItem onClose={onClose} />
+          <ViewEditDeleteFoodListItem food={food} onClose={onClose} />
         </Modal>
       )}
     </>
