@@ -12,7 +12,7 @@ const CreateFood = ({ onClose }) => {
   const [confirmationClicked, setConfirmationClicked] = useState(false);
 
   const [brandName, setBrandName] = useState("");
-  const [foodDescription, setFoodDescription] = useState("");
+  const [description, setDescription] = useState("");
   const [servingSize, setServingSize] = useState("");
   const [calories, setCalories] = useState("");
   const [totalFat, setTotalFat] = useState("");
@@ -22,7 +22,7 @@ const CreateFood = ({ onClose }) => {
   const [transFat, setTransFat] = useState("");
   const [cholesterol, setCholesterol] = useState("");
   const [sodium, setSodium] = useState("");
-  const [potassium, setPotassium] = useState();
+  const [potassium, setPotassium] = useState("");
   const [totalCarbohydrates, setTotalCarbohydrates] = useState("");
   const [dietaryFiber, setDietaryFiber] = useState("");
   const [sugars, setSugars] = useState("");
@@ -77,28 +77,28 @@ const CreateFood = ({ onClose }) => {
   const onSubmit = () => {
     const payload = {
       brand_name: brandName,
-      food_description: foodDescription,
+      description: description,
       serving_size: servingSize,
-      calories,
-      total_fat: totalFat,
-      saturated_fat: saturatedFat,
-      polysaturated_fat: polysaturatedFat,
-      monounsaturated_fat: monounsaturatedFat,
-      trans_fat: transFat,
-      cholesterol,
-      sodium,
-      potassium,
-      total_carbohydrates: totalCarbohydrates,
-      dietary_fiber: dietaryFiber,
-      sugars,
-      added_sugars: addedSugars,
-      sugar_alcohols: sugarAlcohols,
-      protein,
-      vitamin_a: vitaminA,
-      vitamin_c: vitaminC,
-      calcium,
-      iron,
-      vitamin_d: vitaminD,
+      calories: calories,
+      total_fat: totalFat || 0,
+      saturated_fat: saturatedFat || 0,
+      polysaturated_fat: polysaturatedFat || 0,
+      monounsaturated_fat: monounsaturatedFat || 0,
+      trans_fat: transFat || 0,
+      cholesterol: cholesterol || 0,
+      sodium: sodium || 0,
+      potassium: potassium || 0,
+      total_carbohydrates: totalCarbohydrates || 0,
+      dietary_fiber: dietaryFiber || 0,
+      sugars: sugars || 0,
+      added_sugars: addedSugars || 0,
+      sugar_alcohols: sugarAlcohols || 0,
+      protein: protein || 0,
+      vitamin_a: vitaminA || 0,
+      vitamin_c: vitaminC || 0,
+      calcium: calcium || 0,
+      iron: iron || 0,
+      vitamin_d: vitaminD || 0,
     };
 
     if (
@@ -186,8 +186,8 @@ const CreateFood = ({ onClose }) => {
         <CreateFoodDescription
           brandName={brandName}
           setBrandName={setBrandName}
-          foodDescription={foodDescription}
-          setFoodDescription={setFoodDescription}
+          description={description}
+          setDescription={setDescription}
           servingSize={servingSize}
           setServingSize={setServingSize}
           errors={errors}

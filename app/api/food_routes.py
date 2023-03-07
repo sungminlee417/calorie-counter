@@ -17,7 +17,8 @@ def format_serving_size(serving_size):
     amount = ""
     unit = ""
 
-    for char in range(len(serving_size)):
+    for i in range(len(serving_size)):
+        char = serving_size[i]
         # If a character exists in unit, only add to unit from then on
         if unit:
             unit += char
@@ -42,7 +43,7 @@ def get_post_foods():
         serving_size = form.data['serving_size']
         food = Food(
             brand_name=form.data['brand_name'],
-            food_description=form.data['food_description'],
+            description=form.data['description'],
             serving_size=format_serving_size(serving_size),
             calories=form.data['calories'],
             total_fat=form.data['total_fat'],
@@ -84,7 +85,7 @@ def edit_delete_food(food_id):
             form['csrf_token'].data = request.cookies['csrf_token']
             if form.validate_on_submit():
                 food.brand_name = form.data['brand_name'],
-                food.food_description = form.data['food_description'],
+                food.description = form.data['description'],
                 food.serving_size = format_serving_size(form.data['serving_size']),
                 food.calories = form.data['calories'],
                 food.total_fat = form.data['total_fat'],

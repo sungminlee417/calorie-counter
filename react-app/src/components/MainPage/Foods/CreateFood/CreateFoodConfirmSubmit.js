@@ -8,7 +8,7 @@ const CreateFoodConfirmSubmit = ({ onClose, onSubmit }) => {
         </div>
       </div>
       <div className="flex divide-x divide-slate-200">
-        <button className="w-full p-2" onClose={onSubmit}>
+        <button className="w-full p-2" onClick={onSubmit}>
           No Thanks
         </button>
         <button className="w-full p-2" onClose={onClose}>

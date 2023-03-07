@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 const CreateFoodNutritionFacts = ({
   calories,
   setCalories,
@@ -40,10 +42,54 @@ const CreateFoodNutritionFacts = ({
   vitaminD,
   setVitaminD,
 }) => {
+  useEffect(() => {
+    if (calories % 1 !== 0 || calories < 0) setCalories(0);
+    if (totalFat < 0) setTotalFat("");
+    if (saturatedFat < 0) setSaturatedFat("");
+    if (polysaturatedFat < 0) setPolysaturatedFat("");
+    if (monounsaturatedFat < 0) setMonounsaturatedFat("");
+    if (transFat < 0) setTransFat("");
+    if (cholesterol < 0) setCholesterol("");
+    if (sodium < 0) setSodium("");
+    if (potassium < 0) setPotassium("");
+    if (totalCarbohydrates < 0) setTotalCarbohydrates("");
+    if (dietaryFiber < 0) setDietaryFiber("");
+    if (sugars < 0) setSugars("");
+    if (addedSugars < 0) setAddedSugars("");
+    if (sugarAlcohols < 0) setSugarAlcohols("");
+    if (protein < 0) setProtein("");
+    if (vitaminA < 0) setVitaminA("");
+    if (vitaminC < 0) setVitaminC("");
+    if (calcium < 0) setCalcium("");
+    if (iron < 0) setIron("");
+    if (vitaminD < 0) setVitaminD("");
+  }, [
+    calories,
+    totalFat,
+    saturatedFat,
+    polysaturatedFat,
+    monounsaturatedFat,
+    transFat,
+    cholesterol,
+    sodium,
+    potassium,
+    totalCarbohydrates,
+    dietaryFiber,
+    sugars,
+    addedSugars,
+    sugarAlcohols,
+    protein,
+    vitaminA,
+    vitaminC,
+    calcium,
+    iron,
+    vitaminD,
+  ]);
+
   return (
     <div className="flex flex-col gap-4 p-3 h-128 overflow-auto">
       <div className="flex gap-4 justify-between items-center">
-        <label className="basis-3/4 flex gap-0.5" htmlFor="calories">
+        <label className="basis-3/4" htmlFor="calories">
           <div>Calories</div>
         </label>
         <input
@@ -53,6 +99,7 @@ const CreateFoodNutritionFacts = ({
           value={calories}
           onChange={(e) => setCalories(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -66,6 +113,7 @@ const CreateFoodNutritionFacts = ({
           value={totalFat}
           onChange={(e) => setTotalFat(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -79,6 +127,7 @@ const CreateFoodNutritionFacts = ({
           value={saturatedFat}
           onChange={(e) => setSaturatedFat(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -92,6 +141,7 @@ const CreateFoodNutritionFacts = ({
           value={polysaturatedFat}
           onChange={(e) => setPolysaturatedFat(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -105,6 +155,7 @@ const CreateFoodNutritionFacts = ({
           value={monounsaturatedFat}
           onChange={(e) => setMonounsaturatedFat(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -118,6 +169,7 @@ const CreateFoodNutritionFacts = ({
           value={transFat}
           onChange={(e) => setTransFat(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -131,6 +183,7 @@ const CreateFoodNutritionFacts = ({
           value={cholesterol}
           onChange={(e) => setCholesterol(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -144,6 +197,7 @@ const CreateFoodNutritionFacts = ({
           value={sodium}
           onChange={(e) => setSodium(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -157,6 +211,7 @@ const CreateFoodNutritionFacts = ({
           value={potassium}
           onChange={(e) => setPotassium(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -170,6 +225,7 @@ const CreateFoodNutritionFacts = ({
           value={totalCarbohydrates}
           onChange={(e) => setTotalCarbohydrates(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -183,6 +239,7 @@ const CreateFoodNutritionFacts = ({
           value={dietaryFiber}
           onChange={(e) => setDietaryFiber(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -196,6 +253,7 @@ const CreateFoodNutritionFacts = ({
           value={sugars}
           onChange={(e) => setSugars(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -209,6 +267,7 @@ const CreateFoodNutritionFacts = ({
           value={addedSugars}
           onChange={(e) => setAddedSugars(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -222,6 +281,7 @@ const CreateFoodNutritionFacts = ({
           value={sugarAlcohols}
           onChange={(e) => setSugarAlcohols(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -235,6 +295,7 @@ const CreateFoodNutritionFacts = ({
           value={protein}
           onChange={(e) => setProtein(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -248,6 +309,7 @@ const CreateFoodNutritionFacts = ({
           value={vitaminA}
           onChange={(e) => setVitaminA(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -261,6 +323,7 @@ const CreateFoodNutritionFacts = ({
           value={vitaminC}
           onChange={(e) => setVitaminC(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -274,6 +337,7 @@ const CreateFoodNutritionFacts = ({
           value={calcium}
           onChange={(e) => setCalcium(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -287,6 +351,7 @@ const CreateFoodNutritionFacts = ({
           value={iron}
           onChange={(e) => setIron(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
@@ -300,6 +365,7 @@ const CreateFoodNutritionFacts = ({
           value={vitaminD}
           onChange={(e) => setVitaminD(e.target.value)}
           type="number"
+          min="0"
         />
       </div>
     </div>

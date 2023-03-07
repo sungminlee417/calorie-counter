@@ -1,19 +1,19 @@
 // constants
 const LOAD_FOODS = "foods/LOAD_FOODS";
-const CREATE_FOOD = "foods/CREATE_FOOD";
+const ADD_FOOD = "foods/ADD_FOOD";
 
 const loadFoods = (foods) => ({
   type: LOAD_FOODS,
   foods,
 });
 
-const createFood = (food) => ({
-  type: CREATE_FOOD,
+const addFood = (food) => ({
+  type: ADD_FOOD,
   food,
 });
 
 export const loadFoodsThunk = () => async (dispatch) => {
-  const response = await fetch("/api/foods");
+  const response = await fetch("/api/foods/");
 
   if (response.ok) {
     const foods = await response.json();
@@ -32,19 +32,20 @@ export const createFoodThunk = (payload) => async (dispatch) => {
 
   if (response.ok) {
     const food = await response.json();
-    dispatch(createFood(food));
+    dispatch(addFood(food));
   }
 };
 
 const initialState = {};
 
 export default function reducer(state = initialState, action) {
-  const newState = { ...initialState };
+  const newState = { ...state };
   switch (action.type) {
     case LOAD_FOODS:
       return action.foods;
-    case CREATE_FOOD:
-      newState.action.food.id = action.food;
+    case ADD_FOOD:
+      console.log(newState);
+      newState[action.food.id] = action.food;
       return newState;
     default:
       return state;

@@ -3,8 +3,8 @@ import { useEffect } from "react";
 const CreateFoodDescription = ({
   brandName,
   setBrandName,
-  foodDescription,
-  setFoodDescription,
+  description,
+  setDescription,
   servingSize,
   setServingSize,
   setErrors,
@@ -45,13 +45,12 @@ const CreateFoodDescription = ({
 
   useEffect(() => {
     const errorObj = {};
-    if (!foodDescription)
-      errorObj["foodDescription"] = "Food description required.";
+    if (!description) errorObj["description"] = "Food description required.";
     if (!servingSize || !servingSizeValid(servingSize))
       errorObj["servingSize"] =
         "Provide serving size in proper format. Ex. 3 cups.";
     setErrors(errorObj);
-  }, [brandName, foodDescription, servingSize, setErrors]);
+  }, [brandName, description, servingSize, setErrors]);
 
   return (
     <div className="flex flex-col gap-4 p-3">
@@ -72,11 +71,11 @@ const CreateFoodDescription = ({
         <label className="basis-3/4 gap-0.5" htmlFor="food-description">
           <div>Description</div>
           <div
-            className={`create-food-description-input-secondary-label create-food-description-input-secondary-label-foodDescription text-xs text-slate-500`}
+            className={`create-food-description-input-secondary-label create-food-description-input-secondary-label-description text-xs text-slate-500`}
           >
             Required
           </div>
-          <div className="create-food-description-error create-food-description-error-foodDescription text-red-600 text-xs hidden">
+          <div className="create-food-description-error create-food-description-error-description text-red-600 text-xs hidden">
             *Food description required.
           </div>
         </label>
@@ -84,8 +83,8 @@ const CreateFoodDescription = ({
           id="food-description"
           placeholder="ex. Chicken Soup"
           className="text-right grow p-1"
-          value={foodDescription}
-          onChange={(e) => setFoodDescription(e.target.value)}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </div>
       <div className="flex gap-4 justify-between items-center">

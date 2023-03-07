@@ -6,9 +6,10 @@ from flask_login import UserMixin
 class Food(db.Model, UserMixin):
     __tablename__ = 'foods'
 
+
     id = db.Column(db.Integer, primary_key=True)
     brand_name = db.Column(db.String(255), nullable=True)
-    food_description = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
     serving_size = db.Column(db.String(255), nullable=False)
     calories = db.Column(db.Integer, nullable=False)
     total_fat = db.Column(db.Integer, nullable=True)
@@ -36,7 +37,7 @@ class Food(db.Model, UserMixin):
         return {
             'id': self.id,
             'brandName': self.brand_name,
-            'foodDesc': self.food_desc,
+            'description': self.description,
             'servingSize': self.serving_size,
             'calories': self.calories,
             'totalFat': self.total_fat,
