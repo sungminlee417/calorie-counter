@@ -7,6 +7,7 @@ def number_followed_by_string(form, field):
     serving_size = field.data
     first_char_number = True
     non_number_exists = True
+    print(serving_size)
 
     # Check that the first character is a number
     if not serving_size[0].isnumeric():
@@ -26,7 +27,7 @@ def number_followed_by_string(form, field):
 
 class FoodForm(FlaskForm):
     brand_name = StringField('brand_name')
-    food_desc = StringField('food_desc', validators=[DataRequired("Food description required.")])
+    food_description = StringField('food_description', validators=[DataRequired("Food description required.")])
     serving_size = StringField('serving_size', validators=[DataRequired("Serving size required."), number_followed_by_string])
     calories = IntegerField('calories', validators=[DataRequired("Calories required.")])
     total_fat = IntegerField('total_fat')

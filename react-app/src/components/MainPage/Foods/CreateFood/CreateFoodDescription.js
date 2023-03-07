@@ -7,7 +7,6 @@ const CreateFoodDescription = ({
   setFoodDescription,
   servingSize,
   setServingSize,
-  errors,
   setErrors,
 }) => {
   const servingSizeValid = (servingSizeInput) => {
@@ -52,11 +51,11 @@ const CreateFoodDescription = ({
       errorObj["servingSize"] =
         "Provide serving size in proper format. Ex. 3 cups.";
     setErrors(errorObj);
-  }, [brandName, foodDescription, servingSize]);
+  }, [brandName, foodDescription, servingSize, setErrors]);
 
   return (
     <div className="flex flex-col gap-4 p-3">
-      <div className="flex gap-4 justify-between">
+      <div className="flex gap-4 justify-between items-center">
         <label className="basis-3/4" htmlFor="brand-name">
           <div>Brand Name</div>
           <div className="text-xs text-slate-500">Optional</div>
@@ -69,7 +68,7 @@ const CreateFoodDescription = ({
           onChange={(e) => setBrandName(e.target.value)}
         />
       </div>
-      <div className="flex gap-4 justify-between">
+      <div className="flex gap-4 justify-between items-center">
         <label className="basis-3/4 gap-0.5" htmlFor="food-description">
           <div>Description</div>
           <div
@@ -89,7 +88,7 @@ const CreateFoodDescription = ({
           onChange={(e) => setFoodDescription(e.target.value)}
         />
       </div>
-      <div className="flex gap-4 justify-between">
+      <div className="flex gap-4 justify-between items-center">
         <label className="basis-3/4" htmlFor="serving-size">
           <div>Serving Size</div>
           <div

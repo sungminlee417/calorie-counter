@@ -42,7 +42,7 @@ def get_post_foods():
         serving_size = form.data['serving_size']
         food = Food(
             brand_name=form.data['brand_name'],
-            food_desc=form.data['food_desc'],
+            food_description=form.data['food_description'],
             serving_size=format_serving_size(serving_size),
             calories=form.data['calories'],
             total_fat=form.data['total_fat'],
@@ -84,7 +84,7 @@ def edit_delete_food(food_id):
             form['csrf_token'].data = request.cookies['csrf_token']
             if form.validate_on_submit():
                 food.brand_name = form.data['brand_name'],
-                food.food_desc = form.data['food_desc'],
+                food.food_description = form.data['food_description'],
                 food.serving_size = format_serving_size(form.data['serving_size']),
                 food.calories = form.data['calories'],
                 food.total_fat = form.data['total_fat'],

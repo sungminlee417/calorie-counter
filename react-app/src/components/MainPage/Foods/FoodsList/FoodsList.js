@@ -1,4 +1,3 @@
-import { useSelector } from "react-redux";
 import CreateFoodModal from "../CreateFoodModal/CreateFoodModal";
 
 const FoodsList = () => {

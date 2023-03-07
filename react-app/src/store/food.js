@@ -22,7 +22,7 @@ export const loadFoodsThunk = () => async (dispatch) => {
 };
 
 export const createFoodThunk = (payload) => async (dispatch) => {
-  const response = await fetch("/api/foods", {
+  const response = await fetch("/api/foods/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

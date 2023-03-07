@@ -8,7 +8,7 @@ class Food(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     brand_name = db.Column(db.String(255), nullable=True)
-    food_desc = db.Column(db.String(255), nullable=False)
+    food_description = db.Column(db.String(255), nullable=False)
     serving_size = db.Column(db.String(255), nullable=False)
     calories = db.Column(db.Integer, nullable=False)
     total_fat = db.Column(db.Integer, nullable=True)
