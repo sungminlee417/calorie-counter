@@ -146,7 +146,7 @@ const CreateFood = ({ onClose }) => {
         {step === 1 ? (
           <>
             <button onClick={onClose}>
-              <i className="fa-solid fa-xmark w-4 h-4"></i>
+              <i className="fa-solid fa-xmark w-4 h-4" />
             </button>
             <div>Create Food</div>
 
@@ -177,7 +177,7 @@ const CreateFood = ({ onClose }) => {
                 className={`fa-solid fa-check ${
                   calories ? "text-blue-500" : "text - slate - 500"
                 }`}
-              ></i>
+              />
             </button>
           </>
         )}

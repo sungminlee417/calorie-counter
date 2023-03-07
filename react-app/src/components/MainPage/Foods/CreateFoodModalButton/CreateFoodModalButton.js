@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Modal } from "../../../../context/Modal";
 import CreateFood from "../CreateFood/CreateFood";
 
-const CreateFoodModal = () => {
+const CreateFoodModalButton = () => {
   const [showModal, setShowModal] = useState(false);
 
   const onClick = () => {
@@ -30,4 +30,4 @@ const CreateFoodModal = () => {
   );
 };
 
-export default CreateFoodModal;
+export default CreateFoodModalButton;
