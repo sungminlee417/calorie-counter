@@ -1,0 +1,21 @@
+{
+  "name": "calorie_counter",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A monorepo for the Calorie Counter project",
+  "author": "Sungmin Lee",
+  "license": "MIT",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "turbo": "^1.10.0"
+  }
+}
