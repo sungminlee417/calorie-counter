@@ -1,5 +1,5 @@
 {
-  "name": "calorie_counter",
+  "name": "calorie-counter",
   "private": true,
   "version": "1.0.0",
   "description": "A monorepo for the Calorie Counter project",
@@ -17,5 +17,9 @@
   ],
   "devDependencies": {
     "turbo": "^1.10.0"
+  },
+  "dependencies": {
+    "@calorie-counter/sequelize": "^1.0.0",
+    "pg": "^8.16.3"
   }
 }

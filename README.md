@@ -1,3 +1,3 @@
-# calorie_counter
-# calorie_counter
-# calorie_counter
+Tech Stack:
+
+NextJS, Sequelize, PostgreSQL
