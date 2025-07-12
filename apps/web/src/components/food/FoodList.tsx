@@ -25,18 +25,18 @@ import {
   FoodCreationAttributes,
 } from "@calorie-counter/sequelize";
 
-const EmptyFood: FoodAttributes | FoodCreationAttributes = {
+const EMPTY_FOOD: FoodAttributes | FoodCreationAttributes = {
   name: "",
   brand: "",
   servingSize: undefined,
   servingUnit: "",
-  calories: undefined,
-  protein: undefined,
-  carbs: undefined,
-  fat: undefined,
-  fiber: undefined,
-  sugar: undefined,
-  sodium: undefined,
+  calories: 0,
+  protein: 0,
+  carbs: 0,
+  fat: 0,
+  fiber: 0,
+  sugar: 0,
+  sodium: 0,
 };
 
 const FoodList = () => {
@@ -45,16 +45,26 @@ const FoodList = () => {
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [editedFood, setEditedFood] = useState<
     FoodAttributes | FoodCreationAttributes
-  >(EmptyFood);
+  >(EMPTY_FOOD);
 
-  const { createFood, foods, updateFood } = useFoods();
+  const { createFood, deleteFood, foods, updateFood } = useFoods();
 
   const handleSaveFood = useCallback(
     (food: FoodAttributes | FoodCreationAttributes) => {
       food.id ? updateFood(food) : createFood(food);
+      setEditedFood(EMPTY_FOOD);
       setIsFoodDialogOpen(false);
     },
     []
+  );
+
+  const handleDeleteFood = useCallback(
+    (foodId: string) => {
+      deleteFood(foodId);
+      setEditedFood(EMPTY_FOOD);
+      setIsFoodDialogOpen(false);
+    },
+    [deleteFood]
   );
 
   return (
@@ -126,6 +136,11 @@ const FoodList = () => {
         dialogActions={
           <DialogFormActions
             onCancel={() => setIsFoodDialogOpen(false)}
+            onDelete={
+              editedFood.id
+                ? () => handleDeleteFood(String(editedFood.id))
+                : undefined
+            }
             onSave={() => handleSaveFood(editedFood)}
           />
         }
