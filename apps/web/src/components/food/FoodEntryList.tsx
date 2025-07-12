@@ -27,7 +27,7 @@ import useFoodEntries from "@/hooks/useFoodEntries";
 
 const EMPTY_FOOD_ENTRY: FoodEntryCreationAttributes = {
   foodId: 0,
-  date: dayjs().startOf("day").toDate(),
+  date: dayjs().toDate(),
   quantity: 1,
 };
 
