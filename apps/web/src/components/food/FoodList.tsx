@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { Fragment, useCallback, useState } from "react";
 
 import {
   TextField,
@@ -13,29 +13,49 @@ import {
   Stack,
   IconButton,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, Edit } from "@mui/icons-material";
 
 import useFoods from "@/hooks/useFoods";
 
 import Dialog from "../ui/Dialog";
-import CreateFoodForm from "./CreateFoodForm";
+import FoodForm from "./FoodForm";
 import DialogFormActions from "../ui/DialogFormActions";
-import { FoodCreationAttributes } from "@calorie-counter/sequelize";
+import {
+  FoodAttributes,
+  FoodCreationAttributes,
+} from "@calorie-counter/sequelize";
+
+const EmptyFood: FoodAttributes | FoodCreationAttributes = {
+  name: "",
+  brand: "",
+  servingSize: undefined,
+  servingUnit: "",
+  calories: undefined,
+  protein: undefined,
+  carbs: undefined,
+  fat: undefined,
+  fiber: undefined,
+  sugar: undefined,
+  sodium: undefined,
+};
 
 const FoodList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [isCreateFoodDialogOpen, setIsCreateFoodDialogOpen] = useState(false);
+  const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [editedFood, setEditedFood] = useState<
-    FoodCreationAttributes | undefined
-  >();
+    FoodAttributes | FoodCreationAttributes
+  >(EmptyFood);
 
-  const { createFood, foods } = useFoods();
+  const { createFood, foods, updateFood } = useFoods();
 
-  const handleSaveFood = useCallback((food: FoodCreationAttributes) => {
-    createFood(food);
-    setIsCreateFoodDialogOpen(false);
-  }, []);
+  const handleSaveFood = useCallback(
+    (food: FoodAttributes | FoodCreationAttributes) => {
+      food.id ? updateFood(food) : createFood(food);
+      setIsFoodDialogOpen(false);
+    },
+    []
+  );
 
   return (
     <Box>
@@ -44,7 +64,7 @@ const FoodList = () => {
           Foods
         </Typography>
 
-        <IconButton onClick={() => setIsCreateFoodDialogOpen(true)}>
+        <IconButton onClick={() => setIsFoodDialogOpen(true)}>
           <Add />
         </IconButton>
       </Stack>
@@ -77,15 +97,26 @@ const FoodList = () => {
         ) : (
           <List disablePadding>
             {foods?.map((food, idx) => (
-              <React.Fragment key={food.id}>
-                <ListItem>
+              <Fragment key={food.id}>
+                <ListItem
+                  secondaryAction={
+                    <IconButton
+                      onClick={() => {
+                        setEditedFood(food);
+                        setIsFoodDialogOpen(true);
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  }
+                >
                   <ListItemText
                     primary={food.name}
                     secondary={`Calories: ${food.calories} | Carbs: ${food.carbs}g | Fats: ${food.fat}g | Protein: ${food.protein}g`}
                   />
                 </ListItem>
                 {idx < foods.length - 1 && <Divider component="li" />}
-              </React.Fragment>
+              </Fragment>
             ))}
           </List>
         )}
@@ -94,17 +125,18 @@ const FoodList = () => {
       <Dialog
         dialogActions={
           <DialogFormActions
-            onCancel={() => setIsCreateFoodDialogOpen(false)}
-            onSave={() => {
-              setIsCreateFoodDialogOpen(false);
-            }}
+            onCancel={() => setIsFoodDialogOpen(false)}
+            onSave={() => handleSaveFood(editedFood)}
           />
         }
-        onClose={() => setIsCreateFoodDialogOpen(false)}
-        open={isCreateFoodDialogOpen}
-        title="Create Food"
+        onClose={() => setIsFoodDialogOpen(false)}
+        open={isFoodDialogOpen}
+        title={editedFood.id ? "Edit Food" : "Create Food"}
       >
-        <CreateFoodForm />
+        <FoodForm
+          food={editedFood}
+          onChange={(updatedFood) => setEditedFood(updatedFood)}
+        />
       </Dialog>
     </Box>
   );

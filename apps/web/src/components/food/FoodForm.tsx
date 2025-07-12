@@ -1,39 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { TextField, Stack } from "@mui/material";
+import {
+  FoodAttributes,
+  FoodCreationAttributes,
+} from "@calorie-counter/sequelize";
 
-import { FoodCreationAttributes } from "@calorie-counter/sequelize";
+export interface FoodDialogProps {
+  food: FoodAttributes | FoodCreationAttributes;
+  onChange: (updatedFood: FoodAttributes | FoodCreationAttributes) => void;
+}
 
-export interface CreateFoodDialogProps {}
-
-const initialState: FoodCreationAttributes = {
-  name: "",
-  brand: "",
-  servingSize: undefined,
-  servingUnit: "",
-  calories: undefined,
-  protein: undefined,
-  carbs: undefined,
-  fat: undefined,
-  fiber: undefined,
-  sugar: undefined,
-  sodium: undefined,
-};
-
-const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
-  const [form, setForm] = useState<FoodCreationAttributes>(initialState);
-
-  // Reset form when dialog opens or foodType changes
-  useEffect(() => {
-    setForm(initialState);
-  }, [open]);
-
-  // Handle input change for number or string fields
+const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
+    onChange(() => ({
+      ...food,
       [name]:
         e.target.type === "number"
           ? value === ""
@@ -48,7 +31,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
       <TextField
         label="Name"
         name="name"
-        value={form.name}
+        value={food.name}
         onChange={handleChange}
         fullWidth
         required
@@ -56,7 +39,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
       <TextField
         label="Brand"
         name="brand"
-        value={form.brand}
+        value={food.brand}
         onChange={handleChange}
         fullWidth
       />
@@ -64,14 +47,14 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
         label="Serving Size"
         name="servingSize"
         type="number"
-        value={form.servingSize ?? ""}
+        value={food.servingSize ?? ""}
         onChange={handleChange}
         fullWidth
       />
       <TextField
         label="Serving Unit"
         name="servingUnit"
-        value={form.servingUnit}
+        value={food.servingUnit}
         onChange={handleChange}
         fullWidth
       />
@@ -80,7 +63,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
         label="Calories"
         name="calories"
         type="number"
-        value={form.calories ?? ""}
+        value={food.calories ?? ""}
         onChange={handleChange}
         fullWidth
       />
@@ -88,7 +71,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
         label="Sugar (g)"
         name="sugar"
         type="number"
-        value={form.sugar ?? ""}
+        value={food.sugar ?? ""}
         onChange={handleChange}
         fullWidth
       />
@@ -96,7 +79,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
         label="Fiber (g)"
         name="fiber"
         type="number"
-        value={form.fiber ?? ""}
+        value={food.fiber ?? ""}
         onChange={handleChange}
         fullWidth
       />
@@ -105,7 +88,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
         label="Sodium (mg)"
         name="sodium"
         type="number"
-        value={form.sodium ?? ""}
+        value={food.sodium ?? ""}
         onChange={handleChange}
         fullWidth
       />
@@ -113,7 +96,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
         label="Protein (g)"
         name="protein"
         type="number"
-        value={form.protein ?? ""}
+        value={food.protein ?? ""}
         onChange={handleChange}
         fullWidth
       />
@@ -121,7 +104,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
         label="Carbs (g)"
         name="carbs"
         type="number"
-        value={form.carbs ?? ""}
+        value={food.carbs ?? ""}
         onChange={handleChange}
         fullWidth
       />
@@ -129,7 +112,7 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
         label="Fat (g)"
         name="fat"
         type="number"
-        value={form.fat ?? ""}
+        value={food.fat ?? ""}
         onChange={handleChange}
         fullWidth
       />
@@ -137,4 +120,4 @@ const CreateFoodForm: React.FC<CreateFoodDialogProps> = ({}) => {
   );
 };
 
-export default CreateFoodForm;
+export default FoodForm;

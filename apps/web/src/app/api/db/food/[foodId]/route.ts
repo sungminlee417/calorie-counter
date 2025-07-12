@@ -2,10 +2,15 @@ import { Food } from "@calorie-counter/sequelize";
 import { NextResponse } from "next/server";
 
 export interface RouteParams {
-  foodId: string;
+  params: {
+    foodId: string;
+  };
 }
 
-export const PATCH = async (request: Request, { foodId }: RouteParams) => {
+export const PATCH = async (
+  request: Request,
+  { params: { foodId } }: RouteParams
+) => {
   try {
     const data = await request.json();
     const food = await Food.update(data, {
@@ -32,7 +37,10 @@ export const PATCH = async (request: Request, { foodId }: RouteParams) => {
   }
 };
 
-export const DELETE = async (request: Request, { foodId }: RouteParams) => {
+export const DELETE = async (
+  request: Request,
+  { params: { foodId } }: RouteParams
+) => {
   try {
     if (!foodId) {
       return NextResponse.json(
