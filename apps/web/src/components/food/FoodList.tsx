@@ -40,6 +40,8 @@ const EMPTY_FOOD: FoodAttributes | FoodCreationAttributes = {
 };
 
 const FoodList = () => {
+  const { createFood, deleteFood, foods, updateFood } = useFoods();
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
@@ -47,11 +49,11 @@ const FoodList = () => {
     FoodAttributes | FoodCreationAttributes
   >(EMPTY_FOOD);
 
-  const { createFood, deleteFood, foods, updateFood } = useFoods();
-
   const handleSaveFood = useCallback(
     (food: FoodAttributes | FoodCreationAttributes) => {
-      food.id ? updateFood(food) : createFood(food);
+      food.id
+        ? updateFood(food as FoodAttributes)
+        : createFood(food as FoodCreationAttributes);
       setEditedFood(EMPTY_FOOD);
       setIsFoodDialogOpen(false);
     },

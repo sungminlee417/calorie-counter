@@ -6,7 +6,10 @@ import {
   fetchGetFoods,
   fetchUpdateFood,
 } from "@/app/api/client/fetch-food";
-import { FoodCreationAttributes } from "@calorie-counter/sequelize";
+import {
+  FoodAttributes,
+  FoodCreationAttributes,
+} from "@calorie-counter/sequelize";
 
 const useFoods = () => {
   const queryClient = useQueryClient();
@@ -22,8 +25,7 @@ const useFoods = () => {
   });
 
   const updateFood = useMutation({
-    mutationFn: (updatedFood: FoodCreationAttributes) =>
-      fetchUpdateFood(updatedFood),
+    mutationFn: (updatedFood: FoodAttributes) => fetchUpdateFood(updatedFood),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["foods"] }),
   });
 

@@ -1,58 +1,58 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Food', {
+    await queryInterface.createTable("Foods", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       brand: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       servingSize: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       servingUnit: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       calories: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       protein: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       carbs: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       fat: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       fiber: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       sugar: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       sodium: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Food');
-  }
+    await queryInterface.dropTable("Foods");
+  },
 };

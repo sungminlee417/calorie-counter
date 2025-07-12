@@ -107,7 +107,7 @@ Food.init(
   },
   {
     sequelize,
-    tableName: "foods",
+    tableName: "Foods",
     timestamps: true,
   }
 );
