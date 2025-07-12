@@ -1,7 +1,7 @@
 import { Food } from "@calorie-counter/sequelize";
 import { NextResponse } from "next/server";
 
-export const GET = async () => {
+export async function GET() {
   try {
     const foods = await Food.findAll();
 
@@ -18,9 +18,9 @@ export const GET = async () => {
       { status: 500 }
     );
   }
-};
+}
 
-export const POST = async (request: Request) => {
+export async function POST(request: Request) {
   try {
     const data = await request.json();
     const food = await Food.create(data);
@@ -35,4 +35,4 @@ export const POST = async (request: Request) => {
       { status: 500 }
     );
   }
-};
+}

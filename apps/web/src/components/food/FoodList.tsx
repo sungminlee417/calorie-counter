@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
+
 import {
   TextField,
   Typography,
@@ -9,19 +10,44 @@ import {
   ListItemText,
   Divider,
   Box,
+  Stack,
+  IconButton,
 } from "@mui/material";
+import { Add } from "@mui/icons-material";
+
 import useFoods from "@/hooks/useFoods";
+
+import Dialog from "../ui/Dialog";
+import CreateFoodForm from "./CreateFoodForm";
+import DialogFormActions from "../ui/DialogFormActions";
+import { FoodCreationAttributes } from "@calorie-counter/sequelize";
 
 const FoodList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { foods } = useFoods();
+  const [isCreateFoodDialogOpen, setIsCreateFoodDialogOpen] = useState(false);
+  const [editedFood, setEditedFood] = useState<
+    FoodCreationAttributes | undefined
+  >();
+
+  const { createFood, foods } = useFoods();
+
+  const handleSaveFood = useCallback((food: FoodCreationAttributes) => {
+    createFood(food);
+    setIsCreateFoodDialogOpen(false);
+  }, []);
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
-        Foods
-      </Typography>
+      <Stack alignItems="center" direction="row" height="fit-content" mb={2}>
+        <Typography variant="h6" gutterBottom flex={1}>
+          Foods
+        </Typography>
+
+        <IconButton onClick={() => setIsCreateFoodDialogOpen(true)}>
+          <Add />
+        </IconButton>
+      </Stack>
 
       <TextField
         fullWidth
@@ -40,7 +66,7 @@ const FoodList = () => {
           borderRadius: 1,
         }}
       >
-        {foods?.length === 0 ? (
+        {!foods?.length ? (
           <Typography
             variant="body2"
             color="text.secondary"
@@ -64,6 +90,22 @@ const FoodList = () => {
           </List>
         )}
       </Box>
+
+      <Dialog
+        dialogActions={
+          <DialogFormActions
+            onCancel={() => setIsCreateFoodDialogOpen(false)}
+            onSave={() => {
+              setIsCreateFoodDialogOpen(false);
+            }}
+          />
+        }
+        onClose={() => setIsCreateFoodDialogOpen(false)}
+        open={isCreateFoodDialogOpen}
+        title="Create Food"
+      >
+        <CreateFoodForm />
+      </Dialog>
     </Box>
   );
 };
