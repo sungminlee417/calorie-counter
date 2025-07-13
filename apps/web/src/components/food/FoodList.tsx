@@ -16,27 +16,23 @@ import {
 import { Add, Edit } from "@mui/icons-material";
 
 import useFoods from "@/hooks/useFoods";
+import { Food } from "@/types/supabase";
 
 import Dialog from "../ui/Dialog";
 import FoodForm from "./FoodForm";
 import DialogFormActions from "../ui/DialogFormActions";
-import {
-  FoodAttributes,
-  FoodCreationAttributes,
-} from "@calorie-counter/sequelize";
 
-const EMPTY_FOOD: FoodAttributes | FoodCreationAttributes = {
+const EMPTY_FOOD: Food = {
   name: "",
-  brand: "",
-  servingSize: undefined,
-  servingUnit: "",
+  serving_size: 0,
+  serving_unit: "",
   calories: 0,
   protein: 0,
   carbs: 0,
   fat: 0,
-  fiber: 0,
-  sugar: 0,
-  sodium: 0,
+  id: 0,
+  created_at: null,
+  updated_at: null,
 };
 
 const FoodList = () => {
@@ -45,20 +41,13 @@ const FoodList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
-  const [editedFood, setEditedFood] = useState<
-    FoodAttributes | FoodCreationAttributes
-  >(EMPTY_FOOD);
+  const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
 
-  const handleSaveFood = useCallback(
-    (food: FoodAttributes | FoodCreationAttributes) => {
-      food.id
-        ? updateFood(food as FoodAttributes)
-        : createFood(food as FoodCreationAttributes);
-      setEditedFood(EMPTY_FOOD);
-      setIsFoodDialogOpen(false);
-    },
-    []
-  );
+  const handleSaveFood = useCallback((food: Food) => {
+    food.id ? updateFood(food) : createFood(food);
+    setEditedFood(EMPTY_FOOD);
+    setIsFoodDialogOpen(false);
+  }, []);
 
   const handleDeleteFood = useCallback(
     (foodId: string) => {

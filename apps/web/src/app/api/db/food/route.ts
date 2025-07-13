@@ -1,12 +1,15 @@
-import { Food } from "@calorie-counter/sequelize";
 import { NextResponse } from "next/server";
+
+import { createClient } from "@/utils/supabase/server";
+
 
 export async function GET() {
   try {
-    const foods = await Food.findAll();
+    const supabase = await createClient();
+    const { data: foods, error} = await supabase.from("foods").select("*");
 
     return NextResponse.json(
-      foods.map((food) => food.toJSON()),
+      foods,
       { status: 200 }
     );
   } catch (e) {
@@ -22,10 +25,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
-    const food = await Food.create(data);
+    const supabase = await createClient();
 
-    return NextResponse.json(food.toJSON(), { status: 201 });
+    const data = await request.json();
+
+    const {data: food, error} = await supabase.from("foods").insert(data).select().single();
+
+    return NextResponse.json(food, { status: 201 });
   } catch (e) {
     return NextResponse.json(
       {

@@ -1,4 +1,4 @@
-import { redirectIfAuthenticated } from "@/app/lib/auth/util";
+import { redirectIfAuthenticated } from "@/utils/auth";
 import AuthForm from "@/components/auth/AuthForm";
 
 const LoginPage = async () => {

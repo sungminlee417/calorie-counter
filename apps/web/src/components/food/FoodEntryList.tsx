@@ -4,11 +4,6 @@ import React, { Fragment, useCallback, useState } from "react";
 import dayjs from "dayjs";
 
 import {
-  FoodEntryAttributes,
-  FoodEntryCreationAttributes,
-} from "@calorie-counter/sequelize";
-
-import {
   List,
   ListItem,
   ListItemText,
@@ -22,15 +17,20 @@ import {
 import { Add, Edit } from "@mui/icons-material";
 
 import useFoodEntries from "@/hooks/useFoodEntries";
+import { FoodEntry } from "@/types/supabase";
 
 import Dialog from "../ui/Dialog";
 import FoodEntryForm from "./FoodEntryForm";
 import DialogFormActions from "../ui/DialogFormActions";
 
-const EMPTY_FOOD_ENTRY: FoodEntryCreationAttributes = {
-  foodId: 0,
-  date: dayjs().toDate(),
+const EMPTY_FOOD_ENTRY: FoodEntry = {
+  food_id: 0,
+  date: dayjs().toString(),
   quantity: 1,
+  created_at: null,
+  id: 0,
+  updated_at: null,
+  user_id: 0,
 };
 
 const FoodEntryList = () => {
@@ -40,15 +40,12 @@ const FoodEntryList = () => {
     useFoodEntries(selectedDate);
 
   const [isFoodEntryDialogOpen, setIsFoodEntryDialogOpen] = useState(false);
-  const [editedFoodEntry, setEditedFoodEntry] = useState<
-    FoodEntryAttributes | FoodEntryCreationAttributes
-  >(EMPTY_FOOD_ENTRY);
+  const [editedFoodEntry, setEditedFoodEntry] =
+    useState<FoodEntry>(EMPTY_FOOD_ENTRY);
 
   const handleSaveFoodEntry = useCallback(
-    (foodEntry: FoodEntryAttributes | FoodEntryCreationAttributes) => {
-      foodEntry.id
-        ? updateFoodEntry(foodEntry as FoodEntryAttributes)
-        : createFoodEntry(foodEntry as FoodEntryCreationAttributes);
+    (foodEntry: FoodEntry) => {
+      foodEntry.id ? updateFoodEntry(foodEntry) : createFoodEntry(foodEntry);
       setEditedFoodEntry(EMPTY_FOOD_ENTRY);
       setIsFoodEntryDialogOpen(false);
     },
@@ -64,7 +61,7 @@ const FoodEntryList = () => {
     [deleteFoodEntry]
   );
 
-  const handleEditClick = (entry: FoodEntryAttributes) => {
+  const handleEditClick = (entry: FoodEntry) => {
     setEditedFoodEntry(entry);
     setIsFoodEntryDialogOpen(true);
   };

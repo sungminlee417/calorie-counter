@@ -1,12 +1,8 @@
-import {
-  FoodEntryAttributes,
-  FoodEntryCreationAttributes,
-  FoodEntryWithFood,
-} from "@calorie-counter/sequelize";
+import { FoodEntry } from "@/types/supabase";
 
 export const fetchGetFoodEntries = async (
   date?: string
-): Promise<FoodEntryWithFood[]> => {
+): Promise<FoodEntry[]> => {
   const url = new URL("/api/db/food-entry", window.location.origin);
 
   if (date) {
@@ -18,12 +14,12 @@ export const fetchGetFoodEntries = async (
   if (!response.ok) {
     throw new Error("Failed to fetch foods");
   }
-  return (await response.json()) as FoodEntryWithFood[];
+  return (await response.json()) as FoodEntry[];
 };
 
 export const fetchCreateFoodEntry = async (
-  foodEntry: FoodEntryCreationAttributes
-): Promise<FoodEntryAttributes> => {
+  foodEntry: FoodEntry
+): Promise<FoodEntry> => {
   const response = await fetch("/api/db/food-entry", {
     method: "POST",
     headers: {
@@ -39,8 +35,8 @@ export const fetchCreateFoodEntry = async (
 };
 
 export const fetchUpdateFoodEntry = async (
-  foodEntry: FoodEntryAttributes
-): Promise<FoodEntryAttributes> => {
+  foodEntry: FoodEntry
+): Promise<FoodEntry> => {
   const response = await fetch(`/api/db/food-entry/${foodEntry.id}`, {
     method: "PATCH",
     headers: {

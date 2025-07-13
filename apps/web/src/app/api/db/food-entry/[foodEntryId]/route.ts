@@ -1,5 +1,6 @@
-import { FoodEntry } from "@calorie-counter/sequelize";
 import { NextResponse } from "next/server";
+
+import { createClient } from "@/utils/supabase/server";
 
 export interface RouteParams {
   params: {
@@ -12,20 +13,17 @@ export const PATCH = async (
   { params: { foodEntryId } }: RouteParams
 ) => {
   try {
+            const supabase = await createClient();
+
     const data = await request.json();
-    const foodEntry = await FoodEntry.update(data, {
-      where: { id: foodEntryId },
-      returning: true,
-    });
+    const {data: foodEntry, error} = await supabase
+      .from("food_entries")
+      .update(data)
+      .eq("id", Number(foodEntryId))
+      .select()
+      .single();
 
-    if (foodEntry[0] === 0) {
-      return NextResponse.json(
-        { error: "Food entry not found or no changes made" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(foodEntry[1][0].toJSON(), { status: 200 });
+    return NextResponse.json(foodEntry, { status: 200 });
   } catch (e) {
     return NextResponse.json(
       {
@@ -42,6 +40,8 @@ export const DELETE = async (
   { params: { foodEntryId } }: RouteParams
 ) => {
   try {
+            const supabase = await createClient();
+
     if (!foodEntryId) {
       return NextResponse.json(
         { error: "Food entry ID is required" },
@@ -49,16 +49,12 @@ export const DELETE = async (
       );
     }
 
-    const deletedCount = await FoodEntry.destroy({
-      where: { id: foodEntryId },
-    });
-
-    if (deletedCount === 0) {
-      return NextResponse.json(
-        { error: "Food entry not found" },
-        { status: 404 }
-      );
-    }
+    const {data: foodEntry, error} = await supabase
+      .from("food_entries")
+      .delete()
+      .eq("id", Number(foodEntryId))
+      .select()
+      .single();
 
     return NextResponse.json(
       { message: "Food entry deleted successfully" },

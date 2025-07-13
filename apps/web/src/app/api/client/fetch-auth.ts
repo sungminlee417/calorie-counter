@@ -1,16 +1,36 @@
-import { signIn, signOut } from "next-auth/react";
+'use server'
+
+import { createClient } from "@/utils/supabase/server";
 
 export const fetchLogin = async (email: string, password: string) => {
-  return await signIn("credentials", {
-    redirect: true,
-    callbackUrl: "/dashboard",
-    email,
-    password,
-  });
+  const supabase = await createClient();
+  return await supabase.auth.signInWithPassword({email, password});
 };
 
-export const fetchLogout = () => {
-  signOut({
-    callbackUrl: "/login",
+export const fetchLogout = async () => {
+const supabase = await createClient();
+  return await supabase.auth.signOut();
+};
+
+export const fetchSignup = async (email: string, password: string, name: string) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        name,
+      },
+    },
   });
+
+  if (error) {
+    if (error.message.includes("User already registered")) {
+      throw new Error("User already exists.");
+    }
+    throw new Error(error.message);
+  }
+
+  return { data };
 };

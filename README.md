@@ -1,3 +1,3 @@
 Tech Stack:
 
-NextJS, Sequelize, PostgreSQL
+NextJS, Supabase

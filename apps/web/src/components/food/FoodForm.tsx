@@ -1,13 +1,11 @@
 import React from "react";
 import { TextField, Stack } from "@mui/material";
-import {
-  FoodAttributes,
-  FoodCreationAttributes,
-} from "@calorie-counter/sequelize";
+
+import { Food } from "@/types/supabase";
 
 export interface FoodDialogProps {
-  food: FoodAttributes | FoodCreationAttributes;
-  onChange: (updatedFood: FoodAttributes | FoodCreationAttributes) => void;
+  food: Food;
+  onChange: (updatedFood: Food) => void;
 }
 
 const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
@@ -15,7 +13,7 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    onChange(() => ({
+    onChange({
       ...food,
       [name]:
         e.target.type === "number"
@@ -23,7 +21,7 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
             ? undefined
             : Number(value)
           : value,
-    }));
+    });
   };
 
   return (
@@ -37,58 +35,25 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
         required
       />
       <TextField
-        label="Brand"
-        name="brand"
-        value={food.brand}
-        onChange={handleChange}
-        fullWidth
-      />
-      <TextField
         label="Serving Size"
-        name="servingSize"
+        name="serving_size"
         type="number"
-        value={food.servingSize ?? ""}
+        value={food.serving_size ?? ""}
         onChange={handleChange}
         fullWidth
       />
       <TextField
         label="Serving Unit"
-        name="servingUnit"
-        value={food.servingUnit}
+        name="serving_unit"
+        value={food.serving_unit}
         onChange={handleChange}
         fullWidth
       />
-
       <TextField
         label="Calories"
         name="calories"
         type="number"
         value={food.calories ?? ""}
-        onChange={handleChange}
-        fullWidth
-      />
-      <TextField
-        label="Sugar (g)"
-        name="sugar"
-        type="number"
-        value={food.sugar ?? ""}
-        onChange={handleChange}
-        fullWidth
-      />
-      <TextField
-        label="Fiber (g)"
-        name="fiber"
-        type="number"
-        value={food.fiber ?? ""}
-        onChange={handleChange}
-        fullWidth
-      />
-
-      <TextField
-        label="Sodium (mg)"
-        name="sodium"
-        type="number"
-        value={food.sodium ?? ""}
         onChange={handleChange}
         fullWidth
       />

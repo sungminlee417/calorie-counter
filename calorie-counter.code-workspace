@@ -4,7 +4,6 @@
       "path": ".",
       "name": "monorepo"
     },
-    { "path": "apps/web", "name": "@calorie-counter/web" },
-    { "path": "packages/sequelize", "name": "@calorie-counter/sequelize" }
+    { "path": "apps/web", "name": "@calorie-counter/web" }
   ]
 }

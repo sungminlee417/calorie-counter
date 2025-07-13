@@ -5,18 +5,12 @@ import { MenuItem, TextField, Stack } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 
-import {
-  FoodEntryAttributes,
-  FoodEntryCreationAttributes,
-} from "@calorie-counter/sequelize";
-
 import useFoods from "@/hooks/useFoods";
+import { FoodEntry } from "@/types/supabase";
 
 export interface FoodEntryFormProps {
-  foodEntry: FoodEntryAttributes | FoodEntryCreationAttributes;
-  onChange: (
-    updatedFoodEntry: FoodEntryAttributes | FoodEntryCreationAttributes
-  ) => void;
+  foodEntry: FoodEntry;
+  onChange: (updatedFoodEntry: FoodEntry) => void;
 }
 
 const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
@@ -38,7 +32,7 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
     if (newDate) {
       onChange({
         ...foodEntry,
-        date: newDate.toDate(),
+        date: newDate.toString(),
       });
     }
   };
@@ -49,7 +43,7 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
         select
         label="Food"
         name="foodId"
-        value={foodEntry.foodId}
+        value={foodEntry.food_id}
         onChange={handleChange}
         fullWidth
         margin="normal"

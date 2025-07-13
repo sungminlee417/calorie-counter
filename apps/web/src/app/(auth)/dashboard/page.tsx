@@ -6,7 +6,7 @@ import Card from "@/components/ui/Card";
 import FoodList from "@/components/food/FoodList";
 import FoodEntryList from "@/components/food/FoodEntryList";
 import MacrosChart from "@/components/food/MacrosChart";
-import { requireAuth } from "@/app/lib/auth/util";
+import { requireAuth } from "@/utils/auth";
 
 const Page = async () => {
   await requireAuth();
