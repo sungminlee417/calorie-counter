@@ -1,9 +1,19 @@
-import { FoodEntry } from "@calorie-counter/sequelize";
+import { Food, FoodEntry, FoodEntryWithFood } from "@calorie-counter/sequelize";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(): Promise<
+  | NextResponse<FoodEntryWithFood[]>
+  | NextResponse<{ error: string; details: string }>
+> {
   try {
-    const foodEntries = await FoodEntry.findAll();
+    const foodEntries = await FoodEntry.findAll({
+      include: [
+        {
+          model: Food,
+          as: "food",
+        },
+      ],
+    });
 
     return NextResponse.json(
       foodEntries.map((foodEntry) => foodEntry.toJSON()),

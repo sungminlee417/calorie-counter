@@ -1,9 +1,10 @@
 import {
   FoodEntryAttributes,
   FoodEntryCreationAttributes,
+  FoodEntryWithFood,
 } from "@calorie-counter/sequelize";
 
-export const fetchGetFoodEntries = async (): Promise<FoodEntryAttributes[]> => {
+export const fetchGetFoodEntries = async (): Promise<FoodEntryWithFood[]> => {
   const response = await fetch("/api/db/food-entry");
 
   if (!response.ok) {

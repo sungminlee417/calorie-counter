@@ -103,8 +103,36 @@ const FoodEntryList = () => {
                   }
                 >
                   <ListItemText
-                    primary={`Food ID: ${entry.foodId} x ${entry.quantity}`}
-                    secondary={dayjs(entry.date).format("MMM D, YYYY")}
+                    primary={
+                      <Box>
+                        <Typography variant="subtitle1" component="span">
+                          {entry.food?.name || "Unknown Food"}
+                        </Typography>
+                      </Box>
+                    }
+                    secondary={
+                      <>
+                        {entry.food?.brand && (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            component="span"
+                          >
+                            {`${entry.food.brand}, ${
+                              entry.quantity * (entry.food?.servingSize ?? 1)
+                            } ${entry.food?.servingUnit ?? ""}`}
+                          </Typography>
+                        )}
+                        <br />
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          component="span"
+                        >
+                          {dayjs(entry.date).format("MMM D, YYYY")}
+                        </Typography>
+                      </>
+                    }
                   />
                 </ListItem>
                 {idx < foodEntries.length - 1 && <Divider component="li" />}
