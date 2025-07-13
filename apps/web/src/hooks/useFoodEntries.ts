@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import dayjs from "dayjs";
 
 import {
   fetchCreateFoodEntry,
@@ -11,12 +12,15 @@ import {
   FoodEntryCreationAttributes,
 } from "@calorie-counter/sequelize";
 
-const useFoodEntries = () => {
+const useFoodEntries = (date: Date) => {
   const queryClient = useQueryClient();
 
+  const formattedDate = dayjs(date).format("YYYY-MM-DD");
+
   const { data, error, isLoading } = useQuery({
-    queryKey: ["food-entries"],
-    queryFn: fetchGetFoodEntries,
+    queryKey: ["food-entries", formattedDate],
+    queryFn: () => fetchGetFoodEntries(formattedDate),
+    enabled: !!date,
   });
 
   const createFoodEntry = useMutation({

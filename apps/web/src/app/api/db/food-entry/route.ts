@@ -1,12 +1,37 @@
-import { Food, FoodEntry, FoodEntryWithFood } from "@calorie-counter/sequelize";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { Op } from "sequelize";
+import utc from "dayjs/plugin/utc";
+import dayjs from "dayjs";
 
-export async function GET(): Promise<
+import { Food, FoodEntry, FoodEntryWithFood } from "@calorie-counter/sequelize";
+
+dayjs.extend(utc);
+
+export async function GET(
+  request: NextRequest
+): Promise<
   | NextResponse<FoodEntryWithFood[]>
   | NextResponse<{ error: string; details: string }>
 > {
   try {
+    const url = new URL(request.url);
+    const dateParam = url.searchParams.get("date");
+
+    const whereClause = dateParam
+      ? {
+          date: {
+            [Op.gte]: dayjs(dateParam).startOf("day").utc().toDate(),
+            [Op.lt]: dayjs(dateParam)
+              .add(1, "day")
+              .startOf("day")
+              .utc()
+              .toDate(),
+          },
+        }
+      : {};
+
     const foodEntries = await FoodEntry.findAll({
+      where: whereClause,
       include: [
         {
           model: Food,

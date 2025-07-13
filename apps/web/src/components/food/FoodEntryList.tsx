@@ -17,13 +17,15 @@ import {
   Box,
   Stack,
   Divider,
+  TextField,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
+
+import useFoodEntries from "@/hooks/useFoodEntries";
 
 import Dialog from "../ui/Dialog";
 import FoodEntryForm from "./FoodEntryForm";
 import DialogFormActions from "../ui/DialogFormActions";
-import useFoodEntries from "@/hooks/useFoodEntries";
 
 const EMPTY_FOOD_ENTRY: FoodEntryCreationAttributes = {
   foodId: 0,
@@ -32,8 +34,10 @@ const EMPTY_FOOD_ENTRY: FoodEntryCreationAttributes = {
 };
 
 const FoodEntryList = () => {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
   const { createFoodEntry, deleteFoodEntry, foodEntries, updateFoodEntry } =
-    useFoodEntries();
+    useFoodEntries(selectedDate);
 
   const [isFoodEntryDialogOpen, setIsFoodEntryDialogOpen] = useState(false);
   const [editedFoodEntry, setEditedFoodEntry] = useState<
@@ -67,10 +71,21 @@ const FoodEntryList = () => {
 
   return (
     <Box>
-      <Stack alignItems="center" direction="row" height="fit-content" mb={2}>
-        <Typography variant="h6" gutterBottom flex={1}>
+      <Stack direction="row" alignItems="center" mb={2} spacing={2}>
+        <Typography variant="h6" flex={1}>
           Food Entries
         </Typography>
+
+        <TextField
+          label="Date"
+          type="date"
+          size="small"
+          value={dayjs(selectedDate).format("YYYY-MM-DD")}
+          onChange={(e) => {
+            const date = dayjs(e.target.value, "YYYY-MM-DD").toDate();
+            setSelectedDate(date);
+          }}
+        />
 
         <IconButton onClick={() => setIsFoodEntryDialogOpen(true)}>
           <Add />
