@@ -11,7 +11,7 @@ import {
   Alert,
 } from "@mui/material";
 import Link from "next/link";
-import { fetchLogin, fetchSignup } from "@/app/api/client/fetch-auth";
+import { fetchLogin, fetchSignup } from "@/lib/supabase/fetch-auth";
 
 interface AuthFormProps {
   mode: "login" | "signup";

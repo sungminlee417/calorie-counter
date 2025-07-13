@@ -44,7 +44,16 @@ const FoodList = () => {
   const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
 
   const handleSaveFood = useCallback((food: Food) => {
-    food.id ? updateFood(food) : createFood(food);
+    const foodToSave = {
+      name: food.name,
+      serving_size: food.serving_size,
+      serving_unit: food.serving_unit,
+      calories: food.calories,
+      protein: food.protein,
+      carbs: food.carbs,
+      fat: food.fat,
+    };
+    food.id ? updateFood(food) : createFood(foodToSave);
     setEditedFood(EMPTY_FOOD);
     setIsFoodDialogOpen(false);
   }, []);

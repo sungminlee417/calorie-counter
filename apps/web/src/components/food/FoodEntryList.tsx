@@ -30,7 +30,7 @@ const EMPTY_FOOD_ENTRY: FoodEntry = {
   created_at: null,
   id: 0,
   updated_at: null,
-  user_id: 0,
+  user_id: "",
 };
 
 const FoodEntryList = () => {
@@ -45,7 +45,14 @@ const FoodEntryList = () => {
 
   const handleSaveFoodEntry = useCallback(
     (foodEntry: FoodEntry) => {
-      foodEntry.id ? updateFoodEntry(foodEntry) : createFoodEntry(foodEntry);
+      const entryToSave = {
+        date: foodEntry.date,
+        quantity: foodEntry.quantity,
+        user_id: foodEntry.user_id,
+        food_id: foodEntry.food_id,
+      };
+
+      foodEntry.id ? updateFoodEntry(foodEntry) : createFoodEntry(entryToSave);
       setEditedFoodEntry(EMPTY_FOOD_ENTRY);
       setIsFoodEntryDialogOpen(false);
     },
@@ -118,22 +125,20 @@ const FoodEntryList = () => {
                     primary={
                       <Box>
                         <Typography variant="subtitle1" component="span">
-                          {entry.food?.name || "Unknown Food"}
+                          {entry.foods?.name || "Unknown Food"}
                         </Typography>
                       </Box>
                     }
                     secondary={
-                      entry.food?.brand && (
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          component="span"
-                        >
-                          {`${entry.food.brand}, ${
-                            entry.quantity * (entry.food?.servingSize ?? 1)
-                          } ${entry.food?.servingUnit ?? ""}`}
-                        </Typography>
-                      )
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        component="span"
+                      >
+                        {`${entry.foods.brand ? `${entry.foods.brand}, ` : ""}${
+                          entry.quantity * (entry.foods?.serving_size ?? 1)
+                        } ${entry.foods?.serving_unit ?? ""}`}
+                      </Typography>
                     }
                   />
                 </ListItem>

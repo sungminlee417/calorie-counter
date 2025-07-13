@@ -15,11 +15,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <Navigation />
-        <Providers>{children}</Providers>
-      </body>
-    </html>
+    <>
+      <Navigation />
+      <Providers>{children}</Providers>
+    </>
   );
 }

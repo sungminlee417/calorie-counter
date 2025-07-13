@@ -9,7 +9,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import { fetchLogout } from "@/app/api/client/fetch-auth";
+import { fetchLogout } from "@/lib/supabase/fetch-auth";
 
 const Navigation = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

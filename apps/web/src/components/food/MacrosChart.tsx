@@ -18,9 +18,9 @@ const MacrosChart = () => {
   const macros = useMemo(() => {
     return foodEntries?.reduce(
       (acc, entry) => {
-        acc.carbs += entry.food.carbs || 0;
-        acc.fats += entry.food.fat || 0;
-        acc.protein += entry.food.protein || 0;
+        acc.carbs += entry.foods.carbs || 0;
+        acc.fats += entry.foods.fat || 0;
+        acc.protein += entry.foods.protein || 0;
         return acc;
       },
       { carbs: 0, fats: 0, protein: 0 }

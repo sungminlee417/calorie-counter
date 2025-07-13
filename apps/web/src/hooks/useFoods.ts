@@ -5,11 +5,8 @@ import {
   fetchDeleteFood,
   fetchGetFoods,
   fetchUpdateFood,
-} from "@/app/api/client/fetch-food";
-import {
-  FoodAttributes,
-  FoodCreationAttributes,
-} from "@calorie-counter/sequelize";
+} from "@/lib/supabase/fetch-food";
+import { Food } from "@/types/supabase";
 
 const useFoods = () => {
   const queryClient = useQueryClient();
@@ -20,17 +17,17 @@ const useFoods = () => {
   });
 
   const createFood = useMutation({
-    mutationFn: (newFood: FoodCreationAttributes) => fetchCreateFood(newFood),
+    mutationFn: (newFood: Omit<Food, 'id' | 'created_at' | 'updated_at'>) => fetchCreateFood(newFood),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["foods"] }),
   });
 
   const updateFood = useMutation({
-    mutationFn: (updatedFood: FoodAttributes) => fetchUpdateFood(updatedFood),
+    mutationFn: (updatedFood: Food) => fetchUpdateFood(updatedFood),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["foods"] }),
   });
 
   const deleteFood = useMutation({
-    mutationFn: (foodId: string) => fetchDeleteFood(foodId),
+    mutationFn: (foodId: string) => fetchDeleteFood(Number(foodId)),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["foods"] }),
   });
 

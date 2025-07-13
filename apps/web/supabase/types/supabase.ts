@@ -14,16 +14,16 @@ export type Database = {
           id: number
           quantity: number
           updated_at: string | null
-          user_id: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
           date: string
           food_id: number
           id?: never
-          quantity?: number
+          quantity: number
           updated_at?: string | null
-          user_id: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -32,7 +32,7 @@ export type Database = {
           id?: never
           quantity?: number
           updated_at?: string | null
-          user_id?: number
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -42,17 +42,11 @@ export type Database = {
             referencedRelation: "foods"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "food_entries_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       foods: {
         Row: {
+          brand: string | null
           calories: number
           carbs: number
           created_at: string | null
@@ -63,8 +57,10 @@ export type Database = {
           serving_size: number | null
           serving_unit: string | null
           updated_at: string | null
+          user_id: string
         }
         Insert: {
+          brand?: string | null
           calories: number
           carbs: number
           created_at?: string | null
@@ -75,8 +71,10 @@ export type Database = {
           serving_size?: number | null
           serving_unit?: string | null
           updated_at?: string | null
+          user_id: string
         }
         Update: {
+          brand?: string | null
           calories?: number
           carbs?: number
           created_at?: string | null
@@ -87,33 +85,7 @@ export type Database = {
           serving_size?: number | null
           serving_unit?: string | null
           updated_at?: string | null
-        }
-        Relationships: []
-      }
-      users: {
-        Row: {
-          created_at: string | null
-          email: string
-          hashed_password: string
-          id: number
-          name: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          hashed_password: string
-          id?: never
-          name?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          hashed_password?: string
-          id?: never
-          name?: string | null
-          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }

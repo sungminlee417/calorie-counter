@@ -37,12 +37,14 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
     }
   };
 
+  console.log(foodEntry.food_id);
+
   return (
     <Stack>
       <TextField
         select
         label="Food"
-        name="foodId"
+        name="food_id"
         value={foodEntry.food_id}
         onChange={handleChange}
         fullWidth
@@ -51,7 +53,7 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
       >
         {foods?.map((food) => (
           <MenuItem key={food.id} value={food.id}>
-            {food.name} {food.brand ? `(${food.brand})` : ""}
+            {food.name}
           </MenuItem>
         ))}
       </TextField>

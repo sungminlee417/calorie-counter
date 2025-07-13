@@ -35,6 +35,13 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
         required
       />
       <TextField
+        label="Brand"
+        name="brand"
+        value={food.brand ?? ""}
+        onChange={handleChange}
+        fullWidth
+      />
+      <TextField
         label="Serving Size"
         name="serving_size"
         type="number"
