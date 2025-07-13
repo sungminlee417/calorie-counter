@@ -42,7 +42,7 @@ const MacrosChart = () => {
   ];
 
   return (
-    <Box width="100%" maxWidth={500} p={2}>
+    <Box>
       <Stack
         direction="row"
         justifyContent="space-between"

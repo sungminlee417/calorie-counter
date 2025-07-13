@@ -126,27 +126,17 @@ const FoodEntryList = () => {
                       </Box>
                     }
                     secondary={
-                      <>
-                        {entry.food?.brand && (
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            component="span"
-                          >
-                            {`${entry.food.brand}, ${
-                              entry.quantity * (entry.food?.servingSize ?? 1)
-                            } ${entry.food?.servingUnit ?? ""}`}
-                          </Typography>
-                        )}
-                        <br />
+                      entry.food?.brand && (
                         <Typography
-                          variant="caption"
+                          variant="body2"
                           color="text.secondary"
                           component="span"
                         >
-                          {dayjs(entry.date).format("MMM D, YYYY")}
+                          {`${entry.food.brand}, ${
+                            entry.quantity * (entry.food?.servingSize ?? 1)
+                          } ${entry.food?.servingUnit ?? ""}`}
                         </Typography>
-                      </>
+                      )
                     }
                   />
                 </ListItem>
