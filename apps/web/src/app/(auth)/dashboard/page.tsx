@@ -13,17 +13,17 @@ const Page = async () => {
 
   return (
     <Grid container padding={2} spacing={2}>
-      <Grid size={8}>
+      <Grid size={{ xs: 12 }}>
         <Card>
           <MacrosChart />
         </Card>
       </Grid>
-      <Grid size={4}>
+      <Grid size={{ lg: 4, md: 6, xs: 12 }}>
         <Card>
           <FoodEntryList />
         </Card>
       </Grid>
-      <Grid size={4}>
+      <Grid size={{ lg: 4, md: 6, xs: 12 }}>
         <Card>
           <FoodList />
         </Card>
