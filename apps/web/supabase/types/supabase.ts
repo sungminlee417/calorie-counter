@@ -89,6 +89,39 @@ export type Database = {
         }
         Relationships: []
       }
+      macro_goals: {
+        Row: {
+          calories: number | null
+          carbs: number | null
+          created_at: string
+          fat: number | null
+          id: number
+          protein: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          calories?: number | null
+          carbs?: number | null
+          created_at?: string
+          fat?: number | null
+          id?: number
+          protein?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Update: {
+          calories?: number | null
+          carbs?: number | null
+          created_at?: string
+          fat?: number | null
+          id?: number
+          protein?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

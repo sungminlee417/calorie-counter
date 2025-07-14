@@ -7,6 +7,7 @@ import FoodList from "@/components/food/FoodList";
 import FoodEntryList from "@/components/food/FoodEntryList";
 import MacrosChart from "@/components/food/MacrosChart";
 import { requireAuth } from "@/utils/auth";
+import MacroGoalsCard from "@/components/goal/MacroGoal";
 
 const Page = async () => {
   await requireAuth();
@@ -26,6 +27,11 @@ const Page = async () => {
       <Grid size={{ lg: 4, md: 6, xs: 12 }}>
         <Card>
           <FoodList />
+        </Card>
+      </Grid>
+      <Grid size={{ lg: 4, md: 6, xs: 12 }}>
+        <Card>
+          <MacroGoalsCard />
         </Card>
       </Grid>
     </Grid>

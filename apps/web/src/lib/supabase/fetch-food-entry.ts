@@ -12,7 +12,13 @@ const supabase = createClient();
 export const fetchGetFoodEntries = async (
   date?: string
 ): Promise<FoodEntryWithFood[]> => {
-  let query = supabase.from("food_entries").select("*, foods(*)",);
+ const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    throw new Error("User not found. Please make sure you are logged in.");
+  }
+
+  let query = supabase.from("food_entries").select("*, foods(*)",).eq('user_id', user.id);
 
   if (date) {
     const start = dayjs(date).startOf("day").toISOString();

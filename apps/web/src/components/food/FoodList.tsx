@@ -3,7 +3,6 @@
 import React, { Fragment, useCallback, useState } from "react";
 
 import {
-  TextField,
   Typography,
   List,
   ListItem,
@@ -39,8 +38,6 @@ const EMPTY_FOOD: Food = {
 
 const FoodList = () => {
   const { createFood, deleteFood, foods, updateFood } = useFoods();
-
-  const [searchTerm, setSearchTerm] = useState("");
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
@@ -86,14 +83,6 @@ const FoodList = () => {
           <Add />
         </IconButton>
       </Stack>
-
-      <TextField
-        fullWidth
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search for a specific food..."
-        value={searchTerm}
-        sx={{ mb: 2 }}
-      />
 
       <Box
         sx={{
