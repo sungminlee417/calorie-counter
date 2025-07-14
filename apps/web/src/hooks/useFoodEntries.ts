@@ -28,7 +28,7 @@ const useFoodEntries = (date: Date) => {
   });
 
   const updateFoodEntry = useMutation({
-    mutationFn: (updatedFoodEntry: FoodEntry) =>
+    mutationFn: (updatedFoodEntry: Omit<FoodEntry, 'created_at' | 'updated_at'>) =>
       fetchUpdateFoodEntry(updatedFoodEntry),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["food-entries"] }),

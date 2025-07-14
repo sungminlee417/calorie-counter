@@ -22,6 +22,7 @@ import { FoodEntry } from "@/types/supabase";
 import Dialog from "../ui/Dialog";
 import FoodEntryForm from "./FoodEntryForm";
 import DialogFormActions from "../ui/DialogFormActions";
+import { FoodEntryWithFood } from "@/lib/supabase/fetch-food-entry";
 
 const EMPTY_FOOD_ENTRY: FoodEntry = {
   food_id: 0,
@@ -44,15 +45,34 @@ const FoodEntryList = () => {
     useState<FoodEntry>(EMPTY_FOOD_ENTRY);
 
   const handleSaveFoodEntry = useCallback(
-    (foodEntry: FoodEntry) => {
-      const entryToSave = {
-        date: foodEntry.date,
-        quantity: foodEntry.quantity,
-        user_id: foodEntry.user_id,
-        food_id: foodEntry.food_id,
-      };
+    (foodEntry: FoodEntry | FoodEntryWithFood) => {
+      const hasFoods = (
+        entry: FoodEntry | FoodEntryWithFood
+      ): entry is FoodEntryWithFood =>
+        "foods" in entry && entry.foods !== undefined;
 
-      foodEntry.id ? updateFoodEntry(foodEntry) : createFoodEntry(entryToSave);
+      let cleanedEntry: Partial<FoodEntry>;
+
+      if (hasFoods(foodEntry)) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { created_at, updated_at, foods, ...rest } = foodEntry;
+        cleanedEntry = { ...rest };
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { id, created_at, updated_at, ...rest } = foodEntry;
+        cleanedEntry = { ...rest };
+      }
+
+      if (foodEntry.id) {
+        updateFoodEntry(
+          cleanedEntry as Omit<FoodEntry, "created_at" | "updated_at">
+        );
+      } else {
+        createFoodEntry(
+          cleanedEntry as Omit<FoodEntry, "id" | "created_at" | "updated_at">
+        );
+      }
+
       setEditedFoodEntry(EMPTY_FOOD_ENTRY);
       setIsFoodEntryDialogOpen(false);
     },

@@ -37,7 +37,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
     setSuccessMessage(null);
 
     if (isLogin) {
-      const { data, error } = await fetchLogin(email, password);
+      const { error } = await fetchLogin(email, password);
       setLoading(false);
 
       if (error) {
@@ -56,7 +56,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
 
       router.push("/dashboard");
     } else {
-      const { data, error } = await fetchSignup(email, password, name);
+      const { error } = await fetchSignup(email, password, name);
       setLoading(false);
 
       if (error) {

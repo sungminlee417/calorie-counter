@@ -18,22 +18,18 @@ const MacrosChart = () => {
   const macros = useMemo(() => {
     return foodEntries?.reduce(
       (acc, entry) => {
-        acc.carbs += entry.foods.carbs || 0;
-        acc.fats += entry.foods.fat || 0;
-        acc.protein += entry.foods.protein || 0;
+        acc.calories += entry.foods.calories * entry.quantity || 0;
+        acc.carbs += entry.foods.carbs * entry.quantity || 0;
+        acc.fats += entry.foods.fat * entry.quantity || 0;
+        acc.protein += entry.foods.protein * entry.quantity || 0;
         return acc;
       },
-      { carbs: 0, fats: 0, protein: 0 }
+      { calories: 0, carbs: 0, fats: 0, protein: 0 }
     );
   }, [foodEntries]);
 
   const total =
     (macros?.carbs ?? 0) + (macros?.fats ?? 0) + (macros?.protein ?? 0);
-
-  const totalCalories = useMemo(() => {
-    if (!macros) return 0;
-    return macros.carbs * 4 + macros.protein * 4 + macros.fats * 9;
-  }, [macros]);
 
   const macroList = [
     { name: "Carbs", value: macros?.carbs ?? 0, color: "#8884d8" },
@@ -49,7 +45,7 @@ const MacrosChart = () => {
         alignItems="center"
         mb={2}
       >
-        <Typography variant="h6">Calories: {totalCalories} kcal</Typography>
+        <Typography variant="h6">Calories: {macros?.calories} kcal</Typography>
 
         <TextField
           label="Date"
@@ -60,7 +56,6 @@ const MacrosChart = () => {
             const date = dayjs(e.target.value, "YYYY-MM-DD").toDate();
             setSelectedDate(date);
           }}
-          InputLabelProps={{ shrink: true }}
         />
       </Stack>
 

@@ -25,8 +25,6 @@ export const fetchGetFoodEntries = async (
 
   const { data, error } = await query;
 
-  console.log(data)
-
   if (error) {
     throw new Error(error.message);
   }
@@ -61,6 +59,7 @@ export const fetchCreateFoodEntry = async (
 export const fetchUpdateFoodEntry = async (
   foodEntry: Partial<FoodEntry> & { id: number }
 ): Promise<FoodEntry> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, created_at, updated_at, ...updateData } = foodEntry;
 
   const { data, error } = await supabase

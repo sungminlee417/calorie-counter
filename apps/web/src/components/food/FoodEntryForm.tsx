@@ -37,8 +37,6 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
     }
   };
 
-  console.log(foodEntry.food_id);
-
   return (
     <Stack>
       <TextField

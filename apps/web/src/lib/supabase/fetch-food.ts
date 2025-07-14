@@ -41,6 +41,7 @@ export const fetchCreateFood = async (
 export const fetchUpdateFood = async (
   food: Partial<Food> & { id: number }
 ): Promise<Food> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, created_at, updated_at, ...foodData } = food;
 
   const { data, error } = await supabase

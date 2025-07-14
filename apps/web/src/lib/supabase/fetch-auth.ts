@@ -15,7 +15,7 @@ const supabase = await createClient();
 export const fetchSignup = async (email: string, password: string, name: string) => {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.auth.signUp({
+  return await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -24,13 +24,4 @@ export const fetchSignup = async (email: string, password: string, name: string)
       },
     },
   });
-
-  if (error) {
-    if (error.message.includes("User already registered")) {
-      throw new Error("User already exists.");
-    }
-    throw new Error(error.message);
-  }
-
-  return { data };
 };
