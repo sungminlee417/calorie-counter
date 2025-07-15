@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 interface ArrowDatePickerProps {
   selectedDate: Date;
   onChange: (date: Date) => void;
-  sx: SxProps;
+  sx?: SxProps;
 }
 
 const ArrowDatePicker: React.FC<ArrowDatePickerProps> = ({

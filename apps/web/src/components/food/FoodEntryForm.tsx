@@ -2,8 +2,6 @@
 
 import React from "react";
 import { MenuItem, TextField, Stack } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs, { Dayjs } from "dayjs";
 
 import useFoods from "@/hooks/useFoods";
 import { FoodEntry } from "@/types/supabase";
