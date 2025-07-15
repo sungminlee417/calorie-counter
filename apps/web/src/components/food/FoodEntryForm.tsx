@@ -7,6 +7,7 @@ import dayjs, { Dayjs } from "dayjs";
 
 import useFoods from "@/hooks/useFoods";
 import { FoodEntry } from "@/types/supabase";
+import ArrowDatePicker from "../form/ArrowDatePicker";
 
 export interface FoodEntryFormProps {
   foodEntry: FoodEntry;
@@ -28,7 +29,7 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
     });
   };
 
-  const handleDateChange = (newDate: Dayjs | null) => {
+  const handleDateChange = (newDate: Date | null) => {
     if (newDate) {
       onChange({
         ...foodEntry,
@@ -39,6 +40,11 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
 
   return (
     <Stack>
+      <ArrowDatePicker
+        selectedDate={new Date(foodEntry.date)}
+        onChange={handleDateChange}
+        sx={{ alignSelf: "center" }}
+      />
       <TextField
         select
         label="Food"
@@ -55,14 +61,6 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
           </MenuItem>
         ))}
       </TextField>
-
-      <DatePicker
-        label="Date"
-        value={dayjs(foodEntry.date)}
-        onChange={handleDateChange}
-        slotProps={{ textField: { fullWidth: true, margin: "normal" } }}
-      />
-
       <TextField
         label="Quantity"
         name="quantity"

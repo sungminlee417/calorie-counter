@@ -6,14 +6,16 @@ import {
   Typography,
   Stack,
   LinearProgress,
-  TextField,
+  Skeleton,
 } from "@mui/material";
-import dayjs from "dayjs";
+
 import useFoodEntries from "@/hooks/useFoodEntries";
 import useMacroGoal from "@/hooks/useMacroGoal";
 
+import ArrowDatePicker from "../form/ArrowDatePicker";
+
 const MacrosChart = () => {
-  const { macroGoal } = useMacroGoal();
+  const { isLoading, macroGoal } = useMacroGoal();
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { foodEntries } = useFoodEntries(selectedDate);
@@ -63,6 +65,57 @@ const MacrosChart = () => {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <Box>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
+          <Skeleton variant="text" width={160} height={32} />
+          <Skeleton
+            variant="rectangular"
+            width={120}
+            height={36}
+            sx={{ borderRadius: 1 }}
+          />
+        </Stack>
+
+        <Skeleton variant="text" width={200} height={20} sx={{ mb: 2 }} />
+
+        <Box mb={3}>
+          <Stack direction="row" justifyContent="space-between" mb={0.5}>
+            <Skeleton variant="text" width={80} height={20} />
+            <Skeleton variant="text" width={80} height={20} />
+          </Stack>
+          <Skeleton
+            variant="rectangular"
+            height={10}
+            sx={{ borderRadius: 5 }}
+          />
+        </Box>
+
+        <Stack spacing={2}>
+          {[...Array(3)].map((_, i) => (
+            <Box key={i}>
+              <Stack direction="row" justifyContent="space-between" mb={0.5}>
+                <Skeleton variant="text" width={80} height={20} />
+                <Skeleton variant="text" width={60} height={20} />
+              </Stack>
+              <Skeleton
+                variant="rectangular"
+                height={10}
+                sx={{ borderRadius: 5 }}
+              />
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <Stack
@@ -79,15 +132,9 @@ const MacrosChart = () => {
             : `Calories: ${macros?.calories.toFixed(1)} kcal (estimated)`}
         </Typography>
 
-        <TextField
-          label="Date"
-          type="date"
-          size="small"
-          value={dayjs(selectedDate).format("YYYY-MM-DD")}
-          onChange={(e) => {
-            const date = dayjs(e.target.value, "YYYY-MM-DD").toDate();
-            setSelectedDate(date);
-          }}
+        <ArrowDatePicker
+          selectedDate={selectedDate}
+          onChange={setSelectedDate}
         />
       </Stack>
 
