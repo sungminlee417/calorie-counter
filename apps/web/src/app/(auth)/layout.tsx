@@ -16,8 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <Navigation />
-      <Providers>{children}</Providers>
+      <Providers>
+        <Navigation />
+        {children}
+      </Providers>
     </>
   );
 }

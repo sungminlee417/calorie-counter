@@ -1,29 +1,24 @@
 "use client";
-
-import { ReactNode, useMemo, useState } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import useTheme from "@/hooks/useTheme";
+import { ThemeModeProvider, useThemeMode } from "../context/ThemeModeContext";
 
-export default function Providers({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
-
-  const { mode } = useTheme();
-
-  console.log(mode);
+function InnerProviders({ children }: { children: ReactNode }) {
+  const { mode } = useThemeMode();
 
   const theme = useMemo(
     () =>
       createTheme({
-        palette: {
-          mode,
-        },
+        palette: { mode },
       }),
     [mode]
   );
+
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <ThemeProvider theme={theme}>
@@ -34,5 +29,13 @@ export default function Providers({ children }: { children: ReactNode }) {
         </LocalizationProvider>
       </QueryClientProvider>
     </ThemeProvider>
+  );
+}
+
+export default function Providers({ children }: { children: ReactNode }) {
+  return (
+    <ThemeModeProvider>
+      <InnerProviders>{children}</InnerProviders>
+    </ThemeModeProvider>
   );
 }

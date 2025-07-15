@@ -11,12 +11,12 @@ import Menu from "@mui/material/Menu";
 import { DarkMode, LightMode } from "@mui/icons-material";
 
 import { fetchLogout } from "@/lib/supabase/fetch-auth";
-import useTheme from "@/hooks/useTheme";
+import { useThemeMode } from "@/context/ThemeModeContext";
 
 const Navigation = () => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const { mode, toggleMode } = useThemeMode();
 
-  const { mode, toggleMode } = useTheme();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
