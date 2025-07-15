@@ -114,7 +114,7 @@ const MacrosChart = () => {
           <LinearProgress
             variant="determinate"
             value={
-              goalCalories ? (macros?.calories ?? 0 / goalCalories) * 100 : 0
+              goalCalories ? ((macros?.calories ?? 0) / goalCalories) * 100 : 0
             }
             sx={{
               height: 10,

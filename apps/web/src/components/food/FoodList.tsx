@@ -15,6 +15,7 @@ import {
 import { Add, Edit } from "@mui/icons-material";
 
 import useFoods from "@/hooks/useFoods";
+import useUser from "@/hooks/useUser";
 import { Food } from "@/types/supabase";
 
 import Dialog from "../ui/Dialog";
@@ -37,6 +38,7 @@ const EMPTY_FOOD: Food = {
 };
 
 const FoodList = () => {
+  const { user } = useUser();
   const { createFood, deleteFood, foods, updateFood } = useFoods();
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
@@ -135,10 +137,18 @@ const FoodList = () => {
             onCancel={() => setIsFoodDialogOpen(false)}
             onDelete={
               editedFood.id
-                ? () => handleDeleteFood(String(editedFood.id))
+                ? editedFood.user_id === user?.id
+                  ? () => handleDeleteFood(String(editedFood.id))
+                  : undefined
                 : undefined
             }
-            onSave={() => handleSaveFood(editedFood)}
+            onSave={
+              editedFood.id
+                ? editedFood.user_id === user?.id
+                  ? () => handleSaveFood(editedFood)
+                  : undefined
+                : undefined
+            }
           />
         }
         onClose={() => setIsFoodDialogOpen(false)}

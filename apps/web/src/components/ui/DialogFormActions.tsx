@@ -4,7 +4,7 @@ import React from "react";
 export interface DialogFormActionsProps {
   onCancel: () => void;
   onDelete?: () => void;
-  onSave: () => void;
+  onSave?: () => void;
 }
 
 const DialogFormActions: React.FC<DialogFormActionsProps> = ({
@@ -21,9 +21,11 @@ const DialogFormActions: React.FC<DialogFormActionsProps> = ({
       width="100%"
     >
       <Stack direction="row" spacing={1}>
-        <Button onClick={onSave} color="primary" variant="contained">
-          Save
-        </Button>
+        {onSave && (
+          <Button onClick={onSave} color="primary" variant="contained">
+            Save
+          </Button>
+        )}
         <Button onClick={onCancel} color="secondary">
           Cancel
         </Button>

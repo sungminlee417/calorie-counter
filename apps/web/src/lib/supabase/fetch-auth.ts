@@ -25,3 +25,8 @@ export const fetchSignup = async (email: string, password: string, name: string)
     },
   });
 };
+
+export const fetchUser = async () => {
+  const supabase = await createClient();
+  return await supabase.auth.getUser();
+}
