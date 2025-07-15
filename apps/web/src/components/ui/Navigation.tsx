@@ -8,10 +8,15 @@ import IconButton from "@mui/material/IconButton";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
+import { DarkMode, LightMode } from "@mui/icons-material";
+
 import { fetchLogout } from "@/lib/supabase/fetch-auth";
+import useTheme from "@/hooks/useTheme";
 
 const Navigation = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const { mode, toggleMode } = useTheme();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -27,6 +32,16 @@ const Navigation = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Calorie Counter
         </Typography>
+
+        <IconButton
+          color="inherit"
+          onClick={toggleMode}
+          aria-label="toggle light/dark mode"
+          sx={{ mr: 1 }}
+        >
+          {mode === "light" ? <DarkMode /> : <LightMode />}
+        </IconButton>
+
         <div>
           <IconButton
             size="large"
@@ -42,7 +57,7 @@ const Navigation = () => {
             id="menu-appbar"
             anchorEl={anchorEl}
             anchorOrigin={{
-              vertical: "top",
+              vertical: "bottom",
               horizontal: "right",
             }}
             keepMounted
