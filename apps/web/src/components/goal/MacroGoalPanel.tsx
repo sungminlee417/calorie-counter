@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Typography, IconButton, Stack, Box } from "@mui/material";
+import { Typography, IconButton, Stack, Box, Skeleton } from "@mui/material";
 import {
   Edit,
   LocalFireDepartment,
@@ -9,6 +9,7 @@ import {
   EmojiNature,
   FitnessCenter,
 } from "@mui/icons-material";
+
 import { MacroGoal } from "@/types/supabase";
 import Dialog from "../ui/Dialog";
 import DialogFormActions from "../ui/DialogFormActions";
@@ -52,7 +53,6 @@ const MacroGoalPanel = () => {
     } else {
       createMacroGoal(macroGoalToSave);
     }
-
     setIsMacroGoalDialogOpen(false);
   }, [createMacroGoal, editedMacroGoal, updateMacroGoal]);
 
@@ -71,6 +71,18 @@ const MacroGoalPanel = () => {
     }
   }, [isLoading, macroGoal]);
 
+  const renderMacroItem = (
+    icon: React.ReactNode,
+    label: string,
+    value: string | null
+  ) => (
+    <MacroItem
+      icon={icon}
+      label={label}
+      value={value !== null ? value : <Skeleton width={60} variant="text" />}
+    />
+  );
+
   return (
     <>
       <Stack
@@ -86,26 +98,26 @@ const MacroGoalPanel = () => {
       </Stack>
 
       <Stack spacing={1.5}>
-        <MacroItem
-          icon={<LocalFireDepartment color="error" />}
-          label="Calories"
-          value={`${macroGoal?.calories ?? 0} kcal`}
-        />
-        <MacroItem
-          icon={<FitnessCenter color="primary" />}
-          label="Protein"
-          value={`${macroGoal?.protein ?? 0}g`}
-        />
-        <MacroItem
-          icon={<EmojiNature sx={{ color: "#43a047" }} />}
-          label="Fat"
-          value={`${macroGoal?.fat ?? 0}g`}
-        />
-        <MacroItem
-          icon={<Restaurant sx={{ color: "#ff9800" }} />}
-          label="Carbs"
-          value={`${macroGoal?.carbs ?? 0}g`}
-        />
+        {renderMacroItem(
+          <LocalFireDepartment color="error" />,
+          "Calories",
+          isLoading ? null : `${macroGoal?.calories ?? 0} kcal`
+        )}
+        {renderMacroItem(
+          <FitnessCenter color="primary" />,
+          "Protein",
+          isLoading ? null : `${macroGoal?.protein ?? 0}g`
+        )}
+        {renderMacroItem(
+          <EmojiNature sx={{ color: "#43a047" }} />,
+          "Fat",
+          isLoading ? null : `${macroGoal?.fat ?? 0}g`
+        )}
+        {renderMacroItem(
+          <Restaurant sx={{ color: "#ff9800" }} />,
+          "Carbs",
+          isLoading ? null : `${macroGoal?.carbs ?? 0}g`
+        )}
       </Stack>
 
       <Dialog
@@ -140,7 +152,7 @@ function MacroItem({
 }: {
   icon: React.ReactNode;
   label: string;
-  value: string;
+  value: React.ReactNode;
 }) {
   return (
     <Stack direction="row" alignItems="center" spacing={2}>

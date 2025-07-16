@@ -9,7 +9,6 @@ export type Database = {
       food_entries: {
         Row: {
           created_at: string | null
-          date: string
           food_id: number
           id: number
           quantity: number
@@ -18,7 +17,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
-          date: string
           food_id: number
           id?: never
           quantity: number
@@ -27,7 +25,6 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
-          date?: string
           food_id?: number
           id?: never
           quantity?: number

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { Fragment, useCallback, useState } from "react";
-
 import {
   Typography,
   List,
@@ -11,6 +10,7 @@ import {
   Box,
   Stack,
   IconButton,
+  Skeleton,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 
@@ -39,7 +39,7 @@ const EMPTY_FOOD: Food = {
 
 const FoodList = () => {
   const { user } = useUser();
-  const { createFood, deleteFood, foods, updateFood } = useFoods();
+  const { createFood, deleteFood, foods, updateFood, isLoading } = useFoods(); // ← Add `isLoading` from hook
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
@@ -76,11 +76,10 @@ const FoodList = () => {
 
   return (
     <Box>
-      <Stack alignItems="center" direction="row" height="fit-content" mb={2}>
+      <Stack alignItems="center" direction="row" mb={2}>
         <Typography variant="h6" gutterBottom flex={1}>
           Foods
         </Typography>
-
         <IconButton onClick={() => setIsFoodDialogOpen(true)}>
           <Add />
         </IconButton>
@@ -95,7 +94,21 @@ const FoodList = () => {
           borderRadius: 1,
         }}
       >
-        {!foods?.length ? (
+        {isLoading ? (
+          <List disablePadding>
+            {[...Array(4)].map((_, idx) => (
+              <Fragment key={idx}>
+                <ListItem>
+                  <ListItemText
+                    primary={<Skeleton width="60%" />}
+                    secondary={<Skeleton width="80%" />}
+                  />
+                </ListItem>
+                {idx < 3 && <Divider component="li" />}
+              </Fragment>
+            ))}
+          </List>
+        ) : !foods?.length ? (
           <Typography
             variant="body2"
             color="text.secondary"
@@ -105,7 +118,7 @@ const FoodList = () => {
           </Typography>
         ) : (
           <List disablePadding>
-            {foods?.map((food, idx) => (
+            {foods.map((food, idx) => (
               <Fragment key={food.id}>
                 <ListItem
                   secondaryAction={
@@ -136,17 +149,13 @@ const FoodList = () => {
           <DialogFormActions
             onCancel={() => setIsFoodDialogOpen(false)}
             onDelete={
-              editedFood.id
-                ? editedFood.user_id === user?.id
-                  ? () => handleDeleteFood(String(editedFood.id))
-                  : undefined
+              editedFood.id && editedFood.user_id === user?.id
+                ? () => handleDeleteFood(String(editedFood.id))
                 : undefined
             }
             onSave={
-              editedFood.id
-                ? editedFood.user_id === user?.id
-                  ? () => handleSaveFood(editedFood)
-                  : undefined
+              editedFood.id && editedFood.user_id === user?.id
+                ? () => handleSaveFood(editedFood)
                 : undefined
             }
           />

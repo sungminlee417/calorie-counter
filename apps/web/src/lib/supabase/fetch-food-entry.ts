@@ -25,8 +25,8 @@ export const fetchGetFoodEntries = async (
     const end = dayjs(date).add(1, "day").startOf("day").toISOString();
 
     query = query
-      .gte("date", start)
-      .lt("date", end);
+      .gte("created_at", start)
+      .lt("created_at", end);
   }
 
   const { data, error } = await query;

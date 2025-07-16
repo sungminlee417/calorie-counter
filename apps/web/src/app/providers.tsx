@@ -6,6 +6,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { ThemeModeProvider, useThemeMode } from "../context/ThemeModeContext";
+import { DateProvider } from "@/context/DateContext";
 
 function InnerProviders({ children }: { children: ReactNode }) {
   const { mode } = useThemeMode();
@@ -33,7 +34,9 @@ function InnerProviders({ children }: { children: ReactNode }) {
 export default function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeModeProvider>
-      <InnerProviders>{children}</InnerProviders>
+      <DateProvider>
+        <InnerProviders>{children}</InnerProviders>
+      </DateProvider>
     </ThemeModeProvider>
   );
 }

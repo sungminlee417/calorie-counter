@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client";
 
 import React, { Fragment, useCallback, useState } from "react";
-import dayjs from "dayjs";
-
 import {
   List,
   ListItem,
@@ -12,21 +12,20 @@ import {
   Box,
   Stack,
   Divider,
-  TextField,
+  Skeleton,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 
 import useFoodEntries from "@/hooks/useFoodEntries";
 import { FoodEntry } from "@/types/supabase";
-
 import Dialog from "../ui/Dialog";
 import FoodEntryForm from "./FoodEntryForm";
 import DialogFormActions from "../ui/DialogFormActions";
 import { FoodEntryWithFood } from "@/lib/supabase/fetch-food-entry";
+import { useDate } from "@/context/DateContext";
 
 const EMPTY_FOOD_ENTRY: FoodEntry = {
   food_id: 0,
-  date: dayjs().toString(),
   quantity: 1,
   created_at: null,
   id: 0,
@@ -35,10 +34,14 @@ const EMPTY_FOOD_ENTRY: FoodEntry = {
 };
 
 const FoodEntryList = () => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  const { createFoodEntry, deleteFoodEntry, foodEntries, updateFoodEntry } =
-    useFoodEntries(selectedDate);
+  const { selectedDate } = useDate();
+  const {
+    createFoodEntry,
+    deleteFoodEntry,
+    foodEntries,
+    updateFoodEntry,
+    isLoading,
+  } = useFoodEntries(selectedDate);
 
   const [isFoodEntryDialogOpen, setIsFoodEntryDialogOpen] = useState(false);
   const [editedFoodEntry, setEditedFoodEntry] =
@@ -54,11 +57,9 @@ const FoodEntryList = () => {
       let cleanedEntry: Partial<FoodEntry>;
 
       if (hasFoods(foodEntry)) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { created_at, updated_at, foods, ...rest } = foodEntry;
         cleanedEntry = { ...rest };
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { id, created_at, updated_at, ...rest } = foodEntry;
         cleanedEntry = { ...rest };
       }
@@ -99,18 +100,6 @@ const FoodEntryList = () => {
         <Typography variant="h6" flex={1}>
           Food Entries
         </Typography>
-
-        <TextField
-          label="Date"
-          type="date"
-          size="small"
-          value={dayjs(selectedDate).format("YYYY-MM-DD")}
-          onChange={(e) => {
-            const date = dayjs(e.target.value, "YYYY-MM-DD").toDate();
-            setSelectedDate(date);
-          }}
-        />
-
         <IconButton onClick={() => setIsFoodEntryDialogOpen(true)}>
           <Add />
         </IconButton>
@@ -123,10 +112,25 @@ const FoodEntryList = () => {
           border: "1px solid",
           borderColor: "divider",
           borderRadius: 1,
+          px: 1,
         }}
       >
-        {foodEntries?.length === 0 ? (
-          <Typography>No food entries yet.</Typography>
+        {isLoading ? (
+          <List>
+            {[...Array(3)].map((_, idx) => (
+              <Fragment key={idx}>
+                <ListItem>
+                  <ListItemText
+                    primary={<Skeleton width="50%" />}
+                    secondary={<Skeleton width="30%" />}
+                  />
+                </ListItem>
+                {idx < 2 && <Divider component="li" />}
+              </Fragment>
+            ))}
+          </List>
+        ) : foodEntries?.length === 0 ? (
+          <Typography p={2}>No food entries yet.</Typography>
         ) : (
           <List>
             {foodEntries?.map((entry, idx) => (
@@ -143,11 +147,9 @@ const FoodEntryList = () => {
                 >
                   <ListItemText
                     primary={
-                      <Box>
-                        <Typography variant="subtitle1" component="span">
-                          {entry.foods?.name || "Unknown Food"}
-                        </Typography>
-                      </Box>
+                      <Typography variant="subtitle1" component="span">
+                        {entry.foods?.name || "Unknown Food"}
+                      </Typography>
                     }
                     secondary={
                       <Typography

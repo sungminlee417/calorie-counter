@@ -5,7 +5,6 @@ import { MenuItem, TextField, Stack } from "@mui/material";
 
 import useFoods from "@/hooks/useFoods";
 import { FoodEntry } from "@/types/supabase";
-import ArrowDatePicker from "../form/ArrowDatePicker";
 
 export interface FoodEntryFormProps {
   foodEntry: FoodEntry;
@@ -27,22 +26,8 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
     });
   };
 
-  const handleDateChange = (newDate: Date | null) => {
-    if (newDate) {
-      onChange({
-        ...foodEntry,
-        date: newDate.toString(),
-      });
-    }
-  };
-
   return (
     <Stack>
-      <ArrowDatePicker
-        selectedDate={new Date(foodEntry.date)}
-        onChange={handleDateChange}
-        sx={{ alignSelf: "center" }}
-      />
       <TextField
         select
         label="Food"

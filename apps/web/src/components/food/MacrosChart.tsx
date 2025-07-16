@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Box,
   Typography,
@@ -11,13 +11,11 @@ import {
 
 import useFoodEntries from "@/hooks/useFoodEntries";
 import useMacroGoal from "@/hooks/useMacroGoal";
-
-import ArrowDatePicker from "../form/ArrowDatePicker";
+import { useDate } from "@/context/DateContext";
 
 const MacrosChart = () => {
+  const { selectedDate } = useDate();
   const { isLoading, macroGoal } = useMacroGoal();
-
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { foodEntries } = useFoodEntries(selectedDate);
 
   const macros = useMemo(() => {
@@ -68,20 +66,7 @@ const MacrosChart = () => {
   if (isLoading) {
     return (
       <Box>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
-          <Skeleton variant="text" width={160} height={32} />
-          <Skeleton
-            variant="rectangular"
-            width={120}
-            height={36}
-            sx={{ borderRadius: 1 }}
-          />
-        </Stack>
+        <Skeleton variant="text" width={160} height={32} sx={{ mb: 2 }} />
 
         <Skeleton variant="text" width={200} height={20} sx={{ mb: 2 }} />
 
@@ -131,11 +116,6 @@ const MacrosChart = () => {
               )} / ${goalCalories.toFixed(1)} kcal`
             : `Calories: ${macros?.calories.toFixed(1)} kcal (estimated)`}
         </Typography>
-
-        <ArrowDatePicker
-          selectedDate={selectedDate}
-          onChange={setSelectedDate}
-        />
       </Stack>
 
       {!macroGoal && (

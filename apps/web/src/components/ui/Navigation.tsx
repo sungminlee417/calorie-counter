@@ -12,9 +12,12 @@ import { DarkMode, LightMode } from "@mui/icons-material";
 
 import { fetchLogout } from "@/lib/supabase/fetch-auth";
 import { useThemeMode } from "@/context/ThemeModeContext";
+import ArrowDatePicker from "../form/ArrowDatePicker";
+import { useDate } from "@/context/DateContext";
 
 const Navigation = () => {
   const { mode, toggleMode } = useThemeMode();
+  const { selectedDate, setSelectedDate } = useDate();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -33,6 +36,11 @@ const Navigation = () => {
           Calorie Counter
         </Typography>
 
+        <ArrowDatePicker
+          selectedDate={selectedDate}
+          onChange={setSelectedDate}
+        />
+
         <IconButton
           color="inherit"
           onClick={toggleMode}
@@ -42,7 +50,7 @@ const Navigation = () => {
           {mode === "light" ? <DarkMode /> : <LightMode />}
         </IconButton>
 
-        <div>
+        <>
           <IconButton
             size="large"
             aria-label="account of current user"
@@ -70,7 +78,7 @@ const Navigation = () => {
           >
             <MenuItem onClick={fetchLogout}>Logout</MenuItem>
           </Menu>
-        </div>
+        </>
       </Toolbar>
     </AppBar>
   );
