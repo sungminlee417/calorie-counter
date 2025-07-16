@@ -67,9 +67,7 @@ const MacrosChart = () => {
     return (
       <Box>
         <Skeleton variant="text" width={160} height={32} sx={{ mb: 2 }} />
-
         <Skeleton variant="text" width={200} height={20} sx={{ mb: 2 }} />
-
         <Box mb={3}>
           <Stack direction="row" justifyContent="space-between" mb={0.5}>
             <Skeleton variant="text" width={80} height={20} />
@@ -160,7 +158,7 @@ const MacrosChart = () => {
         {macroList.map((macro) => {
           const progress = macro.goal
             ? (macro.value / macro.goal) * 100
-            : (macro.value / total) * 100;
+            : (macro.value / (total || 1)) * 100;
 
           const label = macro.goal
             ? `${macro.value.toFixed(1)} / ${macro.goal.toFixed(1)}${
