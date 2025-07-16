@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -8,7 +9,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { DarkMode, LightMode } from "@mui/icons-material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import Image from "next/image";
+import { Box } from "@mui/material";
 
 import { fetchLogout } from "@/lib/supabase/fetch-auth";
 import { useThemeMode } from "@/context/ThemeModeContext";
@@ -32,14 +33,16 @@ const Navigation = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Image
-          src="/logo.png"
-          alt="Logo"
-          height={40}
-          width={120}
-          style={{ objectFit: "contain" }}
-          priority
-        />
+        <Box flexGrow={1}>
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            height={40}
+            width={120}
+            style={{ objectFit: "contain" }}
+            priority
+          />
+        </Box>
 
         <ArrowDatePicker
           selectedDate={selectedDate}
