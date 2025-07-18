@@ -13,12 +13,9 @@ import { Box } from "@mui/material";
 
 import { fetchLogout } from "@/lib/supabase/fetch-auth";
 import { useThemeMode } from "@/context/ThemeModeContext";
-import ArrowDatePicker from "../form/ArrowDatePicker";
-import { useDate } from "@/context/DateContext";
 
 const Navigation = () => {
   const { mode, toggleMode } = useThemeMode();
-  const { selectedDate, setSelectedDate } = useDate();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -50,11 +47,6 @@ const Navigation = () => {
             priority
           />
         </Box>
-
-        <ArrowDatePicker
-          selectedDate={selectedDate}
-          onChange={setSelectedDate}
-        />
 
         <IconButton
           color="inherit"

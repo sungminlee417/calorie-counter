@@ -7,16 +7,22 @@ import {
   Stack,
   LinearProgress,
   Skeleton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import useFoodEntries from "@/hooks/useFoodEntries";
 import useMacroGoal from "@/hooks/useMacroGoal";
 import { useDate } from "@/context/DateContext";
+import ArrowDatePicker from "../form/ArrowDatePicker";
 
 const MacrosChart = () => {
-  const { selectedDate } = useDate();
+  const { selectedDate, setSelectedDate } = useDate();
   const { isLoading, macroGoal } = useMacroGoal();
   const { foodEntries } = useFoodEntries(selectedDate);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const macros = useMemo(() => {
     return foodEntries?.reduce(
@@ -101,13 +107,37 @@ const MacrosChart = () => {
 
   return (
     <Box>
+      {/* Show DatePicker on top and centered for small screens */}
+      {isSmallScreen && (
+        <Box
+          mb={3}
+          display="flex"
+          justifyContent="center"
+          sx={{ width: "100%" }}
+        >
+          <ArrowDatePicker
+            selectedDate={selectedDate}
+            onChange={setSelectedDate}
+          />
+        </Box>
+      )}
+
       <Stack
-        direction="row"
+        direction={isSmallScreen ? "column" : "row"}
         justifyContent="space-between"
         alignItems="center"
         mb={2}
+        spacing={isSmallScreen ? 1 : 0}
       >
-        <Typography variant="h6">
+        {/* On larger screens, date picker can be inline here if desired */}
+        {!isSmallScreen && (
+          <ArrowDatePicker
+            selectedDate={selectedDate}
+            onChange={setSelectedDate}
+          />
+        )}
+
+        <Typography variant="h6" sx={{ mt: isSmallScreen ? 2 : 0 }}>
           {macroGoal
             ? `Calories: ${(macros?.calories ?? 0).toFixed(
                 1

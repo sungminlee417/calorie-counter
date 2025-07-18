@@ -121,7 +121,6 @@ const FoodEntryList = () => {
       <Paper
         variant="outlined"
         sx={{
-          maxHeight: 320,
           overflowY: "auto",
           borderRadius: 2,
           px: 1,

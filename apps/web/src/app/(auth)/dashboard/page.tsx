@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Grid } from "@mui/material";
 
 import Card from "@/components/ui/Card";
@@ -19,18 +18,30 @@ const Page = async () => {
           <MacrosChart />
         </Card>
       </Grid>
-      <Grid size={{ lg: 4, md: 6, xs: 12 }}>
-        <Card>
+
+      <Grid
+        size={{ lg: 4, md: 6, xs: 12 }}
+        sx={{ display: "flex", flexDirection: "column" }}
+      >
+        <Card sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
           <FoodEntryList />
         </Card>
       </Grid>
-      <Grid size={{ lg: 4, md: 6, xs: 12 }}>
-        <Card>
+
+      <Grid
+        size={{ lg: 4, md: 6, xs: 12 }}
+        sx={{ display: "flex", flexDirection: "column" }}
+      >
+        <Card sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
           <FoodList />
         </Card>
       </Grid>
-      <Grid size={{ lg: 4, md: 6, xs: 12 }}>
-        <Card>
+
+      <Grid
+        size={{ lg: 4, md: 6, xs: 12 }}
+        sx={{ display: "flex", flexDirection: "column" }}
+      >
+        <Card sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
           <MacroGoalPanel />
         </Card>
       </Grid>
