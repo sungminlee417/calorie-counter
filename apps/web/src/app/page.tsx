@@ -151,7 +151,7 @@ const Home = () => {
               icon: "📱",
             },
           ].map(({ title, description, icon }) => (
-            <Grid item xs={12} sm={6} key={title}>
+            <Grid size={{ xs: 12, sm: 6 }} key={title}>
               <Paper
                 elevation={6}
                 sx={{
