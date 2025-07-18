@@ -29,16 +29,16 @@ const MacrosChart = () => {
       (acc, entry) => {
         acc.calories += (entry.foods.calories ?? 0) * entry.quantity;
         acc.carbs += (entry.foods.carbs ?? 0) * entry.quantity;
-        acc.fats += (entry.foods.fat ?? 0) * entry.quantity;
+        acc.fat += (entry.foods.fat ?? 0) * entry.quantity;
         acc.protein += (entry.foods.protein ?? 0) * entry.quantity;
         return acc;
       },
-      { calories: 0, carbs: 0, fats: 0, protein: 0 }
+      { calories: 0, carbs: 0, fat: 0, protein: 0 }
     );
   }, [foodEntries]);
 
   const total =
-    (macros?.carbs ?? 0) + (macros?.fats ?? 0) + (macros?.protein ?? 0);
+    (macros?.carbs ?? 0) + (macros?.fat ?? 0) + (macros?.protein ?? 0);
 
   const goalCalories =
     (macroGoal?.protein ?? 0) * 4 +
@@ -54,8 +54,8 @@ const MacrosChart = () => {
       color: "#8884d8",
     },
     {
-      name: "Fats",
-      value: macros?.fats ?? 0,
+      name: "Fat",
+      value: macros?.fat ?? 0,
       goal: macroGoal?.fat ?? null,
       unit: "g",
       color: "#82ca9d",

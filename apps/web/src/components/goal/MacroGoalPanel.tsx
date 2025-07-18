@@ -18,10 +18,12 @@ import {
   FitnessCenter,
 } from "@mui/icons-material";
 
+import useMacroGoal from "@/hooks/useMacroGoal";
 import { MacroGoal } from "@/types/supabase";
+import { macroGoalSchema } from "@/types/goal";
+
 import Dialog from "../ui/Dialog";
 import DialogFormActions from "../ui/DialogFormActions";
-import useMacroGoal from "@/hooks/useMacroGoal";
 import MacroGoalForm from "./MacroGoalForm";
 
 const EMPTY_MACRO_GOAL: MacroGoal = {
@@ -55,6 +57,12 @@ const MacroGoalPanel = () => {
       calories: editedGoal.calories,
       user_id: editedGoal.user_id,
     };
+
+    const result = macroGoalSchema.safeParse(editedGoal);
+    if (!result.success) {
+      console.error("Validation failed:", result.error.flatten());
+      return;
+    }
 
     if (editedGoal.id) {
       updateMacroGoal(editedGoal);

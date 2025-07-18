@@ -57,8 +57,6 @@ const FoodEntryList = () => {
 
       const { created_at, updated_at, id, ...rest } = foodEntry;
 
-      console.log(rest);
-
       const result = foodEntrySchema.safeParse(rest);
       if (!result.success) {
         console.error("Validation failed:", result.error.flatten());
@@ -185,7 +183,10 @@ const FoodEntryList = () => {
 
       <Dialog
         open={isDialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={() => {
+          setEditedEntry(EMPTY_FOOD_ENTRY);
+          setDialogOpen(false);
+        }}
         title={editedEntry.id ? "Edit Food Entry" : "Add Food Entry"}
         dialogActions={
           <DialogFormActions

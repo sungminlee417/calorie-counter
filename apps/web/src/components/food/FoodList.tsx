@@ -19,6 +19,7 @@ import { Add, Edit } from "@mui/icons-material";
 import useFoods from "@/hooks/useFoods";
 import useUser from "@/hooks/useUser";
 import { Food } from "@/types/supabase";
+import { foodSchema } from "@/types/food";
 
 import Dialog from "../ui/Dialog";
 import FoodForm from "./FoodForm";
@@ -59,6 +60,11 @@ const FoodList = () => {
         brand: food.brand,
         user_id: food.user_id,
       };
+
+      const result = foodSchema.safeParse(food);
+      if (!result.success) {
+        return;
+      }
 
       if (food.id) updateFood(food);
       else createFood(foodToSave);
@@ -164,7 +170,10 @@ const FoodList = () => {
 
       <Dialog
         open={isFoodDialogOpen}
-        onClose={() => setIsFoodDialogOpen(false)}
+        onClose={() => {
+          setEditedFood(EMPTY_FOOD);
+          setIsFoodDialogOpen(false);
+        }}
         title={editedFood.id ? "Edit Food" : "Add Food"}
         dialogActions={
           <DialogFormActions
@@ -175,9 +184,11 @@ const FoodList = () => {
                 : undefined
             }
             onSave={
-              editedFood.id && editedFood.user_id === user?.id
-                ? () => handleSaveFood(editedFood)
-                : undefined
+              editedFood.id
+                ? editedFood.user_id === user?.id
+                  ? () => handleSaveFood(editedFood)
+                  : undefined
+                : () => handleSaveFood(editedFood)
             }
           />
         }

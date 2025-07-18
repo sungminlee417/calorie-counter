@@ -23,7 +23,7 @@ const Dialog: React.FC<DialogProps> = ({
   title,
 }) => {
   return (
-    <MuiDialog onClose={onClose} open={open} maxWidth="sm" fullWidth>
+    <MuiDialog onClose={onClose} open={open} maxWidth="md" fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <Box mt={1.5}>{children}</Box>
