@@ -17,8 +17,8 @@ const Home = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #6b73ff 0%, #000dff 100%)",
-        color: "white",
+        background: `linear-gradient(135deg, rgba(107,115,255,0.9) 0%, rgba(0,13,255,0.9) 100%)`,
+        color: "rgba(255, 255, 255, 0.95)",
         py: { xs: 6, md: 12 },
       }}
     >
@@ -49,7 +49,7 @@ const Home = () => {
             </Typography>
             <Typography
               variant="h6"
-              sx={{ mt: 2, mb: 4, opacity: 0.85, fontWeight: 500 }}
+              sx={{ mt: 2, mb: 4, opacity: 0.88, fontWeight: 500 }}
             >
               Track your calories, macros, and meals effortlessly — anytime,
               anywhere.
@@ -66,10 +66,10 @@ const Home = () => {
                   sx={{
                     px: 6,
                     background: "linear-gradient(45deg, #ffb74d, #ff9800)",
-                    boxShadow: "0 4px 15px 0 rgba(255, 152, 0, 0.75)",
+                    boxShadow: "0 3px 12px rgba(255, 152, 0, 0.5)",
                     "&:hover": {
                       background: "linear-gradient(45deg, #ff9800, #f57c00)",
-                      boxShadow: "0 6px 20px 0 rgba(245, 124, 0, 0.85)",
+                      boxShadow: "0 5px 18px rgba(245, 124, 0, 0.65)",
                     },
                     fontWeight: "bold",
                     textTransform: "none",
@@ -84,7 +84,7 @@ const Home = () => {
                   size="large"
                   sx={{
                     px: 6,
-                    borderColor: "rgba(255, 255, 255, 0.7)",
+                    borderColor: "rgba(255, 255, 255, 0.75)",
                     color: "white",
                     fontWeight: "bold",
                     textTransform: "none",
@@ -110,10 +110,10 @@ const Home = () => {
               maxWidth: 600,
               width: "100%",
               borderRadius: 3,
-              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
+              boxShadow: "0 6px 18px rgba(0, 0, 0, 0.18)",
               userSelect: "none",
               pointerEvents: "none",
-              filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.3))",
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.22))",
               animation: "float 6s ease-in-out infinite",
               "@keyframes float": {
                 "0%, 100%": { transform: "translateY(0px)" },
@@ -151,19 +151,19 @@ const Home = () => {
               icon: "📱",
             },
           ].map(({ title, description, icon }) => (
-            <Grid size={{ xs: 12, sm: 6 }} key={title}>
+            <Grid item xs={12} sm={6} key={title}>
               <Paper
                 elevation={6}
                 sx={{
                   p: 4,
                   borderRadius: 3,
                   height: "100%",
-                  backgroundColor: "rgba(255 255 255 / 0.1)",
-                  color: "white",
+                  backgroundColor: "rgba(255 255 255 / 0.12)",
+                  color: "rgba(255,255,255,0.95)",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
                   "&:hover": {
                     transform: "translateY(-8px)",
-                    boxShadow: "0 20px 40px rgba(255, 183, 77, 0.4)",
+                    boxShadow: "0 16px 32px rgba(255, 183, 77, 0.35)",
                   },
                 }}
               >
@@ -199,12 +199,12 @@ const Home = () => {
                 px: 7,
                 py: 1.5,
                 background: "linear-gradient(45deg, #ffb74d, #ff9800)",
-                boxShadow: "0 6px 24px rgba(255, 152, 0, 0.9)",
+                boxShadow: "0 5px 18px rgba(255, 152, 0, 0.65)",
                 fontWeight: "bold",
                 textTransform: "none",
                 "&:hover": {
                   background: "linear-gradient(45deg, #ff9800, #f57c00)",
-                  boxShadow: "0 8px 30px rgba(245, 124, 0, 1)",
+                  boxShadow: "0 7px 24px rgba(245, 124, 0, 0.85)",
                 },
               }}
             >
@@ -218,9 +218,9 @@ const Home = () => {
           component="footer"
           textAlign="center"
           py={3}
-          color="rgba(255,255,255,0.6)"
+          color="rgba(255,255,255,0.65)"
           fontSize="0.875rem"
-          sx={{ borderTop: "1px solid rgba(255,255,255,0.2)" }}
+          sx={{ borderTop: "1px solid rgba(255,255,255,0.18)" }}
         >
           © {new Date().getFullYear()} Calorie Counter. All rights reserved.
         </Box>
