@@ -11,6 +11,8 @@ import {
   Stack,
   IconButton,
   Skeleton,
+  Paper,
+  Tooltip,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 
@@ -23,23 +25,23 @@ import FoodForm from "./FoodForm";
 import DialogFormActions from "../ui/DialogFormActions";
 
 const EMPTY_FOOD: Food = {
+  id: 0,
   name: "",
+  brand: null,
   serving_size: 0,
   serving_unit: "",
   calories: 0,
   protein: 0,
   carbs: 0,
   fat: 0,
-  id: 0,
   created_at: null,
   updated_at: null,
-  brand: null,
   user_id: "",
 };
 
 const FoodList = () => {
   const { user } = useUser();
-  const { createFood, deleteFood, foods, updateFood, isLoading } = useFoods(); // ← Add `isLoading` from hook
+  const { createFood, deleteFood, foods, updateFood, isLoading } = useFoods();
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
@@ -54,11 +56,13 @@ const FoodList = () => {
         protein: food.protein,
         carbs: food.carbs,
         fat: food.fat,
-        user_id: food.user_id,
         brand: food.brand,
+        user_id: food.user_id,
       };
+
       if (food.id) updateFood(food);
       else createFood(foodToSave);
+
       setEditedFood(EMPTY_FOOD);
       setIsFoodDialogOpen(false);
     },
@@ -74,24 +78,32 @@ const FoodList = () => {
     [deleteFood]
   );
 
+  const openEditDialog = (food: Food) => {
+    setEditedFood(food);
+    setIsFoodDialogOpen(true);
+  };
+
   return (
     <Box>
-      <Stack alignItems="center" direction="row" mb={2}>
-        <Typography variant="h6" gutterBottom flex={1}>
+      <Stack direction="row" alignItems="center" mb={2} spacing={2}>
+        <Typography variant="h6" flex={1}>
           Foods
         </Typography>
-        <IconButton onClick={() => setIsFoodDialogOpen(true)}>
-          <Add />
-        </IconButton>
+        <Tooltip title="Add new food">
+          <IconButton onClick={() => setIsFoodDialogOpen(true)}>
+            <Add />
+          </IconButton>
+        </Tooltip>
       </Stack>
 
-      <Box
+      <Paper
+        variant="outlined"
         sx={{
-          maxHeight: 300,
+          maxHeight: 320,
           overflowY: "auto",
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: 1,
+          borderRadius: 2,
+          px: 1,
+          backgroundColor: "background.paper",
         }}
       >
         {isLoading ? (
@@ -122,19 +134,25 @@ const FoodList = () => {
               <Fragment key={food.id}>
                 <ListItem
                   secondaryAction={
-                    <IconButton
-                      onClick={() => {
-                        setEditedFood(food);
-                        setIsFoodDialogOpen(true);
-                      }}
-                    >
-                      <Edit />
-                    </IconButton>
+                    <Tooltip title="Edit food">
+                      <IconButton onClick={() => openEditDialog(food)}>
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
                   }
                 >
                   <ListItemText
-                    primary={food.name}
-                    secondary={`Calories: ${food.calories} | Carbs: ${food.carbs}g | Fats: ${food.fat}g | Protein: ${food.protein}g`}
+                    primary={
+                      <Typography variant="subtitle1">
+                        {food.name}
+                        {food.brand ? ` (${food.brand})` : ""}
+                      </Typography>
+                    }
+                    secondary={
+                      <Typography variant="body2" color="text.secondary">
+                        {`Calories: ${food.calories} kcal | Carbs: ${food.carbs}g | Fat: ${food.fat}g | Protein: ${food.protein}g`}
+                      </Typography>
+                    }
                   />
                 </ListItem>
                 {idx < foods.length - 1 && <Divider component="li" />}
@@ -142,9 +160,12 @@ const FoodList = () => {
             ))}
           </List>
         )}
-      </Box>
+      </Paper>
 
       <Dialog
+        open={isFoodDialogOpen}
+        onClose={() => setIsFoodDialogOpen(false)}
+        title={editedFood.id ? "Edit Food" : "Add Food"}
         dialogActions={
           <DialogFormActions
             onCancel={() => setIsFoodDialogOpen(false)}
@@ -160,9 +181,6 @@ const FoodList = () => {
             }
           />
         }
-        onClose={() => setIsFoodDialogOpen(false)}
-        open={isFoodDialogOpen}
-        title={editedFood.id ? "Edit Food" : "Create Food"}
       >
         <FoodForm
           food={editedFood}

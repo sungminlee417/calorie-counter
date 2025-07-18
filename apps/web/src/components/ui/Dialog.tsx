@@ -4,6 +4,7 @@ import {
   DialogActions,
   DialogTitle,
   DialogContent,
+  Box,
 } from "@mui/material";
 
 export interface DialogProps {
@@ -24,7 +25,9 @@ const Dialog: React.FC<DialogProps> = ({
   return (
     <MuiDialog onClose={onClose} open={open} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent>{children}</DialogContent>
+      <DialogContent>
+        <Box mt={1.5}>{children}</Box>
+      </DialogContent>
       <DialogActions>{dialogActions}</DialogActions>
     </MuiDialog>
   );

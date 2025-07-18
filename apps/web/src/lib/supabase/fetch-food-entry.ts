@@ -18,7 +18,7 @@ export const fetchGetFoodEntries = async (
     throw new Error("User not found. Please make sure you are logged in.");
   }
 
-  let query = supabase.from("food_entries").select("*, foods(*)",).eq('user_id', user.id);
+  let query = supabase.from("food_entries").select("*, foods(*)",).eq('user_id', user.id).order("created_at", { ascending: false });
 
   if (date) {
     const start = dayjs(date).startOf("day").toISOString();

@@ -13,6 +13,8 @@ import {
   Stack,
   Divider,
   Skeleton,
+  Paper,
+  Tooltip,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 
@@ -23,14 +25,15 @@ import FoodEntryForm from "./FoodEntryForm";
 import DialogFormActions from "../ui/DialogFormActions";
 import { FoodEntryWithFood } from "@/lib/supabase/fetch-food-entry";
 import { useDate } from "@/context/DateContext";
+import { foodEntrySchema } from "@/types/food-entry";
 
 const EMPTY_FOOD_ENTRY: FoodEntry = {
+  id: 0,
+  user_id: "",
   food_id: 0,
   quantity: 1,
   created_at: null,
-  id: 0,
   updated_at: null,
-  user_id: "",
 };
 
 const FoodEntryList = () => {
@@ -43,16 +46,24 @@ const FoodEntryList = () => {
     isLoading,
   } = useFoodEntries(selectedDate);
 
-  const [isFoodEntryDialogOpen, setIsFoodEntryDialogOpen] = useState(false);
-  const [editedFoodEntry, setEditedFoodEntry] =
-    useState<FoodEntry>(EMPTY_FOOD_ENTRY);
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [editedEntry, setEditedEntry] = useState<FoodEntry>(EMPTY_FOOD_ENTRY);
 
-  const handleSaveFoodEntry = useCallback(
+  const handleSave = useCallback(
     (foodEntry: FoodEntry | FoodEntryWithFood) => {
       const hasFoods = (
-        entry: FoodEntry | FoodEntryWithFood
-      ): entry is FoodEntryWithFood =>
-        "foods" in entry && entry.foods !== undefined;
+        data: FoodEntry | FoodEntryWithFood
+      ): data is FoodEntryWithFood => "foods" in data;
+
+      const { created_at, updated_at, id, ...rest } = foodEntry;
+
+      console.log(rest);
+
+      const result = foodEntrySchema.safeParse(rest);
+      if (!result.success) {
+        console.error("Validation failed:", result.error.flatten());
+        return;
+      }
 
       let cleanedEntry: Partial<FoodEntry>;
 
@@ -74,24 +85,24 @@ const FoodEntryList = () => {
         );
       }
 
-      setEditedFoodEntry(EMPTY_FOOD_ENTRY);
-      setIsFoodEntryDialogOpen(false);
+      setEditedEntry(EMPTY_FOOD_ENTRY);
+      setDialogOpen(false);
     },
     [createFoodEntry, updateFoodEntry]
   );
 
-  const handleDeleteFoodEntry = useCallback(
-    (foodEntryId: string) => {
-      deleteFoodEntry(foodEntryId);
-      setEditedFoodEntry(EMPTY_FOOD_ENTRY);
-      setIsFoodEntryDialogOpen(false);
+  const handleDelete = useCallback(
+    (id: string) => {
+      deleteFoodEntry(id);
+      setEditedEntry(EMPTY_FOOD_ENTRY);
+      setDialogOpen(false);
     },
     [deleteFoodEntry]
   );
 
   const handleEditClick = (entry: FoodEntry) => {
-    setEditedFoodEntry(entry);
-    setIsFoodEntryDialogOpen(true);
+    setEditedEntry(entry);
+    setDialogOpen(true);
   };
 
   return (
@@ -100,19 +111,21 @@ const FoodEntryList = () => {
         <Typography variant="h6" flex={1}>
           Food Entries
         </Typography>
-        <IconButton onClick={() => setIsFoodEntryDialogOpen(true)}>
-          <Add />
-        </IconButton>
+        <Tooltip title="Add new food entry">
+          <IconButton onClick={() => setDialogOpen(true)}>
+            <Add />
+          </IconButton>
+        </Tooltip>
       </Stack>
 
-      <Box
+      <Paper
+        variant="outlined"
         sx={{
-          maxHeight: 300,
+          maxHeight: 320,
           overflowY: "auto",
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: 1,
+          borderRadius: 2,
           px: 1,
+          backgroundColor: "background.paper",
         }}
       >
         {isLoading ? (
@@ -130,36 +143,36 @@ const FoodEntryList = () => {
             ))}
           </List>
         ) : foodEntries?.length === 0 ? (
-          <Typography p={2}>No food entries yet.</Typography>
+          <Typography p={2} color="text.secondary">
+            No food entries yet.
+          </Typography>
         ) : (
           <List>
             {foodEntries?.map((entry, idx) => (
               <Fragment key={entry.id}>
                 <ListItem
                   secondaryAction={
-                    <IconButton
-                      edge="end"
-                      onClick={() => handleEditClick(entry)}
-                    >
-                      <Edit />
-                    </IconButton>
+                    <Tooltip title="Edit entry">
+                      <IconButton
+                        edge="end"
+                        onClick={() => handleEditClick(entry)}
+                      >
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
                   }
                 >
                   <ListItemText
                     primary={
-                      <Typography variant="subtitle1" component="span">
+                      <Typography variant="subtitle1">
                         {entry.foods?.name || "Unknown Food"}
                       </Typography>
                     }
                     secondary={
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        component="span"
-                      >
-                        {`${entry.foods.brand ? `${entry.foods.brand}, ` : ""}${
-                          entry.quantity * (entry.foods?.serving_size ?? 1)
-                        } ${entry.foods?.serving_unit ?? ""}`}
+                      <Typography variant="body2" color="text.secondary">
+                        {entry.foods?.brand ? `${entry.foods.brand}, ` : ""}
+                        {entry.quantity * (entry.foods?.serving_size ?? 1)}{" "}
+                        {entry.foods?.serving_unit || ""}
                       </Typography>
                     }
                   />
@@ -169,28 +182,25 @@ const FoodEntryList = () => {
             ))}
           </List>
         )}
-      </Box>
+      </Paper>
 
       <Dialog
+        open={isDialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={editedEntry.id ? "Edit Food Entry" : "Add Food Entry"}
         dialogActions={
           <DialogFormActions
-            onCancel={() => setIsFoodEntryDialogOpen(false)}
+            onCancel={() => setDialogOpen(false)}
             onDelete={
-              editedFoodEntry.id
-                ? () => handleDeleteFoodEntry(String(editedFoodEntry.id))
+              editedEntry.id
+                ? () => handleDelete(String(editedEntry.id))
                 : undefined
             }
-            onSave={() => handleSaveFoodEntry(editedFoodEntry)}
+            onSave={() => handleSave(editedEntry)}
           />
         }
-        onClose={() => setIsFoodEntryDialogOpen(false)}
-        open={isFoodEntryDialogOpen}
-        title={editedFoodEntry.id ? "Edit Food Entry" : "Create Food Entry"}
       >
-        <FoodEntryForm
-          foodEntry={editedFoodEntry}
-          onChange={(updatedFoodEntry) => setEditedFoodEntry(updatedFoodEntry)}
-        />
+        <FoodEntryForm foodEntry={editedEntry} onChange={setEditedEntry} />
       </Dialog>
     </Box>
   );

@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Typography, IconButton, Stack, Box, Skeleton } from "@mui/material";
+import {
+  Typography,
+  IconButton,
+  Stack,
+  Box,
+  Skeleton,
+  Paper,
+  Tooltip,
+} from "@mui/material";
 import {
   Edit,
   LocalFireDepartment,
@@ -17,14 +25,14 @@ import useMacroGoal from "@/hooks/useMacroGoal";
 import MacroGoalForm from "./MacroGoalForm";
 
 const EMPTY_MACRO_GOAL: MacroGoal = {
+  id: 0,
   protein: 0,
   fat: 0,
   carbs: 0,
-  created_at: "",
-  id: 0,
-  updated_at: null,
-  user_id: "",
   calories: 0,
+  user_id: "",
+  created_at: "",
+  updated_at: null,
 };
 
 const MacroGoalPanel = () => {
@@ -36,38 +44,39 @@ const MacroGoalPanel = () => {
     updateMacroGoal,
   } = useMacroGoal();
 
-  const [isMacroGoalDialogOpen, setIsMacroGoalDialogOpen] = useState(false);
-  const [editedMacroGoal, setEditedMacroGoal] =
-    useState<MacroGoal>(EMPTY_MACRO_GOAL);
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [editedGoal, setEditedGoal] = useState<MacroGoal>(EMPTY_MACRO_GOAL);
 
   const handleSave = useCallback(() => {
-    const macroGoalToSave = {
-      protein: editedMacroGoal.protein,
-      fat: editedMacroGoal.fat,
-      carbs: editedMacroGoal.carbs,
-      calories: editedMacroGoal.calories,
-      user_id: editedMacroGoal.user_id,
+    const payload = {
+      protein: editedGoal.protein,
+      fat: editedGoal.fat,
+      carbs: editedGoal.carbs,
+      calories: editedGoal.calories,
+      user_id: editedGoal.user_id,
     };
-    if (editedMacroGoal.id) {
-      updateMacroGoal(editedMacroGoal);
-    } else {
-      createMacroGoal(macroGoalToSave);
-    }
-    setIsMacroGoalDialogOpen(false);
-  }, [createMacroGoal, editedMacroGoal, updateMacroGoal]);
 
-  const handleDeleteMacroGoal = useCallback(
-    (macroGoalId: string) => {
-      deleteMacroGoal(macroGoalId);
-      setEditedMacroGoal(EMPTY_MACRO_GOAL);
-      setIsMacroGoalDialogOpen(false);
+    if (editedGoal.id) {
+      updateMacroGoal(editedGoal);
+    } else {
+      createMacroGoal(payload);
+    }
+
+    setDialogOpen(false);
+  }, [createMacroGoal, updateMacroGoal, editedGoal]);
+
+  const handleDelete = useCallback(
+    (goalId: string) => {
+      deleteMacroGoal(goalId);
+      setEditedGoal(EMPTY_MACRO_GOAL);
+      setDialogOpen(false);
     },
     [deleteMacroGoal]
   );
 
   useEffect(() => {
     if (!isLoading && macroGoal) {
-      setEditedMacroGoal(macroGoal);
+      setEditedGoal(macroGoal);
     }
   }, [isLoading, macroGoal]);
 
@@ -79,22 +88,28 @@ const MacroGoalPanel = () => {
     <MacroItem
       icon={icon}
       label={label}
-      value={value !== null ? value : <Skeleton width={60} variant="text" />}
+      value={value ?? <Skeleton width={60} variant="text" />}
     />
   );
 
   return (
-    <>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
-      >
-        <Typography variant="h6">🎯 Daily Macro Goals</Typography>
-        <IconButton onClick={() => setIsMacroGoalDialogOpen(true)}>
-          <Edit />
-        </IconButton>
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        backgroundColor: "background.paper",
+      }}
+    >
+      <Stack direction="row" alignItems="center" mb={2}>
+        <Typography variant="h6" flex={1}>
+          🎯 Daily Macro Goals
+        </Typography>
+        <Tooltip title="Edit macro goals">
+          <IconButton color="primary" onClick={() => setDialogOpen(true)}>
+            <Edit />
+          </IconButton>
+        </Tooltip>
       </Stack>
 
       <Stack spacing={1.5}>
@@ -121,27 +136,27 @@ const MacroGoalPanel = () => {
       </Stack>
 
       <Dialog
+        open={isDialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title="Edit Macro Goals"
         dialogActions={
           <DialogFormActions
-            onCancel={() => setIsMacroGoalDialogOpen(false)}
+            onCancel={() => setDialogOpen(false)}
             onDelete={
-              editedMacroGoal.id
-                ? () => handleDeleteMacroGoal(String(editedMacroGoal.id))
+              editedGoal.id
+                ? () => handleDelete(String(editedGoal.id))
                 : undefined
             }
-            onSave={() => handleSave()}
+            onSave={handleSave}
           />
         }
-        onClose={() => setIsMacroGoalDialogOpen(false)}
-        open={isMacroGoalDialogOpen}
-        title="Edit Macro Goals"
       >
         <MacroGoalForm
-          macroGoal={editedMacroGoal}
-          onChange={(updatedMacroGoal) => setEditedMacroGoal(updatedMacroGoal)}
+          macroGoal={editedGoal}
+          onChange={(updated) => setEditedGoal(updated)}
         />
       </Dialog>
-    </>
+    </Paper>
   );
 };
 
@@ -156,7 +171,11 @@ function MacroItem({
 }) {
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
-      <Box sx={{ width: 32, height: 32 }}>{icon}</Box>
+      <Box
+        sx={{ width: 32, height: 32, display: "flex", alignItems: "center" }}
+      >
+        {icon}
+      </Box>
       <Typography variant="body1" sx={{ minWidth: 80 }}>
         {label}
       </Typography>

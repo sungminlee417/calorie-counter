@@ -20,23 +20,24 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    const { name, value } = e.target;
     onChange({
       ...foodEntry,
-      [e.target.name]: e.target.value,
+      [name]: name === "quantity" ? Number(value) : value,
     });
   };
 
   return (
-    <Stack>
+    <Stack spacing={3}>
       <TextField
         select
-        label="Food"
+        id="food_id"
+        label="Select Food"
         name="food_id"
         value={foodEntry.food_id}
         onChange={handleChange}
-        fullWidth
-        margin="normal"
-        required
+        variant="outlined"
+        helperText="Choose a food item from your list"
       >
         {foods?.map((food) => (
           <MenuItem key={food.id} value={food.id}>
@@ -44,16 +45,17 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
           </MenuItem>
         ))}
       </TextField>
+
       <TextField
-        label="Quantity"
+        id="quantity"
+        label="Servings"
         name="quantity"
         type="number"
         value={foodEntry.quantity}
         onChange={handleChange}
         fullWidth
-        margin="normal"
         required
-        inputProps={{ min: 1 }}
+        helperText="Enter the number of servings (e.g., 1.5)"
       />
     </Stack>
   );
