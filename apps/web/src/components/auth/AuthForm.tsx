@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Box,
   Button,
   TextField,
   Typography,
   Stack,
   Alert,
+  Paper,
 } from "@mui/material";
 import Link from "next/link";
 import { fetchLogin, fetchSignup } from "@/lib/supabase/fetch-auth";
@@ -42,7 +42,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
 
   const [loginData, setLoginData] = useState<LoginInput>(EMPTY_LOGIN_DATA);
   const [signupData, setSignupData] = useState<SignupInput>(EMPTY_SIGNUP_DATA);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(externalError || null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -58,39 +57,31 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
     try {
       if (isLogin) {
         loginSchema.parse(loginData);
-
         const { error } = await fetchLogin(loginData);
         setLoading(false);
 
         if (error) {
-          if (
+          setError(
             error.message.includes("Email not confirmed") ||
-            error.message.includes("invalid login credentials")
-          ) {
-            setError(
-              "Login failed. Make sure you have confirmed your email and your credentials are correct."
-            );
-          } else {
-            setError(error.message);
-          }
+              error.message.includes("invalid login credentials")
+              ? "Login failed. Make sure you have confirmed your email and your credentials are correct."
+              : error.message
+          );
           return;
         }
 
         router.push("/dashboard");
       } else {
         signupSchema.parse(signupData);
-
         const { error } = await fetchSignup(signupData);
         setLoading(false);
 
         if (error) {
-          if (error.message.includes("User already registered")) {
-            setError(
-              "This email is already registered. Please log in or reset your password."
-            );
-          } else {
-            setError(error.message);
-          }
+          setError(
+            error.message.includes("User already registered")
+              ? "This email is already registered. Please log in or reset your password."
+              : error.message
+          );
           return;
         }
 
@@ -109,21 +100,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
   };
 
   return (
-    <Box
+    <Paper
       component="form"
       onSubmit={handleSubmit}
+      elevation={3}
       sx={{
-        maxWidth: 400,
+        maxWidth: 420,
         mx: "auto",
-        mt: 8,
+        mt: 10,
         p: 4,
-        border: "1px solid #ddd",
-        borderRadius: 2,
-        boxShadow: 1,
+        borderRadius: 3,
+        backgroundColor: "background.paper",
       }}
     >
-      <Typography variant="h5" mb={2}>
-        {isLogin ? "Login" : "Sign Up"}
+      <Typography variant="h4" textAlign="center" mb={3}>
+        {isLogin ? "Welcome Back" : "Create Your Account"}
       </Typography>
 
       <Stack spacing={2}>
@@ -140,6 +131,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
                 }))
               }
               disabled={loading}
+              fullWidth
             />
             <TextField
               label="Last Name"
@@ -152,6 +144,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
                 }))
               }
               disabled={loading}
+              fullWidth
             />
           </>
         )}
@@ -167,6 +160,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
               : setSignupData((prev) => ({ ...prev, email: e.target.value }))
           }
           disabled={loading}
+          fullWidth
         />
         <TextField
           label="Password"
@@ -182,6 +176,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
                 }))
           }
           disabled={loading}
+          fullWidth
         />
 
         {error && <Alert severity="error">{error}</Alert>}
@@ -190,6 +185,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
         <Button
           type="submit"
           variant="contained"
+          color="primary"
+          size="large"
           disabled={loading}
           sx={{ mt: 1 }}
         >
@@ -205,16 +202,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
         <Typography variant="body2" align="center" sx={{ mt: 2 }}>
           {isLogin ? (
             <>
-              Don&apos;t have an account? <Link href="/signup">Sign up</Link>
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" style={{ textDecoration: "underline" }}>
+                Sign up
+              </Link>
             </>
           ) : (
             <>
-              Already have an account? <Link href="/login">Login</Link>
+              Already have an account?{" "}
+              <Link href="/login" style={{ textDecoration: "underline" }}>
+                Log in
+              </Link>
             </>
           )}
         </Typography>
       </Stack>
-    </Box>
+    </Paper>
   );
 };
 
