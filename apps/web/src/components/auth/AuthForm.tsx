@@ -10,7 +10,8 @@ import {
   Alert,
   Paper,
 } from "@mui/material";
-import Link from "next/link";
+import z from "zod/v4";
+
 import { fetchLogin, fetchSignup } from "@/lib/supabase/fetch-auth";
 import {
   LoginInput,
@@ -18,7 +19,8 @@ import {
   SignupInput,
   signupSchema,
 } from "@/types/auth";
-import z from "zod/v4";
+
+import StyledNextLink from "../ui/StyledNextLink";
 
 interface AuthFormProps {
   mode: "login" | "signup";
@@ -100,124 +102,129 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
   };
 
   return (
-    <Paper
-      component="form"
-      onSubmit={handleSubmit}
-      elevation={3}
-      sx={{
-        maxWidth: 420,
-        mx: "auto",
-        mt: 10,
-        p: 4,
-        borderRadius: 3,
-        backgroundColor: "background.paper",
-      }}
+    <Stack
+      alignItems="center"
+      justifyContent="center"
+      sx={{ height: "100vh", padding: 2, width: "100vw" }}
     >
-      <Typography variant="h4" textAlign="center" mb={3}>
-        {isLogin ? "Welcome Back" : "Create Your Account"}
-      </Typography>
+      <Paper
+        component="form"
+        onSubmit={handleSubmit}
+        elevation={3}
+        sx={{
+          maxWidth: 420,
+          width: "100%",
+          p: 4,
+          borderRadius: 3,
+          backgroundColor: "background.paper",
+          boxSizing: "border-box",
+        }}
+      >
+        <Typography variant="h4" textAlign="center" mb={3}>
+          {isLogin ? "Welcome Back" : "Create Your Account"}
+        </Typography>
 
-      <Stack spacing={2}>
-        {!isLogin && (
-          <>
-            <TextField
-              label="First Name"
-              value={signupData.first_name}
-              required
-              onChange={(e) =>
-                setSignupData((prev) => ({
-                  ...prev,
-                  first_name: e.target.value,
-                }))
-              }
-              disabled={loading}
-              fullWidth
-            />
-            <TextField
-              label="Last Name"
-              value={signupData.last_name}
-              required
-              onChange={(e) =>
-                setSignupData((prev) => ({
-                  ...prev,
-                  last_name: e.target.value,
-                }))
-              }
-              disabled={loading}
-              fullWidth
-            />
-          </>
-        )}
-
-        <TextField
-          label="Email"
-          type="email"
-          value={isLogin ? loginData.email : signupData.email}
-          required
-          onChange={(e) =>
-            isLogin
-              ? setLoginData((prev) => ({ ...prev, email: e.target.value }))
-              : setSignupData((prev) => ({ ...prev, email: e.target.value }))
-          }
-          disabled={loading}
-          fullWidth
-        />
-        <TextField
-          label="Password"
-          type="password"
-          value={isLogin ? loginData.password : signupData.password}
-          required
-          onChange={(e) =>
-            isLogin
-              ? setLoginData((prev) => ({ ...prev, password: e.target.value }))
-              : setSignupData((prev) => ({
-                  ...prev,
-                  password: e.target.value,
-                }))
-          }
-          disabled={loading}
-          fullWidth
-        />
-
-        {error && <Alert severity="error">{error}</Alert>}
-        {successMessage && <Alert severity="success">{successMessage}</Alert>}
-
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="large"
-          disabled={loading}
-          sx={{ mt: 1 }}
-        >
-          {loading
-            ? isLogin
-              ? "Logging in..."
-              : "Signing up..."
-            : isLogin
-            ? "Login"
-            : "Sign Up"}
-        </Button>
-
-        <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-          {isLogin ? (
+        <Stack spacing={2}>
+          {!isLogin && (
             <>
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" style={{ textDecoration: "underline" }}>
-                Sign up
-              </Link>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <Link href="/login" style={{ textDecoration: "underline" }}>
-                Log in
-              </Link>
+              <TextField
+                label="First Name"
+                value={signupData.first_name}
+                required
+                onChange={(e) =>
+                  setSignupData((prev) => ({
+                    ...prev,
+                    first_name: e.target.value,
+                  }))
+                }
+                disabled={loading}
+                fullWidth
+              />
+              <TextField
+                label="Last Name"
+                value={signupData.last_name}
+                required
+                onChange={(e) =>
+                  setSignupData((prev) => ({
+                    ...prev,
+                    last_name: e.target.value,
+                  }))
+                }
+                disabled={loading}
+                fullWidth
+              />
             </>
           )}
-        </Typography>
-      </Stack>
-    </Paper>
+
+          <TextField
+            label="Email"
+            type="email"
+            value={isLogin ? loginData.email : signupData.email}
+            required
+            onChange={(e) =>
+              isLogin
+                ? setLoginData((prev) => ({ ...prev, email: e.target.value }))
+                : setSignupData((prev) => ({ ...prev, email: e.target.value }))
+            }
+            disabled={loading}
+            fullWidth
+          />
+          <TextField
+            label="Password"
+            type="password"
+            value={isLogin ? loginData.password : signupData.password}
+            required
+            onChange={(e) =>
+              isLogin
+                ? setLoginData((prev) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }))
+                : setSignupData((prev) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }))
+            }
+            disabled={loading}
+            fullWidth
+          />
+
+          {error && <Alert severity="error">{error}</Alert>}
+          {successMessage && <Alert severity="success">{successMessage}</Alert>}
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            size="large"
+            disabled={loading}
+            sx={{ mt: 1 }}
+          >
+            {loading
+              ? isLogin
+                ? "Logging in..."
+                : "Signing up..."
+              : isLogin
+              ? "Login"
+              : "Sign Up"}
+          </Button>
+
+          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+            {isLogin ? (
+              <>
+                Don&apos;t have an account?{" "}
+                <StyledNextLink href="/signup">Sign up</StyledNextLink>
+              </>
+            ) : (
+              <>
+                Already have an account?{" "}
+                <StyledNextLink href="/login">Log in</StyledNextLink>
+              </>
+            )}
+          </Typography>
+        </Stack>
+      </Paper>
+    </Stack>
   );
 };
 
