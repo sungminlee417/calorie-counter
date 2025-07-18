@@ -114,7 +114,7 @@ const MacroGoalPanel = () => {
           🎯 Daily Macro Goals
         </Typography>
         <Tooltip title="Edit macro goals">
-          <IconButton color="primary" onClick={() => setDialogOpen(true)}>
+          <IconButton onClick={() => setDialogOpen(true)}>
             <Edit />
           </IconButton>
         </Tooltip>
