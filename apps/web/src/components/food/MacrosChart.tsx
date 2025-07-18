@@ -109,7 +109,7 @@ const MacrosChart = () => {
       >
         <Typography variant="h6">
           {macroGoal
-            ? `Calories: ${macros?.calories.toFixed(
+            ? `Calories: ${(macros?.calories ?? 0).toFixed(
                 1
               )} / ${goalCalories.toFixed(1)} kcal`
             : `Calories: ${macros?.calories.toFixed(1)} kcal (estimated)`}

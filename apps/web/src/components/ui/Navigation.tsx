@@ -33,12 +33,19 @@ const Navigation = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Box flexGrow={1}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            flexGrow: 1,
+          }}
+        >
           <Image
             src="/logo.png"
             alt="Logo"
-            height={40}
-            width={120}
+            height={80}
+            width={80}
             style={{ objectFit: "contain" }}
             priority
           />
