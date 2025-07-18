@@ -169,7 +169,9 @@ const MacrosChart = () => {
           <LinearProgress
             variant="determinate"
             value={
-              goalCalories ? ((macros?.calories ?? 0) / goalCalories) * 100 : 0
+              goalCalories
+                ? Math.min(((macros?.calories ?? 0) / goalCalories) * 100, 100)
+                : 0
             }
             sx={{
               height: 10,
@@ -187,7 +189,7 @@ const MacrosChart = () => {
       <Stack spacing={2}>
         {macroList.map((macro) => {
           const progress = macro.goal
-            ? (macro.value / macro.goal) * 100
+            ? Math.min((macro.value / macro.goal) * 100, 100)
             : (macro.value / (total || 1)) * 100;
 
           const label = macro.goal

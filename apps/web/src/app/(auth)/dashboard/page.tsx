@@ -12,39 +12,24 @@ const Page = async () => {
   await requireAuth();
 
   return (
-    <Grid container padding={2} spacing={2}>
+    <Grid container padding={2} spacing={2} aria-label="Macro Nutrients Chart">
       <Grid size={{ xs: 12 }}>
         <Card>
           <MacrosChart />
         </Card>
       </Grid>
 
-      <Grid
-        size={{ lg: 4, md: 6, xs: 12 }}
-        sx={{ display: "flex", flexDirection: "column" }}
-      >
-        <Card>
-          <FoodEntryList />
-        </Card>
-      </Grid>
-
-      <Grid
-        size={{ lg: 4, md: 6, xs: 12 }}
-        sx={{ display: "flex", flexDirection: "column" }}
-      >
-        <Card>
-          <FoodList />
-        </Card>
-      </Grid>
-
-      <Grid
-        size={{ lg: 4, md: 6, xs: 12 }}
-        sx={{ display: "flex", flexDirection: "column" }}
-      >
-        <Card>
-          <MacroGoalPanel />
-        </Card>
-      </Grid>
+      {[FoodEntryList, FoodList, MacroGoalPanel].map((Component, i) => (
+        <Grid
+          key={i}
+          size={{ lg: 4, md: 6, xs: 12 }}
+          sx={{ display: "flex", flexDirection: "column" }}
+        >
+          <Card>
+            <Component />
+          </Card>
+        </Grid>
+      ))}
     </Grid>
   );
 };
