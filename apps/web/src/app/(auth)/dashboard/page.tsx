@@ -23,7 +23,7 @@ const Page = async () => {
         size={{ lg: 4, md: 6, xs: 12 }}
         sx={{ display: "flex", flexDirection: "column" }}
       >
-        <Card sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Card>
           <FoodEntryList />
         </Card>
       </Grid>
@@ -32,7 +32,7 @@ const Page = async () => {
         size={{ lg: 4, md: 6, xs: 12 }}
         sx={{ display: "flex", flexDirection: "column" }}
       >
-        <Card sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Card>
           <FoodList />
         </Card>
       </Grid>
@@ -41,7 +41,7 @@ const Page = async () => {
         size={{ lg: 4, md: 6, xs: 12 }}
         sx={{ display: "flex", flexDirection: "column" }}
       >
-        <Card sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Card>
           <MacroGoalPanel />
         </Card>
       </Grid>
