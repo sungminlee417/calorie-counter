@@ -4,9 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 const supabase = createClient();
 
 export const fetchGetFoods = async (): Promise<Food[]> => {
-  const { data: foods, error } = await supabase
-    .from("foods")
-    .select("*");
+  const { data: foods, error } = await supabase.from("foods").select("*");
 
   if (error) {
     throw new Error(error.message);
@@ -18,16 +16,18 @@ export const fetchGetFoods = async (): Promise<Food[]> => {
 export const fetchCreateFood = async (
   food: Omit<Food, "id" | "created_at" | "updated_at">
 ): Promise<Food> => {
-    const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (!user) {
-      throw new Error("User not found. Please make sure you are logged in.");
-    }
-    const userId = user.id
+  if (!user) {
+    throw new Error("User not found. Please make sure you are logged in.");
+  }
+  const userId = user.id;
 
   const { data, error } = await supabase
     .from("foods")
-    .insert({...food, user_id: userId})
+    .insert({ ...food, user_id: userId })
     .select()
     .single();
 
@@ -58,15 +58,14 @@ export const fetchUpdateFood = async (
   return data!;
 };
 
-export const fetchDeleteFood = async (foodId: number): Promise<{ message: string }> => {
+export const fetchDeleteFood = async (
+  foodId: number
+): Promise<{ message: string }> => {
   if (!foodId) {
     throw new Error("Food ID is required");
   }
 
-  const { error } = await supabase
-    .from("foods")
-    .delete()
-    .eq("id", foodId);
+  const { error } = await supabase.from("foods").delete().eq("id", foodId);
 
   if (error) {
     throw new Error(error.message);

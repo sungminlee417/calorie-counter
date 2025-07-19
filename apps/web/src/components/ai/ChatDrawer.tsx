@@ -28,6 +28,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     status,
   } = useChat({
     api: "/api/chat",
+    experimental_throttle: 50,
   });
 
   const scrollRef = useRef<HTMLDivElement>(null);

@@ -3,11 +3,16 @@ import z from "zod/v4";
 export const foodEntrySchema = z.object({
   food_id: z
     .number()
-    .min(1, "Food ID cannot be empty")
-    .describe("Unique identifier for the food item from the database"),
+    .int()
+    .min(1, "Food ID must be a positive integer")
+    .describe(
+      "Unique integer identifier for the food item, referencing the food database record"
+    ),
 
   quantity: z
     .number()
-    .positive("Servings must be a positive number")
-    .describe("Number of servings consumed for the given food item"),
+    .positive("Quantity must be a positive number")
+    .describe(
+      "The number of servings consumed, e.g., 1.5 for one and a half servings. Used as a multiplier against the food's nutritional values"
+    ),
 });
