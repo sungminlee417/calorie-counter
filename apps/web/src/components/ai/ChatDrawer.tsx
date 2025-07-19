@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Close as CloseIcon } from "@mui/icons-material";
 import {
   Box,
@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
   Button,
+  useTheme,
 } from "@mui/material";
 import { useChat } from "@ai-sdk/react";
 
@@ -17,15 +18,28 @@ export interface ChatDrawerProps {
 }
 
 const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
-  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
+  const theme = useTheme();
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    setMessages,
+    status,
+  } = useChat({
     api: "/api/chat",
   });
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const disabled = useMemo(() => {
+    return status === "submitted" || status === "streaming";
+  }, [status]);
+
   const handleClose = useCallback(() => {
+    setMessages([]);
     onClose();
-  }, [onClose]);
+  }, [onClose, setMessages]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -33,6 +47,15 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
       behavior: "smooth",
     });
   }, [messages]);
+
+  const userColor =
+    theme.palette.mode === "dark" ? "primary.dark" : "primary.main";
+  const userText = theme.palette.getContrastText(theme.palette.primary.main);
+
+  const assistantBg =
+    theme.palette.mode === "dark"
+      ? theme.palette.grey[800]
+      : theme.palette.grey[200];
 
   return (
     <Drawer
@@ -54,61 +77,59 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
         display="flex"
         alignItems="center"
         justifyContent="space-between"
+        borderBottom={`1px solid ${theme.palette.divider}`}
       >
-        <Typography variant="h6">AI Assistant</Typography>
+        <Typography variant="h6">💬 AI Assistant</Typography>
         <IconButton onClick={handleClose} aria-label="close chat drawer">
           <CloseIcon />
         </IconButton>
       </Box>
 
       <Paper
-        variant="outlined"
         sx={{
           flexGrow: 1,
           overflowY: "auto",
-          borderRadius: 2,
-          m: 2,
-          p: 2,
-          bgcolor: "background.paper",
+          borderRadius: 0,
+          m: 0,
+          px: 2,
+          py: 2,
+          bgcolor: "background.default",
         }}
         ref={scrollRef}
       >
         {messages.length === 0 && (
-          <Typography color="text.secondary" align="center">
+          <Typography color="text.secondary" align="center" mt={4}>
             Start the conversation by typing a message below.
           </Typography>
         )}
 
-        {messages.map((message) => (
-          <Box
-            key={message.id}
-            sx={{
-              mb: 1.5,
-              textAlign: message.role === "user" ? "right" : "left",
-            }}
-          >
-            <Typography
-              variant="body2"
-              component="span"
-              sx={{
-                px: 2,
-                py: 1,
-                borderRadius: 2,
-                bgcolor: message.role === "user" ? "primary.main" : "grey.300",
-                color:
-                  message.role === "user"
-                    ? "primary.contrastText"
-                    : "text.primary",
-                display: "inline-block",
-                maxWidth: "75%",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
+        {messages.map((message) => {
+          const isUser = message.role === "user";
+          return (
+            <Box
+              key={message.id}
+              display="flex"
+              justifyContent={isUser ? "flex-end" : "flex-start"}
+              mb={1.5}
             >
-              {message.content}
-            </Typography>
-          </Box>
-        ))}
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  borderRadius: 3,
+                  bgcolor: isUser ? userColor : assistantBg,
+                  color: isUser ? userText : "text.primary",
+                  maxWidth: "75%",
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  boxShadow: 1,
+                }}
+              >
+                <Typography variant="body2">{message.content}</Typography>
+              </Box>
+            </Box>
+          );
+        })}
       </Paper>
 
       <Box
@@ -119,6 +140,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
           display: "flex",
           gap: 1,
           borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+          bgcolor: "background.paper",
         }}
       >
         <TextField
@@ -127,7 +149,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
           placeholder="Type your message..."
           value={input}
           onChange={handleInputChange}
-          disabled={status === "streaming"}
+          disabled={disabled}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -141,7 +163,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
         <Button
           variant="contained"
           type="submit"
-          disabled={status === "streaming" || input.trim().length === 0}
+          disabled={disabled || input.trim().length === 0}
           aria-label="send message"
         >
           Send
