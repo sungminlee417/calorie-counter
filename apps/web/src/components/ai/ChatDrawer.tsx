@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Close as CloseIcon } from "@mui/icons-material";
 import {
   Box,
@@ -23,6 +23,10 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
@@ -34,7 +38,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     <Drawer
       anchor="right"
       open={isDrawerOpen}
-      onClose={onClose}
+      onClose={handleClose}
       slotProps={{
         paper: {
           sx: {
@@ -52,7 +56,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
         justifyContent="space-between"
       >
         <Typography variant="h6">AI Assistant</Typography>
-        <IconButton onClick={onClose} aria-label="close chat drawer">
+        <IconButton onClick={handleClose} aria-label="close chat drawer">
           <CloseIcon />
         </IconButton>
       </Box>

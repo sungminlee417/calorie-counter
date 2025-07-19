@@ -1,36 +1,24 @@
 
-// import { generateText } from 'ai';
-// import OpenAI from 'openai';
-// import { createFood, addEntry } from '@/lib/aiTools';
+import { NextRequest } from 'next/server';
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY!,
-// });
+export async function POST(req: NextRequest) {
+  try {
+    const { messages } = await req.json();
 
-// export async function POST(req: Request) {
-//   const { messages } = await req.json();
+    if (!Array.isArray(messages)) {
+      return new Response('Invalid messages format', { status: 400 });
+    }
 
-//   const response = await openai.chat.completions.create({
-//     model: 'gpt-4-0613',
-//     stream: true,
-//     messages,
-//     tools,
-//     tool_choice: "auto",
-//   });
+    const result = streamText({
+      model: openai('o4-mini'),
+      messages,
+    });
 
-//   const stream = OpenAIStream(response, {
-//     async onToolCall(toolCall) {
-//       const { name, arguments: args } = toolCall;
-//       if (name === 'createFood') {
-//         const result = await createFood(JSON.parse(args));
-//         return { result };
-//       }
-//       if (name === 'addEntry') {
-//         const result = await addEntry(JSON.parse(args));
-//         return { result };
-//       }
-//     },
-//   });
-
-//   return new StreamingTextResponse(stream);
-// }
+    return result.toDataStreamResponse();
+  } catch (error) {
+    console.error('Error in /api/chat:', error);
+    return new Response('Internal Server Error', { status: 500 });
+  }
+}
