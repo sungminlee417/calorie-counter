@@ -1,9 +1,14 @@
 import { NextRequest } from "next/server";
 import { streamText, UIMessage } from "ai";
 import { openai } from "@ai-sdk/openai";
+
 import { CreateFoodToolManager } from "@/lib/ai/tools/create-food-tool-manager";
+import { SearchFoodToolManager } from "@/lib/ai/tools/search-food-tool-manager";
+import { CreateFoodEntryToolManager } from "@/lib/ai/tools/create-food-entry-tool-manager";
 
 const createFoodTool = new CreateFoodToolManager();
+const createFoodEntry = new CreateFoodEntryToolManager();
+const searchFoodTool = new SearchFoodToolManager();
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,7 +22,12 @@ export async function POST(req: NextRequest) {
       model: openai("gpt-4o-mini"),
       system: "You are a helpful assistant.",
       messages,
-      tools: { createFood: createFoodTool.tool() },
+      tools: {
+        createFood: createFoodTool.tool(),
+        createFoodEntry: createFoodEntry.tool(),
+        searchFood: searchFoodTool.tool(),
+      },
+      maxSteps: 5,
       onError: (error) => {
         console.log(error);
       },

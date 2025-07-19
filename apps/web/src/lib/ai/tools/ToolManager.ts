@@ -3,15 +3,15 @@ import { Schema } from "ai";
 interface ToolOptions {
   name: string;
   description: string;
-  parameters: Schema;
-  execute: (input: unknown) => Promise<string>;
+  parameters?: Schema;
+  execute: (input: unknown) => Promise<unknown>;
 }
 
 export class ToolManager {
   readonly name: string;
   readonly description: string;
-  readonly parameters: Schema;
-  private readonly handler: (input: unknown) => Promise<string>;
+  readonly parameters?: Schema;
+  private readonly handler: (input: unknown) => Promise<unknown>;
 
   constructor(options: ToolOptions) {
     this.name = options.name;
@@ -29,7 +29,7 @@ export class ToolManager {
     };
   }
 
-  async call(input: unknown): Promise<string> {
+  async call(input: unknown): Promise<unknown> {
     return await this.handler(input);
   }
 }

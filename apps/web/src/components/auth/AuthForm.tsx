@@ -91,10 +91,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
           "Signup successful! Please check your email and confirm your address before logging in."
         );
       }
-    } catch (err) {
+    } catch (e) {
       setLoading(false);
-      if (err instanceof z.ZodError) {
-        setError(err.issues[0].message);
+      if (e instanceof z.ZodError) {
+        setError(e.issues[0].message);
       } else {
         setError("An unexpected error occurred.");
       }
