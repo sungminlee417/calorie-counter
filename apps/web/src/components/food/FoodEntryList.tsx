@@ -123,6 +123,7 @@ const FoodEntryList = () => {
           borderRadius: 2,
           px: 1,
           backgroundColor: "background.paper",
+          maxHeight: 320,
         }}
       >
         {isLoading ? (
