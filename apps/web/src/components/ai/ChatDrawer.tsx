@@ -37,7 +37,6 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     experimental_throttle: 50,
   });
 
-  console.log(messages);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [files, setFiles] = useState<FileList | undefined>(undefined);
 
@@ -65,6 +64,14 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     theme.palette.mode === "dark"
       ? theme.palette.grey[800]
       : theme.palette.grey[200];
+
+  const onSubmit = useCallback(
+    (e: React.FormEvent | React.KeyboardEvent) => {
+      handleSubmit(e, { experimental_attachments: files });
+      setFiles(undefined);
+    },
+    [files, handleSubmit]
+  );
 
   return (
     <Drawer
@@ -143,12 +150,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
 
       <Box
         component="form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          console.log(files);
-          handleSubmit(e, { experimental_attachments: files });
-          setFiles(undefined);
-        }}
+        onSubmit={onSubmit}
         sx={{
           p: 2,
           display: "flex",
@@ -167,8 +169,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
           disabled={disabled}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit(e);
+              onSubmit(e);
             }
           }}
           multiline
