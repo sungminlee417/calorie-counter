@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { streamText, UIMessage } from "ai";
 import { openai } from "@ai-sdk/openai";
+import outdent from "outdent";
 
 import { CreateFoodToolManager } from "@/lib/ai/tools/create-food-tool-manager";
 import { SearchFoodToolManager } from "@/lib/ai/tools/search-food-tool-manager";
@@ -20,7 +21,11 @@ export async function POST(req: NextRequest) {
 
     const result = streamText({
       model: openai("gpt-4o-mini"),
-      system: "You are a helpful assistant.",
+      system: outdent`
+        You are a friendly and knowledgeable nutrition assistant.
+        Help users track their daily macros by searching for foods, creating new food entries, and logging food intake accurately.
+        Use the available tools to find detailed food information, add new foods if they are missing, and log food consumption.
+        Always be clear, concise, and supportive, encouraging healthy eating habits and precise tracking.`,
       messages,
       tools: {
         [createFoodTool.name]: createFoodTool.tool(),
