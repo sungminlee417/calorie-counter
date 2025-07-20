@@ -17,6 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useChat } from "@ai-sdk/react";
+import { userFriendlyToolNames } from "@/lib/ai/tools/utils";
 
 export interface ChatDrawerProps {
   isDrawerOpen: boolean;
@@ -142,7 +143,40 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
                   boxShadow: 1,
                 }}
               >
-                <Typography variant="body2">{message.content}</Typography>
+                {message.content ? (
+                  <Typography variant="body2">{message.content}</Typography>
+                ) : message.parts?.some(
+                    (part) => part.type === "tool-invocation"
+                  ) ? (
+                  message.parts.map((part, idx) => {
+                    if (part.type === "tool-invocation") {
+                      return (
+                        <Typography
+                          key={idx}
+                          variant="body2"
+                          fontStyle="italic"
+                          color="text.secondary"
+                        >
+                          {userFriendlyToolNames[
+                            part.toolInvocation.toolName
+                          ] ?? "Unknown Tool Call"}
+                        </Typography>
+                      );
+                    }
+                    return null;
+                  })
+                ) : (
+                  message.parts?.map((part, idx) => {
+                    if (part.type === "text") {
+                      return (
+                        <Typography key={idx} variant="body2">
+                          {part.text}
+                        </Typography>
+                      );
+                    }
+                    return null;
+                  })
+                )}
               </Box>
             </Box>
           );

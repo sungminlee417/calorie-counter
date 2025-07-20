@@ -35,6 +35,15 @@ const searchFoodSchema = z.object({
     .describe("Maximum carbohydrates (grams)"),
   minFat: z.number().nonnegative().optional().describe("Minimum fat (grams)"),
   maxFat: z.number().nonnegative().optional().describe("Maximum fat (grams)"),
+  servingSize: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe("The amount of the food item"),
+  servingUnit: z
+    .string()
+    .optional()
+    .describe("The unit for the serving size (e.g. grams, cups, tbsp)"),
 });
 
 const searchFoodJsonSchema = z.toJSONSchema(searchFoodSchema) as JSONSchema7;
@@ -44,7 +53,7 @@ export class SearchFoodToolManager extends ToolManager {
     super({
       name: "searchFood",
       description:
-        "Search for food items by nutritional info and name or brand",
+        "Search for food items by nutritional info, name or brand, and optionally by serving size and unit",
       parameters: jsonSchema(searchFoodJsonSchema),
       execute: async (input) => {
         try {
@@ -65,7 +74,9 @@ export class SearchFoodToolManager extends ToolManager {
 
           let queryBuilder = supabase
             .from("foods")
-            .select("id, name, brand, calories, protein, carbs, fat")
+            .select(
+              "id, name, brand, calories, protein, carbs, fat, serving_size, serving_unit"
+            )
             .eq("user_id", userId);
 
           if (parsed.query) {
@@ -116,7 +127,11 @@ export class SearchFoodToolManager extends ToolManager {
                   item.calories
                 } kcal, ${item.protein}g protein, ${item.carbs}g carbs, ${
                   item.fat
-                }g fat`
+                }g fat${
+                  item.serving_size && item.serving_unit
+                    ? ` (Serving: ${item.serving_size} ${item.serving_unit})`
+                    : ""
+                }`
             )
             .join("\n");
 
