@@ -3,8 +3,25 @@ import { createClient } from "@/utils/supabase/client";
 
 const supabase = createClient();
 
-export const fetchGetFoods = async (): Promise<Food[]> => {
-  const { data: foods, error } = await supabase.from("foods").select("*");
+export const fetchGetFoods = async (
+  limit = 10,
+  offset = 0,
+  search = ""
+): Promise<Food[]> => {
+  const from = offset;
+  const to = offset + limit - 1;
+
+  let query = supabase
+    .from("foods")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (search.trim() !== "") {
+    query = query.ilike("name", `%${search.trim()}%`);
+  }
+
+  const { data: foods, error } = await query;
 
   if (error) {
     throw new Error(error.message);

@@ -1,6 +1,12 @@
 "use client";
 
-import React, { Fragment, useCallback, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Typography,
   List,
@@ -13,6 +19,8 @@ import {
   Skeleton,
   Paper,
   Tooltip,
+  CircularProgress,
+  TextField,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 
@@ -43,7 +51,27 @@ const EMPTY_FOOD: Food = {
 
 const FoodList = () => {
   const { user } = useUser();
-  const { createFood, deleteFood, foods, updateFood, isLoading } = useFoods();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  const {
+    createFood,
+    deleteFood,
+    foods,
+    updateFood,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useFoods(debouncedSearch);
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
@@ -127,12 +155,45 @@ const FoodList = () => {
     setIsFoodDialogOpen(true);
   };
 
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+
+    const el = bottomRef.current;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
   return (
     <Box>
       <Stack direction="row" alignItems="center" mb={2} spacing={2}>
         <Typography variant="h6" flex={1}>
           Foods
         </Typography>
+
+        {/* Search input */}
+        <TextField
+          size="small"
+          placeholder="Search foods"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ width: 250, mr: 2 }}
+        />
+
         <Tooltip title="Add new food">
           <IconButton onClick={() => setIsFoodDialogOpen(true)}>
             <Add />
@@ -205,6 +266,12 @@ const FoodList = () => {
                 {idx < foods.length - 1 && <Divider component="li" />}
               </Fragment>
             ))}
+            {isFetchingNextPage && (
+              <Box display="flex" justifyContent="center" py={2}>
+                <CircularProgress size={24} />
+              </Box>
+            )}
+            {hasNextPage && <div ref={bottomRef} />}
           </List>
         )}
       </Paper>
