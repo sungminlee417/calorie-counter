@@ -103,6 +103,21 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     [files, handleSubmit]
   );
 
+  // Find the latest tool-invocation part across all messages
+  const lastToolPart = React.useMemo(() => {
+    return [...messages]
+      .flatMap(
+        (msg) =>
+          msg.parts?.map((part) => ({
+            id: msg.id,
+            role: msg.role,
+            part,
+          })) ?? []
+      )
+      .reverse()
+      .find((p) => p.part.type === "tool-invocation");
+  }, [messages]);
+
   return (
     <Drawer
       anchor="right"
@@ -151,6 +166,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
 
         {messages.map((message) => {
           const isUser = message.role === "user";
+
           return (
             <Box
               key={message.id}
@@ -173,28 +189,31 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
               >
                 {message.content ? (
                   <Typography variant="body2">{message.content}</Typography>
-                ) : message.parts?.some(
-                    (part) => part.type === "tool-invocation"
-                  ) ? (
-                  message.parts.map((part, idx) => {
-                    if (part.type === "tool-invocation") {
-                      return (
-                        <Typography
-                          key={idx}
-                          variant="body2"
-                          fontStyle="italic"
-                          color="text.secondary"
-                        >
-                          {userFriendlyToolNames[
-                            part.toolInvocation.toolName
-                          ] ?? "Unknown Tool Call"}
-                        </Typography>
-                      );
-                    }
-                    return null;
-                  })
                 ) : (
                   message.parts?.map((part, idx) => {
+                    if (part.type === "tool-invocation") {
+                      // Show only the last tool-invocation part
+                      if (
+                        lastToolPart &&
+                        lastToolPart.id === message.id &&
+                        part === lastToolPart.part
+                      ) {
+                        return (
+                          <Typography
+                            key={idx}
+                            variant="body2"
+                            fontStyle="italic"
+                            color="text.secondary"
+                          >
+                            {userFriendlyToolNames[
+                              part.toolInvocation.toolName
+                            ] ?? "Unknown Tool Call"}
+                          </Typography>
+                        );
+                      }
+                      return null;
+                    }
+
                     if (part.type === "text") {
                       return (
                         <Typography key={idx} variant="body2">
@@ -202,6 +221,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
                         </Typography>
                       );
                     }
+
                     return null;
                   })
                 )}
