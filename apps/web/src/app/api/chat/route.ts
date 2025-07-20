@@ -33,14 +33,10 @@ export async function POST(req: NextRequest) {
         [searchFoodTool.name]: searchFoodTool.tool(),
       },
       maxSteps: 5,
-      onError: (error) => {
-        console.log(error);
-      },
     });
 
     return result.toDataStreamResponse();
   } catch (error) {
-    console.error("Error in /api/chat:", error);
     return new Response("Internal Server Error", { status: 500 });
   }
 }
