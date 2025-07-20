@@ -32,6 +32,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     handleSubmit,
     setMessages,
     status,
+    stop,
   } = useChat({
     api: "/api/chat",
     experimental_throttle: 50,
@@ -206,11 +207,17 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
           <Box flexGrow={1} />
           <Button
             variant="contained"
-            type="submit"
-            disabled={disabled || input.trim().length === 0}
-            aria-label="send message"
+            onClick={disabled ? stop : undefined}
+            type={disabled ? "button" : "submit"}
+            disabled={
+              disabled &&
+              status !== "streaming" &&
+              status !== "submitted" &&
+              !input.trim()
+            }
+            aria-label={disabled ? "stop message" : "send message"}
           >
-            Send
+            {disabled ? "Stop" : "Send"}
           </Button>
         </Box>
       </Box>
