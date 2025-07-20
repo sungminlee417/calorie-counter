@@ -27,6 +27,7 @@ import DialogFormActions from "../ui/DialogFormActions";
 import { FoodEntryWithFood } from "@/lib/supabase/fetch-food-entry";
 import { useDate } from "@/context/DateContext";
 import { foodEntrySchema, MealType, mealTypes } from "@/types/food-entry";
+import Toast from "../ui/Toast";
 
 const EMPTY_FOOD_ENTRY: FoodEntry = {
   id: 0,
@@ -88,15 +89,38 @@ const FoodEntryList = () => {
   const [editedEntry, setEditedEntry] = useState<FoodEntry>(EMPTY_FOOD_ENTRY);
   const [selectedMeal, setSelectedMeal] = useState<MealType>("breakfast");
 
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<
+    "success" | "error" | "info" | "warning"
+  >("success");
+
+  const showToast = (
+    message: string,
+    severity: "success" | "error" | "info" | "warning" = "success"
+  ) => {
+    setToastMessage(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
+
+  const handleCloseToast = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") return;
+    setToastOpen(false);
+  };
+
   const groupedEntries = groupByMealType(foodEntries);
 
   const handleSave = useCallback(
-    (foodEntry: FoodEntry | FoodEntryWithFood) => {
+    async (foodEntry: FoodEntry | FoodEntryWithFood) => {
       const { created_at, updated_at, id, ...rest } = foodEntry;
 
       const result = foodEntrySchema.safeParse(rest);
       if (!result.success) {
-        console.error("Validation failed:", result.error.flatten());
+        showToast("Invalid food entry data. Please check your input.", "error");
         return;
       }
 
@@ -109,27 +133,37 @@ const FoodEntryList = () => {
         cleanedEntry = rest;
       }
 
-      if (foodEntry.id) {
-        updateFoodEntry(
-          cleanedEntry as Omit<FoodEntry, "created_at" | "updated_at">
-        );
-      } else {
-        createFoodEntry(
-          cleanedEntry as Omit<FoodEntry, "id" | "created_at" | "updated_at">
-        );
+      try {
+        if (foodEntry.id) {
+          await updateFoodEntry.mutateAsync(
+            cleanedEntry as Omit<FoodEntry, "created_at" | "updated_at">
+          );
+          showToast("Food entry updated successfully!", "success");
+        } else {
+          await createFoodEntry.mutateAsync(
+            cleanedEntry as Omit<FoodEntry, "id" | "created_at" | "updated_at">
+          );
+          showToast("Food entry created successfully!", "success");
+        }
+        setEditedEntry(EMPTY_FOOD_ENTRY);
+        setDialogOpen(false);
+      } catch {
+        showToast("Failed to save food entry.", "error");
       }
-
-      setEditedEntry(EMPTY_FOOD_ENTRY);
-      setDialogOpen(false);
     },
     [createFoodEntry, updateFoodEntry]
   );
 
   const handleDelete = useCallback(
-    (id: string) => {
-      deleteFoodEntry(id);
-      setEditedEntry(EMPTY_FOOD_ENTRY);
-      setDialogOpen(false);
+    async (id: string) => {
+      try {
+        await deleteFoodEntry.mutateAsync(id);
+        showToast("Food entry deleted successfully!", "success");
+        setEditedEntry(EMPTY_FOOD_ENTRY);
+        setDialogOpen(false);
+      } catch {
+        showToast("Failed to delete food entry.", "error");
+      }
     },
     [deleteFoodEntry]
   );
@@ -251,8 +285,10 @@ const FoodEntryList = () => {
       <Dialog
         open={isDialogOpen}
         onClose={() => {
-          setEditedEntry(EMPTY_FOOD_ENTRY);
-          setDialogOpen(false);
+          if (!isLoading) {
+            setEditedEntry(EMPTY_FOOD_ENTRY);
+            setDialogOpen(false);
+          }
         }}
         title={editedEntry.id ? "Edit Food Entry" : "Add Food Entry"}
         dialogActions={
@@ -269,6 +305,14 @@ const FoodEntryList = () => {
       >
         <FoodEntryForm foodEntry={editedEntry} onChange={setEditedEntry} />
       </Dialog>
+
+      <Toast
+        handleCloseToast={handleCloseToast}
+        toastOpen={toastOpen}
+        toastSeverity={toastSeverity}
+      >
+        {toastMessage}
+      </Toast>
     </Box>
   );
 };

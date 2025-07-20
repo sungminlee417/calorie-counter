@@ -17,7 +17,8 @@ const useFoods = () => {
   });
 
   const createFood = useMutation({
-    mutationFn: (newFood: Omit<Food, 'id' | 'created_at' | 'updated_at'>) => fetchCreateFood(newFood),
+    mutationFn: (newFood: Omit<Food, "id" | "created_at" | "updated_at">) =>
+      fetchCreateFood(newFood),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["foods"] }),
   });
 
@@ -35,9 +36,9 @@ const useFoods = () => {
     foods: data,
     error,
     isLoading,
-    createFood: createFood.mutate,
-    updateFood: updateFood.mutate,
-    deleteFood: deleteFood.mutate,
+    createFood,
+    updateFood,
+    deleteFood,
   };
 };
 

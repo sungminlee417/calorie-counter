@@ -1,19 +1,25 @@
-import {  MacroGoal } from "@/types/supabase";
+import { MacroGoal } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/client";
 
 const supabase = createClient();
 
-export const fetchGetMacroGoal = async (): Promise<MacroGoal> => {
-  const { data: { user } } = await supabase.auth.getUser()
+export const fetchGetMacroGoal = async (): Promise<MacroGoal | null> => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     throw new Error("User not found. Please make sure you are logged in.");
   }
 
-  const { data, error } = await supabase.from("macro_goals").select("*").eq('user_id', user.id).single();
+  const { data, error } = await supabase
+    .from("macro_goals")
+    .select("*")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    return null;
   }
 
   return data ?? [];
@@ -22,17 +28,19 @@ export const fetchGetMacroGoal = async (): Promise<MacroGoal> => {
 export const fetchCreateMacroGoal = async (
   macroGoal: Omit<MacroGoal, "id" | "created_at" | "updated_at">
 ): Promise<MacroGoal> => {
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     throw new Error("User not found. Please make sure you are logged in.");
   }
 
-  const userId = user.id
+  const userId = user.id;
 
   const { data, error } = await supabase
     .from("macro_goals")
-    .insert({...macroGoal, user_id: userId})
+    .insert({ ...macroGoal, user_id: userId })
     .select()
     .single();
 
@@ -63,7 +71,9 @@ export const fetchUpdateMacroGoal = async (
   return data;
 };
 
-export const fetchDeleteMacroGoal = async (macroGoalId: number): Promise<{ message: string }> => {
+export const fetchDeleteMacroGoal = async (
+  macroGoalId: number
+): Promise<{ message: string }> => {
   if (!macroGoalId) {
     throw new Error("Macro goal ID is required");
   }

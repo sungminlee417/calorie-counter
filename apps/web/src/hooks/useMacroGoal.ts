@@ -17,27 +17,33 @@ const useMacroGoal = () => {
   });
 
   const createMacroGoal = useMutation({
-    mutationFn: (newMacroGoal: Omit<MacroGoal, 'id' | 'created_at' | 'updated_at'>) => fetchCreateMacroGoal(newMacroGoal),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["macro_goals"] }),
+    mutationFn: (
+      newMacroGoal: Omit<MacroGoal, "id" | "created_at" | "updated_at">
+    ) => fetchCreateMacroGoal(newMacroGoal),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["macro_goals"] }),
   });
 
   const updateMacroGoal = useMutation({
-    mutationFn: (updatedMacroGoal: MacroGoal) => fetchUpdateMacroGoal(updatedMacroGoal),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["macro_goals"] }),
+    mutationFn: (updatedMacroGoal: MacroGoal) =>
+      fetchUpdateMacroGoal(updatedMacroGoal),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["macro_goals"] }),
   });
 
   const deleteMacroGoal = useMutation({
     mutationFn: (foodId: string) => fetchDeleteMacroGoal(Number(foodId)),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["macro_goals"] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["macro_goals"] }),
   });
 
   return {
     macroGoal: data,
     error,
     isLoading,
-    createMacroGoal: createMacroGoal.mutate,
-    updateMacroGoal: updateMacroGoal.mutate,
-    deleteMacroGoal: deleteMacroGoal.mutate,
+    createMacroGoal,
+    updateMacroGoal,
+    deleteMacroGoal,
   };
 };
 

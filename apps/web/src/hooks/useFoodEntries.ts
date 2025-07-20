@@ -21,21 +21,24 @@ const useFoodEntries = (date: Date) => {
   });
 
   const createFoodEntry = useMutation({
-    mutationFn: (newFoodEntry: Omit<FoodEntry, 'id' | 'created_at' | 'updated_at'>) =>
-      fetchCreateFoodEntry(newFoodEntry),
+    mutationFn: (
+      newFoodEntry: Omit<FoodEntry, "id" | "created_at" | "updated_at">
+    ) => fetchCreateFoodEntry(newFoodEntry),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["food-entries"] }),
   });
 
   const updateFoodEntry = useMutation({
-    mutationFn: (updatedFoodEntry: Omit<FoodEntry, 'created_at' | 'updated_at'>) =>
-      fetchUpdateFoodEntry(updatedFoodEntry),
+    mutationFn: (
+      updatedFoodEntry: Omit<FoodEntry, "created_at" | "updated_at">
+    ) => fetchUpdateFoodEntry(updatedFoodEntry),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["food-entries"] }),
   });
 
   const deleteFoodEntry = useMutation({
-    mutationFn: (foodEntryId: string) => fetchDeleteFoodEntry(Number(foodEntryId)),
+    mutationFn: (foodEntryId: string) =>
+      fetchDeleteFoodEntry(Number(foodEntryId)),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["food-entries"] }),
   });
@@ -44,9 +47,9 @@ const useFoodEntries = (date: Date) => {
     foodEntries: data,
     error,
     isLoading,
-    createFoodEntry: createFoodEntry.mutate,
-    updateFoodEntry: updateFoodEntry.mutate,
-    deleteFoodEntry: deleteFoodEntry.mutate,
+    createFoodEntry,
+    updateFoodEntry,
+    deleteFoodEntry,
   };
 };
 

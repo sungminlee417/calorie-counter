@@ -8,9 +8,12 @@ const useUser = () => {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user }, error } = await fetchUser();
+      const {
+        data: { user },
+        error,
+      } = await fetchUser();
       if (error) {
-        console.error("Error fetching user:", error);
+        throw new Error("Error fetching user:", error);
       }
       setUser(user);
       setLoading(false);

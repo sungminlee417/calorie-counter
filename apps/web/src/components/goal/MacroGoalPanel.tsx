@@ -25,6 +25,7 @@ import { macroGoalSchema } from "@/types/goal";
 import Dialog from "../ui/Dialog";
 import DialogFormActions from "../ui/DialogFormActions";
 import MacroGoalForm from "./MacroGoalForm";
+import Toast from "../ui/Toast";
 
 const EMPTY_MACRO_GOAL: MacroGoal = {
   id: 0,
@@ -49,7 +50,30 @@ const MacroGoalPanel = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [editedGoal, setEditedGoal] = useState<MacroGoal>(EMPTY_MACRO_GOAL);
 
-  const handleSave = useCallback(() => {
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<
+    "success" | "error" | "info" | "warning"
+  >("success");
+
+  const showToast = (
+    message: string,
+    severity: "success" | "error" | "info" | "warning" = "success"
+  ) => {
+    setToastMessage(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
+
+  const handleCloseToast = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") return;
+    setToastOpen(false);
+  };
+
+  const handleSave = useCallback(async () => {
     const payload = {
       protein: editedGoal.protein,
       fat: editedGoal.fat,
@@ -60,24 +84,35 @@ const MacroGoalPanel = () => {
 
     const result = macroGoalSchema.safeParse(editedGoal);
     if (!result.success) {
-      console.error("Validation failed:", result.error.flatten());
+      showToast("Invalid food entry data. Please check your input.", "error");
       return;
     }
 
-    if (editedGoal.id) {
-      updateMacroGoal(editedGoal);
-    } else {
-      createMacroGoal(payload);
+    try {
+      if (editedGoal.id) {
+        await updateMacroGoal.mutateAsync(editedGoal);
+        showToast("Macro goal updated successfully!", "success");
+      } else {
+        await createMacroGoal.mutateAsync(payload);
+        showToast("Macro goal created successfully!", "success");
+      }
+    } catch {
+      showToast("Failed to save macro goal.", "error");
     }
 
     setDialogOpen(false);
   }, [createMacroGoal, updateMacroGoal, editedGoal]);
 
   const handleDelete = useCallback(
-    (goalId: string) => {
-      deleteMacroGoal(goalId);
-      setEditedGoal(EMPTY_MACRO_GOAL);
-      setDialogOpen(false);
+    async (goalId: string) => {
+      try {
+        await deleteMacroGoal.mutateAsync(goalId);
+        showToast("Macro goal deleted successfully!", "success");
+        setEditedGoal(EMPTY_MACRO_GOAL);
+        setDialogOpen(false);
+      } catch {
+        showToast("Food entry delete macro goal.", "error");
+      }
     },
     [deleteMacroGoal]
   );
@@ -145,7 +180,9 @@ const MacroGoalPanel = () => {
 
       <Dialog
         open={isDialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={() => {
+          if (!isLoading) setDialogOpen(false);
+        }}
         title="Edit Macro Goals"
         dialogActions={
           <DialogFormActions
@@ -164,6 +201,14 @@ const MacroGoalPanel = () => {
           onChange={(updated) => setEditedGoal(updated)}
         />
       </Dialog>
+
+      <Toast
+        handleCloseToast={handleCloseToast}
+        toastOpen={toastOpen}
+        toastSeverity={toastSeverity}
+      >
+        {toastMessage}
+      </Toast>
     </Paper>
   );
 };

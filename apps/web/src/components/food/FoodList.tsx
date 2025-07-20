@@ -24,6 +24,7 @@ import { foodSchema } from "@/types/food";
 import Dialog from "../ui/Dialog";
 import FoodForm from "./FoodForm";
 import DialogFormActions from "../ui/DialogFormActions";
+import Toast from "../ui/Toast";
 
 const EMPTY_FOOD: Food = {
   id: 0,
@@ -47,8 +48,31 @@ const FoodList = () => {
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
 
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<
+    "success" | "error" | "info" | "warning"
+  >("success");
+
+  const showToast = (
+    message: string,
+    severity: "success" | "error" | "info" | "warning" = "success"
+  ) => {
+    setToastMessage(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
+
+  const handleCloseToast = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") return;
+    setToastOpen(false);
+  };
+
   const handleSaveFood = useCallback(
-    (food: Food) => {
+    async (food: Food) => {
       const foodToSave = {
         name: food.name,
         serving_size: food.serving_size,
@@ -63,23 +87,37 @@ const FoodList = () => {
 
       const result = foodSchema.safeParse(food);
       if (!result.success) {
+        showToast("Invalid food data. Please check your input.", "error");
         return;
       }
 
-      if (food.id) updateFood(food);
-      else createFood(foodToSave);
-
-      setEditedFood(EMPTY_FOOD);
-      setIsFoodDialogOpen(false);
+      try {
+        if (food.id) {
+          await updateFood.mutateAsync(food);
+          showToast("Food updated successfully!", "success");
+        } else {
+          await createFood.mutateAsync(foodToSave);
+          showToast("Food created successfully!", "success");
+        }
+        setEditedFood(EMPTY_FOOD);
+        setIsFoodDialogOpen(false);
+      } catch {
+        showToast("Failed to save food.", "error");
+      }
     },
     [createFood, updateFood]
   );
 
   const handleDeleteFood = useCallback(
-    (foodId: string) => {
-      deleteFood(foodId);
-      setEditedFood(EMPTY_FOOD);
-      setIsFoodDialogOpen(false);
+    async (foodId: string) => {
+      try {
+        await deleteFood.mutateAsync(foodId);
+        showToast("Food deleted successfully!", "success");
+        setEditedFood(EMPTY_FOOD);
+        setIsFoodDialogOpen(false);
+      } catch {
+        showToast("Failed to delete food.", "error");
+      }
     },
     [deleteFood]
   );
@@ -174,8 +212,10 @@ const FoodList = () => {
       <Dialog
         open={isFoodDialogOpen}
         onClose={() => {
-          setEditedFood(EMPTY_FOOD);
-          setIsFoodDialogOpen(false);
+          if (!isLoading) {
+            setEditedFood(EMPTY_FOOD);
+            setIsFoodDialogOpen(false);
+          }
         }}
         title={editedFood.id ? "Edit Food" : "Add Food"}
         dialogActions={
@@ -201,6 +241,14 @@ const FoodList = () => {
           onChange={(updatedFood) => setEditedFood(updatedFood)}
         />
       </Dialog>
+
+      <Toast
+        handleCloseToast={handleCloseToast}
+        toastOpen={toastOpen}
+        toastSeverity={toastSeverity}
+      >
+        {toastMessage}
+      </Toast>
     </Box>
   );
 };
