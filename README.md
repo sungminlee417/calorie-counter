@@ -46,6 +46,7 @@ Users can:
 
 - Use the AI assistant to add new food items by natural language commands
 - The AI validates and inserts food data securely linked to your account
+- Now supports sending images to help identify foods or add food photos
 - Example:
   _"Add a new food called 'Almond Butter' with 190 calories, 7g protein, 16g fat, and 6g carbs."_
 - Seamlessly expand your food database without manual form input
