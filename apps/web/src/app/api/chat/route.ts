@@ -36,7 +36,8 @@ export async function POST(req: NextRequest) {
     });
 
     return result.toDataStreamResponse();
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
     return new Response("Internal Server Error", { status: 500 });
   }
 }
