@@ -191,7 +191,6 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
                 ) : (
                   message.parts?.map((part, idx) => {
                     if (part.type === "tool-invocation") {
-                      // Show only the last tool-invocation part
                       if (
                         lastToolPart &&
                         lastToolPart.id === message.id &&
