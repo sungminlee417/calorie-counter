@@ -17,6 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useChat } from "@ai-sdk/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { userFriendlyToolNames } from "@/lib/ai/tools/utils";
 
 export interface ChatDrawerProps {
@@ -26,6 +27,17 @@ export interface ChatDrawerProps {
 
 const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
   const theme = useTheme();
+  const queryClient = useQueryClient();
+  const toolsCalledRef = useRef(new Set<string>());
+
+  const addToolCall = (toolName: string) => {
+    toolsCalledRef.current.add(toolName);
+  };
+
+  const clearToolCalls = () => {
+    toolsCalledRef.current.clear();
+  };
+
   const {
     messages,
     input,
@@ -37,6 +49,22 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
   } = useChat({
     api: "/api/chat",
     experimental_throttle: 50,
+    onToolCall: ({ toolCall: { toolName } }) => {
+      if (toolName === "createFood" || toolName === "createFoodEntry") {
+        addToolCall(toolName);
+      }
+    },
+    onFinish: () => {
+      toolsCalledRef.current.forEach((toolName) => {
+        if (toolName === "createFood") {
+          queryClient.invalidateQueries({ queryKey: ["foods"] });
+        }
+        if (toolName === "createFoodEntry") {
+          queryClient.invalidateQueries({ queryKey: ["food-entries"] });
+        }
+      });
+      clearToolCalls();
+    },
   });
 
   const scrollRef = useRef<HTMLDivElement>(null);
