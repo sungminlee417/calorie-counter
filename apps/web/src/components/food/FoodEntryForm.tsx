@@ -5,6 +5,7 @@ import { MenuItem, TextField, Stack } from "@mui/material";
 
 import useFoods from "@/hooks/useFoods";
 import { FoodEntry } from "@/types/supabase";
+import { mealTypes } from "@/types/food-entry";
 
 export interface FoodEntryFormProps {
   foodEntry: FoodEntry;
@@ -57,6 +58,24 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
         required
         helperText="Enter the number of servings (e.g., 1.5)"
       />
+
+      <TextField
+        select
+        id="meal_type"
+        label="Meal Type"
+        name="meal_type"
+        value={foodEntry.meal_type}
+        onChange={handleChange}
+        fullWidth
+        required
+        helperText="Choose which meal this entry belongs to"
+      >
+        {mealTypes.map((meal) => (
+          <MenuItem key={meal} value={meal}>
+            {meal.charAt(0).toUpperCase() + meal.slice(1)}
+          </MenuItem>
+        ))}
+      </TextField>
     </Stack>
   );
 };

@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 "use client";
 
 import React, { Fragment, useCallback, useState } from "react";
 import {
+  Box,
+  Typography,
+  Stack,
+  IconButton,
   List,
   ListItem,
   ListItemText,
-  IconButton,
-  Typography,
-  Box,
-  Stack,
   Divider,
   Skeleton,
   Paper,
   Tooltip,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 
@@ -25,7 +26,7 @@ import FoodEntryForm from "./FoodEntryForm";
 import DialogFormActions from "../ui/DialogFormActions";
 import { FoodEntryWithFood } from "@/lib/supabase/fetch-food-entry";
 import { useDate } from "@/context/DateContext";
-import { foodEntrySchema } from "@/types/food-entry";
+import { foodEntrySchema, MealType, mealTypes } from "@/types/food-entry";
 
 const EMPTY_FOOD_ENTRY: FoodEntry = {
   id: 0,
@@ -34,6 +35,43 @@ const EMPTY_FOOD_ENTRY: FoodEntry = {
   quantity: 1,
   created_at: null,
   updated_at: null,
+  meal_type: "breakfast",
+};
+
+const mealIcons: Record<MealType, string> = {
+  breakfast: "🍳",
+  lunch: "🥪",
+  dinner: "🍽️",
+  snacks: "🍎",
+};
+
+const groupByMealType = (
+  entries: (FoodEntryWithFood | FoodEntry)[] | undefined
+): Record<MealType, (FoodEntryWithFood | FoodEntry)[]> => {
+  return (
+    entries?.reduce(
+      (acc, entry) => {
+        const mealType = (entry as FoodEntryWithFood).meal_type ?? "snacks";
+        if (mealTypes.includes(mealType as MealType)) {
+          acc[mealType as MealType].push(entry);
+        } else {
+          acc.snacks.push(entry);
+        }
+        return acc;
+      },
+      {
+        breakfast: [],
+        lunch: [],
+        dinner: [],
+        snacks: [],
+      } as Record<MealType, (FoodEntryWithFood | FoodEntry)[]>
+    ) ?? {
+      breakfast: [],
+      lunch: [],
+      dinner: [],
+      snacks: [],
+    }
+  );
 };
 
 const FoodEntryList = () => {
@@ -48,13 +86,12 @@ const FoodEntryList = () => {
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [editedEntry, setEditedEntry] = useState<FoodEntry>(EMPTY_FOOD_ENTRY);
+  const [selectedMeal, setSelectedMeal] = useState<MealType>("breakfast");
+
+  const groupedEntries = groupByMealType(foodEntries);
 
   const handleSave = useCallback(
     (foodEntry: FoodEntry | FoodEntryWithFood) => {
-      const hasFoods = (
-        data: FoodEntry | FoodEntryWithFood
-      ): data is FoodEntryWithFood => "foods" in data;
-
       const { created_at, updated_at, id, ...rest } = foodEntry;
 
       const result = foodEntrySchema.safeParse(rest);
@@ -65,12 +102,11 @@ const FoodEntryList = () => {
 
       let cleanedEntry: Partial<FoodEntry>;
 
-      if (hasFoods(foodEntry)) {
-        const { created_at, updated_at, foods, ...rest } = foodEntry;
-        cleanedEntry = { ...rest };
+      if ("foods" in foodEntry) {
+        const { foods, ...rest } = foodEntry;
+        cleanedEntry = rest;
       } else {
-        const { id, created_at, updated_at, ...rest } = foodEntry;
-        cleanedEntry = { ...rest };
+        cleanedEntry = rest;
       }
 
       if (foodEntry.id) {
@@ -103,6 +139,10 @@ const FoodEntryList = () => {
     setDialogOpen(true);
   };
 
+  const handleTabChange = (_: React.SyntheticEvent, newMeal: MealType) => {
+    setSelectedMeal(newMeal);
+  };
+
   return (
     <Box>
       <Stack direction="row" alignItems="center" mb={2} spacing={2}>
@@ -118,68 +158,94 @@ const FoodEntryList = () => {
 
       <Paper
         variant="outlined"
-        sx={{
-          overflowY: "auto",
-          borderRadius: 2,
-          px: 1,
-          backgroundColor: "background.paper",
-          maxHeight: 320,
-        }}
+        sx={{ borderRadius: 2, backgroundColor: "background.paper" }}
       >
-        {isLoading ? (
-          <List>
-            {[...Array(4)].map((_, idx) => (
-              <Fragment key={idx}>
-                <ListItem>
-                  <ListItemText
-                    primary={<Skeleton width="50%" />}
-                    secondary={<Skeleton width="30%" />}
-                  />
-                </ListItem>
-                {idx < 3 && <Divider component="li" />}
-              </Fragment>
-            ))}
-          </List>
-        ) : foodEntries?.length === 0 ? (
-          <Typography p={2} color="text.secondary">
-            No food entries yet.
-          </Typography>
-        ) : (
-          <List>
-            {foodEntries?.map((entry, idx) => (
-              <Fragment key={entry.id}>
-                <ListItem
-                  secondaryAction={
-                    <Tooltip title="Edit entry">
-                      <IconButton
-                        edge="end"
-                        onClick={() => handleEditClick(entry)}
-                      >
-                        <Edit />
-                      </IconButton>
-                    </Tooltip>
-                  }
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="subtitle1">
-                        {entry.foods?.name || "Unknown Food"}
-                      </Typography>
+        <Tabs
+          value={selectedMeal}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons={true}
+          allowScrollButtonsMobile
+          sx={{ px: 2, pt: 1 }}
+        >
+          {mealTypes.map((meal) => (
+            <Tab
+              key={meal}
+              label={
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <span>{mealIcons[meal]}</span>
+                  <span style={{ textTransform: "capitalize" }}>{meal}</span>
+                </Box>
+              }
+              value={meal}
+            />
+          ))}
+        </Tabs>
+
+        <Box sx={{ maxHeight: 320, overflowY: "auto", px: 1 }}>
+          {isLoading ? (
+            <List>
+              {[...Array(4)].map((_, idx) => (
+                <Fragment key={idx}>
+                  <ListItem>
+                    <ListItemText
+                      primary={<Skeleton width="50%" />}
+                      secondary={<Skeleton width="30%" />}
+                    />
+                  </ListItem>
+                  {idx < 3 && <Divider component="li" />}
+                </Fragment>
+              ))}
+            </List>
+          ) : groupedEntries[selectedMeal].length === 0 ? (
+            <Typography p={2} color="text.secondary" fontStyle="italic">
+              No {selectedMeal} entries yet.
+            </Typography>
+          ) : (
+            <List>
+              {groupedEntries[selectedMeal].map((entry, idx) => (
+                <Fragment key={entry.id}>
+                  <ListItem
+                    secondaryAction={
+                      <Tooltip title="Edit entry">
+                        <IconButton
+                          edge="end"
+                          onClick={() => handleEditClick(entry)}
+                        >
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>
                     }
-                    secondary={
-                      <Typography variant="body2" color="text.secondary">
-                        {entry.foods?.brand ? `${entry.foods.brand}, ` : ""}
-                        {entry.quantity * (entry.foods?.serving_size ?? 1)}{" "}
-                        {entry.foods?.serving_unit || ""}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-                {idx < foodEntries.length - 1 && <Divider component="li" />}
-              </Fragment>
-            ))}
-          </List>
-        )}
+                  >
+                    <ListItemText
+                      primary={
+                        <Typography variant="subtitle1" fontWeight="medium">
+                          {(entry as FoodEntryWithFood).foods?.name ||
+                            "Unknown Food"}
+                        </Typography>
+                      }
+                      secondary={
+                        <Typography variant="body2" color="text.secondary">
+                          {(entry as FoodEntryWithFood).foods?.brand
+                            ? `${(entry as FoodEntryWithFood).foods.brand}, `
+                            : ""}
+                          {entry.quantity *
+                            ((entry as FoodEntryWithFood).foods?.serving_size ??
+                              1)}{" "}
+                          {(entry as FoodEntryWithFood).foods?.serving_unit ||
+                            ""}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  {idx < groupedEntries[selectedMeal].length - 1 && (
+                    <Divider component="li" />
+                  )}
+                </Fragment>
+              ))}
+            </List>
+          )}
+        </Box>
       </Paper>
 
       <Dialog
