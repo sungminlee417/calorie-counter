@@ -103,7 +103,6 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     [files, handleSubmit]
   );
 
-  // Find the latest tool-invocation part across all messages
   const lastToolPart = React.useMemo(() => {
     return [...messages]
       .flatMap(
