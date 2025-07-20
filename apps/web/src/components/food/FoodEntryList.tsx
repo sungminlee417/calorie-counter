@@ -128,7 +128,7 @@ const FoodEntryList = () => {
       >
         {isLoading ? (
           <List>
-            {[...Array(3)].map((_, idx) => (
+            {[...Array(4)].map((_, idx) => (
               <Fragment key={idx}>
                 <ListItem>
                   <ListItemText
@@ -136,7 +136,7 @@ const FoodEntryList = () => {
                     secondary={<Skeleton width="30%" />}
                   />
                 </ListItem>
-                {idx < 2 && <Divider component="li" />}
+                {idx < 3 && <Divider component="li" />}
               </Fragment>
             ))}
           </List>

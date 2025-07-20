@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Close as CloseIcon } from "@mui/icons-material";
 import {
   Box,
@@ -31,7 +37,9 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     experimental_throttle: 50,
   });
 
+  console.log(messages);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [files, setFiles] = useState<FileList | undefined>(undefined);
 
   const disabled = useMemo(() => {
     return status === "submitted" || status === "streaming";
@@ -135,10 +143,16 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
 
       <Box
         component="form"
-        onSubmit={handleSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          console.log(files);
+          handleSubmit(e, { experimental_attachments: files });
+          setFiles(undefined);
+        }}
         sx={{
           p: 2,
           display: "flex",
+          flexDirection: "column",
           gap: 1,
           borderTop: (theme) => `1px solid ${theme.palette.divider}`,
           bgcolor: "background.paper",
@@ -161,14 +175,43 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
           maxRows={4}
           aria-label="chat input"
         />
-        <Button
-          variant="contained"
-          type="submit"
-          disabled={disabled || input.trim().length === 0}
-          aria-label="send message"
-        >
-          Send
-        </Button>
+
+        <Box display="flex" alignItems="center" gap={1}>
+          <Button
+            variant="outlined"
+            component="label"
+            disabled={disabled}
+            sx={{ minWidth: 0 }}
+          >
+            📎
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => {
+                if (e.target.files) {
+                  setFiles(e.target.files);
+                }
+              }}
+            />
+          </Button>
+
+          {!!files?.length && (
+            <Typography variant="body2" color="text.secondary">
+              {files[0].name}
+            </Typography>
+          )}
+
+          <Box flexGrow={1} />
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={disabled || input.trim().length === 0}
+            aria-label="send message"
+          >
+            Send
+          </Button>
+        </Box>
       </Box>
     </Drawer>
   );

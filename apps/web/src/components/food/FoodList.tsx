@@ -113,7 +113,7 @@ const FoodList = () => {
         }}
       >
         {isLoading ? (
-          <List disablePadding>
+          <List>
             {[...Array(4)].map((_, idx) => (
               <Fragment key={idx}>
                 <ListItem>
@@ -135,13 +135,16 @@ const FoodList = () => {
             No foods found.
           </Typography>
         ) : (
-          <List disablePadding>
+          <List>
             {foods.map((food, idx) => (
               <Fragment key={food.id}>
                 <ListItem
                   secondaryAction={
                     <Tooltip title="Edit food">
-                      <IconButton onClick={() => openEditDialog(food)}>
+                      <IconButton
+                        edge="end"
+                        onClick={() => openEditDialog(food)}
+                      >
                         <Edit />
                       </IconButton>
                     </Tooltip>
