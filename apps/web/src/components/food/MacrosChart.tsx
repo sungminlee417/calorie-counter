@@ -162,7 +162,16 @@ const MacrosChart = () => {
         <Box mb={3}>
           <Stack direction="row" justifyContent="space-between">
             <Typography variant="body2">Calories</Typography>
-            <Typography variant="body2">
+            <Typography
+              variant="body2"
+              sx={{
+                color:
+                  macros?.calories !== undefined &&
+                  macros.calories > goalCalories
+                    ? "error.main"
+                    : "text.primary",
+              }}
+            >
               {macros?.calories.toFixed(1)} / {goalCalories.toFixed(1)} kcal
             </Typography>
           </Stack>
@@ -204,7 +213,17 @@ const MacrosChart = () => {
             <Box key={macro.name}>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2">{macro.name}</Typography>
-                <Typography variant="body2">{label}</Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color:
+                      macro.goal !== null && macro.value > macro.goal
+                        ? "error.main"
+                        : "text.primary",
+                  }}
+                >
+                  {label}
+                </Typography>
               </Stack>
               <LinearProgress
                 variant="determinate"
