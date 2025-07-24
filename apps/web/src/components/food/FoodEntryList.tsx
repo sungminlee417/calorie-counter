@@ -16,6 +16,8 @@ import {
   Tooltip,
   Tabs,
   Tab,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 
@@ -28,6 +30,8 @@ import { FoodEntryWithFood } from "@/lib/supabase/fetch-food-entry";
 import { useDate } from "@/context/DateContext";
 import { foodEntrySchema, MealType, mealTypes } from "@/types/food-entry";
 import Toast from "../ui/Toast";
+import useToast from "@/hooks/useToast";
+import FoodQuickAddList from "./FoodQuickAddList";
 
 const EMPTY_FOOD_ENTRY: FoodEntry = {
   id: 0,
@@ -85,32 +89,28 @@ const FoodEntryList = () => {
     isLoading,
   } = useFoodEntries(selectedDate);
 
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [openAddFromScratch, setOpenAddFromScratch] = useState(false);
+  const [openQuickAdd, setOpenQuickAdd] = useState(false);
+
+  const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   const [editedEntry, setEditedEntry] = useState<FoodEntry>(EMPTY_FOOD_ENTRY);
   const [selectedMeal, setSelectedMeal] = useState<MealType>("breakfast");
 
-  const [toastOpen, setToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState<
-    "success" | "error" | "info" | "warning"
-  >("success");
-
-  const showToast = (
-    message: string,
-    severity: "success" | "error" | "info" | "warning" = "success"
-  ) => {
-    setToastMessage(message);
-    setToastSeverity(severity);
-    setToastOpen(true);
-  };
-
-  const handleCloseToast = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") return;
-    setToastOpen(false);
-  };
+  const {
+    handleCloseToast,
+    showToast,
+    toastMessage,
+    toastOpen,
+    toastSeverity,
+  } = useToast();
 
   const groupedEntries = groupByMealType(foodEntries);
 
@@ -146,12 +146,12 @@ const FoodEntryList = () => {
           showToast("Food entry created successfully!", "success");
         }
         setEditedEntry(EMPTY_FOOD_ENTRY);
-        setDialogOpen(false);
+        setOpenAddFromScratch(false);
       } catch {
         showToast("Failed to save food entry.", "error");
       }
     },
-    [createFoodEntry, updateFoodEntry]
+    [createFoodEntry, showToast, updateFoodEntry]
   );
 
   const handleDelete = useCallback(
@@ -160,17 +160,17 @@ const FoodEntryList = () => {
         await deleteFoodEntry.mutateAsync(id);
         showToast("Food entry deleted successfully!", "success");
         setEditedEntry(EMPTY_FOOD_ENTRY);
-        setDialogOpen(false);
+        setOpenAddFromScratch(false);
       } catch {
         showToast("Failed to delete food entry.", "error");
       }
     },
-    [deleteFoodEntry]
+    [deleteFoodEntry, showToast]
   );
 
   const handleEditClick = (entry: FoodEntry) => {
     setEditedEntry(entry);
-    setDialogOpen(true);
+    setOpenAddFromScratch(true);
   };
 
   const handleTabChange = (_: React.SyntheticEvent, newMeal: MealType) => {
@@ -183,11 +183,34 @@ const FoodEntryList = () => {
         <Typography variant="h6" flex={1}>
           Food Entries
         </Typography>
-        <Tooltip title="Add new food entry">
-          <IconButton onClick={() => setDialogOpen(true)}>
+        <Tooltip title="Add food entry">
+          <IconButton onClick={handleAddClick}>
             <Add />
           </IconButton>
         </Tooltip>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem
+            onClick={() => {
+              setOpenAddFromScratch(true);
+              handleMenuClose();
+            }}
+          >
+            Add from scratch
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setOpenQuickAdd(true);
+              handleMenuClose();
+            }}
+          >
+            Add from existing foods
+          </MenuItem>
+        </Menu>
       </Stack>
 
       <Paper
@@ -283,17 +306,17 @@ const FoodEntryList = () => {
       </Paper>
 
       <Dialog
-        open={isDialogOpen}
+        open={openAddFromScratch}
         onClose={() => {
           if (!isLoading) {
             setEditedEntry(EMPTY_FOOD_ENTRY);
-            setDialogOpen(false);
+            setOpenAddFromScratch(false);
           }
         }}
         title={editedEntry.id ? "Edit Food Entry" : "Add Food Entry"}
         dialogActions={
           <DialogFormActions
-            onCancel={() => setDialogOpen(false)}
+            onCancel={() => setOpenAddFromScratch(false)}
             onDelete={
               editedEntry.id
                 ? () => handleDelete(String(editedEntry.id))
@@ -303,7 +326,19 @@ const FoodEntryList = () => {
           />
         }
       >
-        <FoodEntryForm foodEntry={editedEntry} onChange={setEditedEntry} />
+        <FoodEntryForm
+          foodEntry={editedEntry}
+          onChange={setEditedEntry}
+          selectedMeal={selectedMeal}
+        />
+      </Dialog>
+
+      <Dialog
+        open={openQuickAdd}
+        onClose={() => setOpenQuickAdd(false)}
+        title="Add from existing foods"
+      >
+        <FoodQuickAddList mealType={selectedMeal} />
       </Dialog>
 
       <Toast

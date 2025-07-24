@@ -26,6 +26,7 @@ import Dialog from "../ui/Dialog";
 import DialogFormActions from "../ui/DialogFormActions";
 import MacroGoalForm from "./MacroGoalForm";
 import Toast from "../ui/Toast";
+import useToast from "@/hooks/useToast";
 
 const EMPTY_MACRO_GOAL: MacroGoal = {
   id: 0,
@@ -50,28 +51,13 @@ const MacroGoalPanel = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [editedGoal, setEditedGoal] = useState<MacroGoal>(EMPTY_MACRO_GOAL);
 
-  const [toastOpen, setToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState<
-    "success" | "error" | "info" | "warning"
-  >("success");
-
-  const showToast = (
-    message: string,
-    severity: "success" | "error" | "info" | "warning" = "success"
-  ) => {
-    setToastMessage(message);
-    setToastSeverity(severity);
-    setToastOpen(true);
-  };
-
-  const handleCloseToast = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") return;
-    setToastOpen(false);
-  };
+  const {
+    handleCloseToast,
+    showToast,
+    toastMessage,
+    toastOpen,
+    toastSeverity,
+  } = useToast();
 
   const handleSave = useCallback(async () => {
     const payload = {
@@ -101,7 +87,7 @@ const MacroGoalPanel = () => {
     }
 
     setDialogOpen(false);
-  }, [createMacroGoal, updateMacroGoal, editedGoal]);
+  }, [editedGoal, showToast, updateMacroGoal, createMacroGoal]);
 
   const handleDelete = useCallback(
     async (goalId: string) => {
@@ -114,7 +100,7 @@ const MacroGoalPanel = () => {
         showToast("Food entry delete macro goal.", "error");
       }
     },
-    [deleteMacroGoal]
+    [deleteMacroGoal, showToast]
   );
 
   useEffect(() => {

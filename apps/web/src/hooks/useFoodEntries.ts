@@ -9,15 +9,14 @@ import {
 } from "@/lib/supabase/fetch-food-entry";
 import { FoodEntry } from "@/types/supabase";
 
-const useFoodEntries = (date: Date) => {
+const useFoodEntries = (date?: Date) => {
   const queryClient = useQueryClient();
 
-  const formattedDate = dayjs(date).format("YYYY-MM-DD");
+  const formattedDate = date ? dayjs(date).format("YYYY-MM-DD") : undefined;
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["food-entries", formattedDate],
     queryFn: () => fetchGetFoodEntries(formattedDate),
-    enabled: !!date,
   });
 
   const createFoodEntry = useMutation({

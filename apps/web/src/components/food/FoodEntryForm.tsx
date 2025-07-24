@@ -1,21 +1,25 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MenuItem, TextField, Stack } from "@mui/material";
 
 import useFoods from "@/hooks/useFoods";
 import { FoodEntry } from "@/types/supabase";
-import { mealTypes } from "@/types/food-entry";
+import { MealType, mealTypes } from "@/types/food-entry";
 
 export interface FoodEntryFormProps {
   foodEntry: FoodEntry;
   onChange: (updatedFoodEntry: FoodEntry) => void;
+  selectedMeal: MealType;
 }
 
 const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
   foodEntry,
   onChange,
+  selectedMeal,
 }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const { foods } = useFoods();
 
   const handleChange = (
@@ -27,6 +31,13 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
       [name]: name === "quantity" ? Number(value) : value,
     });
   };
+
+  useEffect(() => {
+    if (!isLoaded) {
+      onChange({ ...foodEntry, meal_type: selectedMeal });
+      setIsLoaded(true);
+    }
+  }, [foodEntry, isLoaded, onChange, selectedMeal]);
 
   return (
     <Stack spacing={3}>

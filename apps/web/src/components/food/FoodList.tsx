@@ -33,6 +33,7 @@ import Dialog from "../ui/Dialog";
 import FoodForm from "./FoodForm";
 import DialogFormActions from "../ui/DialogFormActions";
 import Toast from "../ui/Toast";
+import useToast from "@/hooks/useToast";
 
 const EMPTY_FOOD: Food = {
   id: 0,
@@ -76,28 +77,13 @@ const FoodList = () => {
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
 
-  const [toastOpen, setToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState<
-    "success" | "error" | "info" | "warning"
-  >("success");
-
-  const showToast = (
-    message: string,
-    severity: "success" | "error" | "info" | "warning" = "success"
-  ) => {
-    setToastMessage(message);
-    setToastSeverity(severity);
-    setToastOpen(true);
-  };
-
-  const handleCloseToast = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") return;
-    setToastOpen(false);
-  };
+  const {
+    handleCloseToast,
+    showToast,
+    toastMessage,
+    toastOpen,
+    toastSeverity,
+  } = useToast();
 
   const handleSaveFood = useCallback(
     async (food: Food) => {
@@ -133,7 +119,7 @@ const FoodList = () => {
         showToast("Failed to save food.", "error");
       }
     },
-    [createFood, updateFood]
+    [createFood, showToast, updateFood]
   );
 
   const handleDeleteFood = useCallback(
@@ -147,7 +133,7 @@ const FoodList = () => {
         showToast("Failed to delete food.", "error");
       }
     },
-    [deleteFood]
+    [deleteFood, showToast]
   );
 
   const openEditDialog = (food: Food) => {
