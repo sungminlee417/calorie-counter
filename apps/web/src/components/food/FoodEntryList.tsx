@@ -334,6 +334,9 @@ const FoodEntryList = () => {
       </Dialog>
 
       <Dialog
+        dialogActions={
+          <DialogFormActions onCancel={() => setOpenQuickAdd(false)} />
+        }
         open={openQuickAdd}
         onClose={() => setOpenQuickAdd(false)}
         title="Add from existing foods"
