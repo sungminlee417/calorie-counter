@@ -3,31 +3,88 @@ import { createClient } from "@/utils/supabase/client";
 
 const supabase = createClient();
 
+interface USDAFood {
+  fdcId: number;
+  brandOwner: string;
+  description: string;
+  dataType: string;
+  foodNutrients: Array<{
+    nutrientName: string;
+    nutrientNumber: string;
+    unitName: string;
+    value: number;
+  }>;
+  servingSize: number;
+  servingSizeUnit: string;
+}
+
+const fetchExternalFoods = async (
+  search: string,
+  limit: number,
+  offset: number
+): Promise<Food[]> => {
+  const res = await fetch(
+    `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${
+      process.env.NEXT_PUBLIC_FDC_API_KEY
+    }&query=${encodeURIComponent(search)}&pageSize=${limit}&pageNumber=${
+      offset + 1
+    }`
+  );
+
+  if (!res.ok) throw new Error("Failed to fetch external foods");
+
+  const data = await res.json();
+
+  return (data.foods || []).map((item: USDAFood) => ({
+    id: item.fdcId.toString(),
+    name: item.description,
+    brand: item.brandOwner,
+    calories:
+      item.foodNutrients.find((n) => n.nutrientNumber === "208")?.value || 0,
+    protein:
+      item.foodNutrients.find((n) => n.nutrientNumber === "203")?.value || 0,
+    carbs:
+      item.foodNutrients.find((n) => n.nutrientNumber === "205")?.value || 0,
+    fat: item.foodNutrients.find((n) => n.nutrientNumber === "204")?.value || 0,
+    serving_size: item.servingSize,
+    serving_unit: item.servingSizeUnit,
+    source: "usda",
+  }));
+};
+
 export const fetchGetFoods = async (
   limit = 10,
-  offset = 0,
+  page = 0,
   search = ""
 ): Promise<Food[]> => {
+  const offset = page * limit;
   const from = offset;
   const to = offset + limit - 1;
 
-  let query = supabase
+  let internalQuery = supabase
     .from("foods")
     .select("*")
     .order("created_at", { ascending: false })
     .range(from, to);
 
-  if (search.trim() !== "") {
-    query = query.ilike("name", `%${search.trim()}%`);
+  if (search.trim()) {
+    internalQuery = internalQuery.ilike("name", `%${search.trim()}%`);
   }
 
-  const { data: foods, error } = await query;
+  const { data: internalFoodsRaw, error } = await internalQuery;
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return foods ?? [];
+  const internalFoods = (internalFoodsRaw ?? []).map((f) => ({
+    ...f,
+    source: "internal" as const,
+  }));
+
+  const externalFoods = await fetchExternalFoods(search.trim(), limit, page);
+
+  return [...internalFoods, ...externalFoods];
 };
 
 export const fetchCreateFood = async (

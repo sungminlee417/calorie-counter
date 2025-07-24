@@ -185,7 +185,6 @@ const FoodList = () => {
           Foods
         </Typography>
 
-        {/* Search input */}
         <TextField
           size="small"
           placeholder="Search foods"

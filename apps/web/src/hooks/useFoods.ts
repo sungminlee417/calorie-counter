@@ -27,10 +27,12 @@ const useFoods = (search: string = "") => {
     refetch,
   } = useInfiniteQuery({
     queryKey: ["foods", search],
-    queryFn: ({ pageParam = 0 }) => fetchGetFoods(PAGE_SIZE, pageParam, search),
+    queryFn: async ({ pageParam = 0 }) => {
+      return await fetchGetFoods(PAGE_SIZE, pageParam, search);
+    },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
-      lastPage.length < PAGE_SIZE ? undefined : allPages.length * PAGE_SIZE,
+      lastPage.length < PAGE_SIZE ? undefined : allPages.length,
   });
 
   const createFood = useMutation({
