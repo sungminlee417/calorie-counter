@@ -32,6 +32,7 @@ Users can:
   - Carbs
 - Calories are auto-calculated using standard macros:
   `calories = (protein * 4) + (carbs * 4) + (fat * 9)`
+- Macro goals are accessible to the AI assistant via a dedicated tool for dynamic use in suggestions and tracking.
 
 ### 🍎 Foods
 
@@ -156,6 +157,12 @@ Stores each user's daily macro goals.
 - AI can search foods, create new foods, and add food entries
 - Tools use Zod schemas and JSON Schema for validation
 - Tool calls return detailed responses for smooth chat flow
+
+### 🥅 Macro Goals Retrieval Tool
+
+- Added an AI tool to fetch the logged-in user's macro nutrition goals directly from the database.
+- Enables personalized meal suggestions and progress tracking based on actual user targets.
+- The AI assistant can now dynamically access and use these goals during interactions, enhancing the app’s personalization and utility.
 
 ---
 
