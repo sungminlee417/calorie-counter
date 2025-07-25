@@ -6,9 +6,13 @@ import outdent from "outdent";
 import { CreateFoodToolManager } from "@/lib/ai/tools/create-food-tool-manager";
 import { SearchFoodToolManager } from "@/lib/ai/tools/search-food-tool-manager";
 import { CreateFoodEntryToolManager } from "@/lib/ai/tools/create-food-entry-tool-manager";
+import { GetMacroGoalsToolManager } from "@/lib/ai/tools/get-macro-goals-tool-manager";
+import { GetFoodEntriesByDateToolManager } from "@/lib/ai/tools/get-food-entries-by-date-tool-manager";
 
 const createFoodTool = new CreateFoodToolManager();
 const createFoodEntryTool = new CreateFoodEntryToolManager();
+const getFoodEntriesByDate = new GetFoodEntriesByDateToolManager();
+const getMacroGoalsTool = new GetMacroGoalsToolManager();
 const searchFoodTool = new SearchFoodToolManager();
 
 export async function POST(req: NextRequest) {
@@ -30,6 +34,8 @@ export async function POST(req: NextRequest) {
       tools: {
         [createFoodTool.name]: createFoodTool.tool(),
         [createFoodEntryTool.name]: createFoodEntryTool.tool(),
+        [getFoodEntriesByDate.name]: getFoodEntriesByDate.tool(),
+        [getMacroGoalsTool.name]: getMacroGoalsTool.tool(),
         [searchFoodTool.name]: searchFoodTool.tool(),
       },
       maxSteps: 5,
