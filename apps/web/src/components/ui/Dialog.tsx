@@ -6,7 +6,6 @@ import {
   DialogContent,
   Box,
   useTheme,
-  Typography,
 } from "@mui/material";
 import { UI_COLORS } from "@/constants/app";
 
@@ -49,20 +48,15 @@ const Dialog: React.FC<DialogProps> = ({
         sx={{
           borderBottom: `1px solid ${theme.palette.divider}`,
           background: `linear-gradient(90deg, ${theme.palette.primary.main}15, ${theme.palette.secondary.main}15)`,
+          fontWeight: 600,
+          fontSize: "1.25rem",
+          backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+          backgroundClip: "text",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
         }}
       >
-        <Typography
-          variant="h6"
-          fontWeight="600"
-          sx={{
-            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          {title}
-        </Typography>
+        {title}
       </DialogTitle>
       <DialogContent sx={{ p: 3 }}>
         <Box mt={1}>{children}</Box>

@@ -122,6 +122,8 @@ const MacrosChart = () => {
     name: string;
     unit: string;
   }) => {
+    const clampedValue = Math.min(Math.max(value || 0, 0), 100);
+
     return (
       <Tooltip
         title={
@@ -144,32 +146,15 @@ const MacrosChart = () => {
         >
           <LinearProgress
             variant="determinate"
-            value={Math.min(value, 100)}
+            value={clampedValue}
             sx={{
               height: 12,
               borderRadius: 6,
               backgroundColor:
                 theme.palette.mode === "dark" ? "#2a2a2a" : "#f0f0f0",
-              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)",
-              overflow: "hidden",
               "& .MuiLinearProgress-bar": {
-                background: `linear-gradient(90deg, ${color}, ${color}dd)`,
+                backgroundColor: color,
                 borderRadius: 6,
-                position: "relative",
-                "&::after": {
-                  content: '""',
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)`,
-                  animation: value > 0 ? "shimmer 2s infinite" : "none",
-                },
-              },
-              "@keyframes shimmer": {
-                "0%": { transform: "translateX(-100%)" },
-                "100%": { transform: "translateX(100%)" },
               },
             }}
           />
@@ -437,9 +422,7 @@ const MacrosChart = () => {
       {/* Macros Grid */}
       <Stack spacing={2}>
         {macroList.map((macro, index) => {
-          const progress = macro.goal
-            ? (macro.value / macro.goal) * 100
-            : (macro.value / (total || 1)) * 100;
+          const progress = macro.goal ? (macro.value / macro.goal) * 100 : 0; // Show 0% when no goal is set
 
           const statusInfo = getStatusInfo(macro.value, macro.goal);
 
@@ -504,14 +487,42 @@ const MacrosChart = () => {
                   </Stack>
                 </Stack>
 
-                <EnhancedProgressBar
-                  value={Math.max(progress, 0)}
-                  color={macro.color}
-                  goal={macro.goal}
-                  current={macro.value}
-                  name={macro.name}
-                  unit={macro.unit}
-                />
+                {macro.goal ? (
+                  <EnhancedProgressBar
+                    value={Math.max(progress, 0)}
+                    color={macro.color}
+                    goal={macro.goal}
+                    current={macro.value}
+                    name={macro.name}
+                    unit={macro.unit}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      height: 12,
+                      borderRadius: 6,
+                      backgroundColor:
+                        theme.palette.mode === "dark" ? "#2a2a2a" : "#f0f0f0",
+                      position: "relative",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        fontSize: "0.6rem",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      No goal set
+                    </Typography>
+                  </Box>
+                )}
 
                 {!macro.goal && (
                   <Typography
@@ -519,7 +530,9 @@ const MacrosChart = () => {
                     color="text.secondary"
                     sx={{ mt: 1, display: "block" }}
                   >
-                    {progress.toFixed(1)}% of today&apos;s intake
+                    {total > 0
+                      ? `${((macro.value / total) * 100).toFixed(1)}% of today's intake`
+                      : "Set macro goals to track progress"}
                   </Typography>
                 )}
               </Paper>

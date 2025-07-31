@@ -13,9 +13,11 @@ import { LocalFireDepartment, Logout, Person } from "@mui/icons-material";
 import { fetchLogout } from "@/lib/supabase/fetch-auth";
 import ThemeSelector from "./ThemeSelector";
 import { MACRO_CHART_COLORS, UI_COLORS } from "@/constants/app";
+import { useThemeMode } from "@/context/ThemeModeContext";
 
 const Navigation = () => {
   const theme = useTheme();
+  const { resolvedTheme } = useThemeMode();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -30,6 +32,7 @@ const Navigation = () => {
     <AppBar
       position="static"
       role="banner"
+      key={resolvedTheme} // Force re-render when theme changes
       sx={{
         background:
           theme.palette.mode === "dark"
