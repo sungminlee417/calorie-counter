@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🎉 Commit successful!"
+echo "📝 Don't forget to:"
+echo "   • Push your changes: git push"
+echo "   • Check if tests still pass: npm run build"
+echo "   • Update documentation if needed"

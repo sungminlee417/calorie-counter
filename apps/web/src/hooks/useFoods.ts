@@ -11,8 +11,7 @@ import {
   fetchUpdateFood,
 } from "@/lib/supabase/fetch-food";
 import { Food } from "@/types/supabase";
-
-const PAGE_SIZE = 10;
+import { PAGE_SIZE } from "@/constants/app";
 
 const useFoods = (search: string = "") => {
   const queryClient = useQueryClient();

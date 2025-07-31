@@ -9,18 +9,21 @@ import { ThemeModeProvider, useThemeMode } from "../context/ThemeModeContext";
 import { DateProvider } from "@/context/DateContext";
 
 function InnerProviders({ children }: { children: ReactNode }) {
-  const { mode } = useThemeMode();
+  const { resolvedTheme } = useThemeMode();
   const [mounted, setMounted] = useState(false);
   const [queryClient] = useState(() => new QueryClient());
 
   useEffect(() => setMounted(true), []);
 
-  const theme = useMemo(() => createTheme({ palette: { mode } }), [mode]);
+  const theme = useMemo(
+    () => createTheme({ palette: { mode: resolvedTheme } }),
+    [resolvedTheme]
+  );
 
   if (!mounted) return null;
 
   return (
-    <ThemeProvider theme={theme} key={mode}>
+    <ThemeProvider theme={theme} key={resolvedTheme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>

@@ -205,8 +205,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, error: externalError }) => {
                 ? "Logging in..."
                 : "Signing up..."
               : isLogin
-              ? "Login"
-              : "Sign Up"}
+                ? "Login"
+                : "Sign Up"}
           </Button>
 
           <Typography variant="body2" align="center" sx={{ mt: 2 }}>

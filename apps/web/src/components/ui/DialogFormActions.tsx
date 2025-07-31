@@ -5,12 +5,14 @@ export interface DialogFormActionsProps {
   onCancel: () => void;
   onDelete?: () => void;
   onSave?: () => void;
+  onSaveDisabled?: boolean;
 }
 
 const DialogFormActions: React.FC<DialogFormActionsProps> = ({
   onCancel,
   onDelete,
   onSave,
+  onSaveDisabled = false,
 }) => {
   return (
     <Stack
@@ -22,7 +24,12 @@ const DialogFormActions: React.FC<DialogFormActionsProps> = ({
     >
       <Stack direction="row" spacing={1}>
         {onSave && (
-          <Button onClick={onSave} color="primary" variant="contained">
+          <Button
+            disabled={onSaveDisabled}
+            onClick={onSave}
+            color="primary"
+            variant="contained"
+          >
             Save
           </Button>
         )}

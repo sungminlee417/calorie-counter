@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Fragment, useCallback, useState } from "react";
 import {
   Typography,
   List,
@@ -22,18 +16,23 @@ import {
   CircularProgress,
   TextField,
 } from "@mui/material";
-import { Add, Edit } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 
 import useFoods from "@/hooks/useFoods";
 import useUser from "@/hooks/useUser";
+import useDebounce from "@/hooks/useDebounce";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { Food } from "@/types/supabase";
 import { foodSchema } from "@/types/food";
+import { SEARCH_DEBOUNCE_DELAY } from "@/constants/app";
 
 import Dialog from "../ui/Dialog";
 import FoodForm from "./FoodForm";
+import FoodListItem from "./FoodListItem";
 import DialogFormActions from "../ui/DialogFormActions";
 import Toast from "../ui/Toast";
 import useToast from "@/hooks/useToast";
+import useErrorHandler from "@/hooks/useErrorHandler";
 
 const EMPTY_FOOD: Food = {
   id: 0,
@@ -54,14 +53,7 @@ const FoodList = () => {
   const { user } = useUser();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchTerm.trim());
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [searchTerm]);
+  const debouncedSearch = useDebounce(searchTerm.trim(), SEARCH_DEBOUNCE_DELAY);
 
   const {
     createFood,
@@ -85,6 +77,8 @@ const FoodList = () => {
     toastSeverity,
   } = useToast();
 
+  const { handleAsyncError } = useErrorHandler();
+
   const handleSaveFood = useCallback(
     async (food: Food) => {
       const foodToSave = {
@@ -99,41 +93,51 @@ const FoodList = () => {
         user_id: food.user_id,
       };
 
-      const result = foodSchema.safeParse(food);
-      if (!result.success) {
+      const validationResult = foodSchema.safeParse(food);
+      if (!validationResult.success) {
         showToast("Invalid food data. Please check your input.", "error");
         return;
       }
 
-      try {
-        if (food.id) {
-          await updateFood.mutateAsync(food);
-          showToast("Food updated successfully!", "success");
-        } else {
-          await createFood.mutateAsync(foodToSave);
-          showToast("Food created successfully!", "success");
-        }
+      const result = await handleAsyncError(
+        async () => {
+          if (food.id) {
+            await updateFood.mutateAsync(food);
+            return "updated";
+          } else {
+            await createFood.mutateAsync(foodToSave);
+            return "created";
+          }
+        },
+        "handleSaveFood",
+        "Failed to save food. Please try again."
+      );
+
+      if (result) {
+        const action = result === "updated" ? "updated" : "created";
+        showToast(`Food ${action} successfully!`, "success");
         setEditedFood(EMPTY_FOOD);
         setIsFoodDialogOpen(false);
-      } catch {
-        showToast("Failed to save food.", "error");
       }
     },
-    [createFood, showToast, updateFood]
+    [createFood, showToast, updateFood, handleAsyncError]
   );
 
   const handleDeleteFood = useCallback(
     async (foodId: string) => {
-      try {
-        await deleteFood.mutateAsync(foodId);
+      const result = await handleAsyncError(
+        () => deleteFood.mutateAsync(foodId),
+        "handleDeleteFood",
+        "Failed to delete food. Please try again."
+      );
+
+      if (result) {
         showToast("Food deleted successfully!", "success");
         setEditedFood(EMPTY_FOOD);
         setIsFoodDialogOpen(false);
-      } catch {
-        showToast("Failed to delete food.", "error");
       }
     },
-    [deleteFood, showToast]
+    [deleteFood, showToast, handleAsyncError]
   );
 
   const openEditDialog = (food: Food) => {
@@ -141,28 +145,11 @@ const FoodList = () => {
     setIsFoodDialogOpen(true);
   };
 
-  const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-
-    const el = bottomRef.current;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (el) observer.observe(el);
-
-    return () => {
-      if (el) observer.unobserve(el);
-    };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  const bottomRef = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   return (
     <Box>
@@ -178,14 +165,28 @@ const FoodList = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           sx={{ width: 250, mr: 2 }}
+          inputProps={{
+            "aria-label": "Search foods",
+            "aria-describedby": "search-foods-description",
+          }}
         />
 
         <Tooltip title="Add new food">
-          <IconButton onClick={() => setIsFoodDialogOpen(true)}>
+          <IconButton
+            onClick={() => setIsFoodDialogOpen(true)}
+            aria-label="Add new food"
+          >
             <Add />
           </IconButton>
         </Tooltip>
       </Stack>
+
+      <Box
+        id="search-foods-description"
+        sx={{ sr: "only", position: "absolute", left: "-10000px" }}
+      >
+        Type to search through your food database
+      </Box>
 
       <Paper
         variant="outlined"
@@ -196,6 +197,8 @@ const FoodList = () => {
           px: 1,
           backgroundColor: "background.paper",
         }}
+        role="region"
+        aria-label="Foods list"
       >
         {isLoading ? (
           <List>
@@ -223,32 +226,7 @@ const FoodList = () => {
           <List>
             {foods.map((food, idx) => (
               <Fragment key={food.id}>
-                <ListItem
-                  secondaryAction={
-                    <Tooltip title="Edit food">
-                      <IconButton
-                        edge="end"
-                        onClick={() => openEditDialog(food)}
-                      >
-                        <Edit />
-                      </IconButton>
-                    </Tooltip>
-                  }
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="subtitle1">
-                        {food.name}
-                        {food.brand ? ` (${food.brand})` : ""}
-                      </Typography>
-                    }
-                    secondary={
-                      <Typography variant="body2" color="text.secondary">
-                        {`Calories: ${food.calories} kcal | Carbs: ${food.carbs}g | Fat: ${food.fat}g | Protein: ${food.protein}g`}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
+                <FoodListItem food={food} onEdit={openEditDialog} />
                 {idx < foods.length - 1 && <Divider component="li" />}
               </Fragment>
             ))}
@@ -271,6 +249,7 @@ const FoodList = () => {
           }
         }}
         title={editedFood.id ? "Edit Food" : "Add Food"}
+        aria-describedby="food-dialog-description"
         dialogActions={
           <DialogFormActions
             onCancel={() => setIsFoodDialogOpen(false)}
@@ -289,6 +268,14 @@ const FoodList = () => {
           />
         }
       >
+        <Box
+          id="food-dialog-description"
+          sx={{ mb: 2, color: "text.secondary" }}
+        >
+          {editedFood.id
+            ? "Edit the nutritional information for this food item"
+            : "Add nutritional information for a new food item"}
+        </Box>
         <FoodForm
           food={editedFood}
           onChange={(updatedFood) => setEditedFood(updatedFood)}

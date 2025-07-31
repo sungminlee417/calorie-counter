@@ -22,7 +22,8 @@ export const macroGoalSchema = z
       ),
   })
   .refine(
-    (data) => data.calories === data.protein * 4 + data.carbs * 4 + data.fat * 9,
+    (data) =>
+      data.calories === data.protein * 4 + data.carbs * 4 + data.fat * 9,
     {
       message: "Calories must equal protein*4 + carbs*4 + fat*9",
       path: ["calories"],

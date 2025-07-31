@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 import { LoginInput, SignupInput } from "@/types/auth";
 import { createClient } from "@/utils/supabase/server";
@@ -17,7 +17,7 @@ export const fetchLogin = async (input: LoginInput) => {
 };
 
 export const fetchLogout = async () => {
-const supabase = await createClient();
+  const supabase = await createClient();
   return await supabase.auth.signOut();
 };
 
@@ -34,7 +34,7 @@ export const fetchSignup = async (input: SignupInput) => {
         first_name,
         last_name,
       },
-      emailRedirectTo: process.env.SIGNUP_REDIRECT_LINK
+      emailRedirectTo: process.env.SIGNUP_REDIRECT_LINK,
     },
   });
 
@@ -44,4 +44,4 @@ export const fetchSignup = async (input: SignupInput) => {
 export const fetchUser = async () => {
   const supabase = await createClient();
   return await supabase.auth.getUser();
-}
+};

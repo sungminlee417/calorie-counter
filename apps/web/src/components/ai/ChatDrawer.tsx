@@ -19,6 +19,7 @@ import {
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { userFriendlyToolNames } from "@/lib/ai/tools/utils";
+import { API_ENDPOINTS } from "@/constants/app";
 
 export interface ChatDrawerProps {
   isDrawerOpen: boolean;
@@ -47,7 +48,7 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ isDrawerOpen, onClose }) => {
     status,
     stop,
   } = useChat({
-    api: "/api/chat",
+    api: API_ENDPOINTS.chat,
     experimental_throttle: 50,
     onToolCall: ({ toolCall: { toolName } }) => {
       if (toolName === "createFood" || toolName === "createFoodEntry") {

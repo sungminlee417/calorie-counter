@@ -7,16 +7,13 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import { DarkMode, LightMode } from "@mui/icons-material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { Box } from "@mui/material";
 
 import { fetchLogout } from "@/lib/supabase/fetch-auth";
-import { useThemeMode } from "@/context/ThemeModeContext";
+import ThemeSelector from "./ThemeSelector";
 
 const Navigation = () => {
-  const { mode, toggleMode } = useThemeMode();
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -28,7 +25,7 @@ const Navigation = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" role="banner">
       <Toolbar>
         <Box
           sx={{
@@ -40,7 +37,7 @@ const Navigation = () => {
         >
           <Image
             src="/logo.png"
-            alt="Logo"
+            alt="Calorie Counter Logo"
             height={80}
             width={80}
             style={{ objectFit: "contain" }}
@@ -48,14 +45,7 @@ const Navigation = () => {
           />
         </Box>
 
-        <IconButton
-          color="inherit"
-          onClick={toggleMode}
-          aria-label="toggle light/dark mode"
-          sx={{ mr: 1 }}
-        >
-          {mode === "light" ? <DarkMode /> : <LightMode />}
-        </IconButton>
+        <ThemeSelector />
 
         <>
           <IconButton

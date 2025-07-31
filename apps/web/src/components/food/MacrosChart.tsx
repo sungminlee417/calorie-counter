@@ -14,6 +14,7 @@ import {
 import useFoodEntries from "@/hooks/useFoodEntries";
 import useMacroGoal from "@/hooks/useMacroGoal";
 import { useDate } from "@/context/DateContext";
+import { MACRO_CHART_COLORS, MACRO_CALORIES } from "@/constants/app";
 import ArrowDatePicker from "../form/ArrowDatePicker";
 
 const MacrosChart = () => {
@@ -41,9 +42,9 @@ const MacrosChart = () => {
     (macros?.carbs ?? 0) + (macros?.fat ?? 0) + (macros?.protein ?? 0);
 
   const goalCalories =
-    (macroGoal?.protein ?? 0) * 4 +
-    (macroGoal?.carbs ?? 0) * 4 +
-    (macroGoal?.fat ?? 0) * 9;
+    (macroGoal?.protein ?? 0) * MACRO_CALORIES.protein +
+    (macroGoal?.carbs ?? 0) * MACRO_CALORIES.carbs +
+    (macroGoal?.fat ?? 0) * MACRO_CALORIES.fat;
 
   const macroList = [
     {
@@ -51,21 +52,21 @@ const MacrosChart = () => {
       value: macros?.carbs ?? 0,
       goal: macroGoal?.carbs ?? null,
       unit: "g",
-      color: "#8884d8",
+      color: MACRO_CHART_COLORS.carbs,
     },
     {
       name: "Fat",
       value: macros?.fat ?? 0,
       goal: macroGoal?.fat ?? null,
       unit: "g",
-      color: "#82ca9d",
+      color: MACRO_CHART_COLORS.fat,
     },
     {
       name: "Protein",
       value: macros?.protein ?? 0,
       goal: macroGoal?.protein ?? null,
       unit: "g",
-      color: "#ffc658",
+      color: MACRO_CHART_COLORS.protein,
     },
   ];
 
@@ -187,7 +188,7 @@ const MacrosChart = () => {
               borderRadius: 5,
               backgroundColor: "#eee",
               "& .MuiLinearProgress-bar": {
-                backgroundColor: "#f44336",
+                backgroundColor: MACRO_CHART_COLORS.calories,
               },
             }}
           />

@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { MenuItem, TextField, Stack } from "@mui/material";
+import { MenuItem, TextField, Stack, Autocomplete } from "@mui/material";
 
 import useFoods from "@/hooks/useFoods";
+import useDebounce from "@/hooks/useDebounce";
 import { FoodEntry } from "@/types/supabase";
 import { MealType, mealTypes } from "@/types/food-entry";
+import { SEARCH_DEBOUNCE_DELAY, SEARCH_MIN_LENGTH } from "@/constants/app";
 
 export interface FoodEntryFormProps {
   foodEntry: FoodEntry;
@@ -19,8 +21,19 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
   selectedMeal,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm.trim(), SEARCH_DEBOUNCE_DELAY);
 
-  const { foods } = useFoods();
+  const { foods, isLoading } = useFoods(
+    debouncedSearch.length >= SEARCH_MIN_LENGTH ? debouncedSearch : ""
+  );
+
+  const handleFoodChange = (newValue: (typeof foods)[number] | null) => {
+    onChange({
+      ...foodEntry,
+      food_id: newValue ? newValue.id : 0,
+    });
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -41,22 +54,24 @@ const FoodEntryForm: React.FC<FoodEntryFormProps> = ({
 
   return (
     <Stack spacing={3}>
-      <TextField
-        select
-        id="food_id"
-        label="Select Food"
-        name="food_id"
-        value={foodEntry.food_id}
-        onChange={handleChange}
-        variant="outlined"
-        helperText="Choose a food item from your list"
-      >
-        {foods?.map((food) => (
-          <MenuItem key={food.id} value={food.id}>
-            {food.name}
-          </MenuItem>
-        ))}
-      </TextField>
+      <Autocomplete
+        loading={isLoading}
+        options={debouncedSearch.length >= SEARCH_MIN_LENGTH ? foods : []}
+        getOptionLabel={(option) => option.name}
+        value={foods.find((f) => f.id === foodEntry.food_id) || null}
+        onChange={(e, newValue) => handleFoodChange(newValue)}
+        inputValue={searchTerm}
+        onInputChange={(event, newInputValue) => setSearchTerm(newInputValue)}
+        renderInput={(params) => (
+          <TextField {...params} label="Select Food" variant="outlined" />
+        )}
+        loadingText="Loading more foods..."
+        noOptionsText={
+          debouncedSearch.length < SEARCH_MIN_LENGTH
+            ? `Type at least ${SEARCH_MIN_LENGTH} letters to search`
+            : "No foods found"
+        }
+      />
 
       <TextField
         id="quantity"

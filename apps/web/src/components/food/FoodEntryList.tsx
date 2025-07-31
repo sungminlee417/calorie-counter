@@ -2,6 +2,7 @@
 "use client";
 
 import React, { Fragment, useCallback, useState } from "react";
+import isEqual from "lodash.isequal";
 import {
   Box,
   Typography,
@@ -19,12 +20,13 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { Add, Edit } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 
 import useFoodEntries from "@/hooks/useFoodEntries";
 import { FoodEntry } from "@/types/supabase";
 import Dialog from "../ui/Dialog";
 import FoodEntryForm from "./FoodEntryForm";
+import FoodEntryListItem from "./FoodEntryListItem";
 import DialogFormActions from "../ui/DialogFormActions";
 import { FoodEntryWithFood } from "@/lib/supabase/fetch-food-entry";
 import { useDate } from "@/context/DateContext";
@@ -101,6 +103,8 @@ const FoodEntryList = () => {
     setAnchorEl(null);
   };
 
+  const [selectedEntry, setSelectedEntry] =
+    useState<FoodEntry>(EMPTY_FOOD_ENTRY);
   const [editedEntry, setEditedEntry] = useState<FoodEntry>(EMPTY_FOOD_ENTRY);
   const [selectedMeal, setSelectedMeal] = useState<MealType>("breakfast");
 
@@ -146,6 +150,7 @@ const FoodEntryList = () => {
           showToast("Food entry created successfully!", "success");
         }
         setEditedEntry(EMPTY_FOOD_ENTRY);
+        setSelectedEntry(EMPTY_FOOD_ENTRY);
         setOpenAddFromScratch(false);
       } catch {
         showToast("Failed to save food entry.", "error");
@@ -160,6 +165,7 @@ const FoodEntryList = () => {
         await deleteFoodEntry.mutateAsync(id);
         showToast("Food entry deleted successfully!", "success");
         setEditedEntry(EMPTY_FOOD_ENTRY);
+        setSelectedEntry(EMPTY_FOOD_ENTRY);
         setOpenAddFromScratch(false);
       } catch {
         showToast("Failed to delete food entry.", "error");
@@ -170,6 +176,7 @@ const FoodEntryList = () => {
 
   const handleEditClick = (entry: FoodEntry) => {
     setEditedEntry(entry);
+    setSelectedEntry(entry);
     setOpenAddFromScratch(true);
   };
 
@@ -262,39 +269,10 @@ const FoodEntryList = () => {
             <List>
               {groupedEntries[selectedMeal].map((entry, idx) => (
                 <Fragment key={entry.id}>
-                  <ListItem
-                    secondaryAction={
-                      <Tooltip title="Edit entry">
-                        <IconButton
-                          edge="end"
-                          onClick={() => handleEditClick(entry)}
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                    }
-                  >
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle1" fontWeight="medium">
-                          {(entry as FoodEntryWithFood).foods?.name ||
-                            "Unknown Food"}
-                        </Typography>
-                      }
-                      secondary={
-                        <Typography variant="body2" color="text.secondary">
-                          {(entry as FoodEntryWithFood).foods?.brand
-                            ? `${(entry as FoodEntryWithFood).foods.brand}, `
-                            : ""}
-                          {entry.quantity *
-                            ((entry as FoodEntryWithFood).foods?.serving_size ??
-                              1)}{" "}
-                          {(entry as FoodEntryWithFood).foods?.serving_unit ||
-                            ""}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
+                  <FoodEntryListItem
+                    foodEntry={entry as FoodEntryWithFood}
+                    onEdit={handleEditClick}
+                  />
                   {idx < groupedEntries[selectedMeal].length - 1 && (
                     <Divider component="li" />
                   )}
@@ -310,6 +288,7 @@ const FoodEntryList = () => {
         onClose={() => {
           if (!isLoading) {
             setEditedEntry(EMPTY_FOOD_ENTRY);
+            setSelectedEntry(EMPTY_FOOD_ENTRY);
             setOpenAddFromScratch(false);
           }
         }}
@@ -323,6 +302,7 @@ const FoodEntryList = () => {
                 : undefined
             }
             onSave={() => handleSave(editedEntry)}
+            onSaveDisabled={isEqual(selectedEntry, editedEntry)}
           />
         }
       >
