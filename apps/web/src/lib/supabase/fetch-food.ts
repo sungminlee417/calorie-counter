@@ -58,12 +58,39 @@ export const fetchCreateFood = async (
 export const fetchUpdateFood = async (
   food: Partial<Food> & { id: number }
 ): Promise<Food> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id, created_at, updated_at, ...foodData } = food;
+  const { id } = food;
 
+  // First, fetch the current food to compare changes
+  const { data: currentFood, error: fetchError } = await supabase
+    .from("foods")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) {
+    throw new Error(`Failed to fetch current food: ${fetchError.message}`);
+  }
+
+  if (!currentFood) {
+    throw new Error("Food not found");
+  }
+
+  // Check for changes using our change detection utility
+  const { checkFoodChanges } = await import("@/utils/change-detection");
+  const changeResult = checkFoodChanges(currentFood, food);
+
+  // If no changes detected, return the current food without updating
+  if (!changeResult.hasChanges) {
+    console.log("No changes detected for food, skipping database update");
+    return currentFood;
+  }
+
+  console.log(`Updating food: ${changeResult.message}`);
+
+  // Only update the fields that have actually changed
   const { data, error } = await supabase
     .from("foods")
-    .update(foodData)
+    .update(changeResult.changedFields)
     .eq("id", id)
     .select()
     .single();

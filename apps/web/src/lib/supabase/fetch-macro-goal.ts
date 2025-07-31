@@ -54,12 +54,41 @@ export const fetchCreateMacroGoal = async (
 export const fetchUpdateMacroGoal = async (
   macroGoal: Partial<MacroGoal> & { id: number }
 ): Promise<MacroGoal> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id, created_at, updated_at, ...updateData } = macroGoal;
+  const { id } = macroGoal;
 
+  // First, fetch the current macro goal to compare changes
+  const { data: currentMacroGoal, error: fetchError } = await supabase
+    .from("macro_goals")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) {
+    throw new Error(
+      `Failed to fetch current macro goal: ${fetchError.message}`
+    );
+  }
+
+  if (!currentMacroGoal) {
+    throw new Error("Macro goal not found");
+  }
+
+  // Check for changes using our change detection utility
+  const { checkMacroGoalChanges } = await import("@/utils/change-detection");
+  const changeResult = checkMacroGoalChanges(currentMacroGoal, macroGoal);
+
+  // If no changes detected, return the current macro goal without updating
+  if (!changeResult.hasChanges) {
+    console.log("No changes detected for macro goal, skipping database update");
+    return currentMacroGoal;
+  }
+
+  console.log(`Updating macro goal: ${changeResult.message}`);
+
+  // Only update the fields that have actually changed
   const { data, error } = await supabase
     .from("macro_goals")
-    .update(updateData)
+    .update(changeResult.changedFields)
     .eq("id", id)
     .select()
     .single();
