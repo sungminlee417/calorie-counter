@@ -1,5 +1,8 @@
 echo "🔍 Running pre-commit checks..."
 
+# Change to the web app directory
+cd apps/web
+
 # Run type checking and lint-staged
 npm run type-check && npx lint-staged
 

@@ -1,7 +1,7 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 echo "🚀 Running pre-push checks..."
+
+# Change to the web app directory
+cd apps/web
 
 # Run type checking
 echo "🔍 Checking TypeScript types..."
