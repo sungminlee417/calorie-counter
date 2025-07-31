@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
+import useFormChangeDetection from "@/hooks/useFormChangeDetection";
 import {
   Typography,
   IconButton,
@@ -49,6 +50,7 @@ const MacroGoalPanel = () => {
   } = useMacroGoal();
 
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<MacroGoal>(EMPTY_MACRO_GOAL);
   const [editedGoal, setEditedGoal] = useState<MacroGoal>(EMPTY_MACRO_GOAL);
 
   const {
@@ -58,6 +60,16 @@ const MacroGoalPanel = () => {
     toastOpen,
     toastSeverity,
   } = useToast();
+
+  // Use change detection for the form
+  const { hasChanges: formHasChanges } = useFormChangeDetection(
+    selectedGoal,
+    editedGoal,
+    {
+      ignoreKeys: ["id", "created_at", "updated_at", "user_id"],
+      enableLogging: process.env.NODE_ENV === "development",
+    }
+  );
 
   const handleSave = useCallback(async () => {
     const payload = {
@@ -105,6 +117,7 @@ const MacroGoalPanel = () => {
 
   useEffect(() => {
     if (!isLoading && macroGoal) {
+      setSelectedGoal(macroGoal);
       setEditedGoal(macroGoal);
     }
   }, [isLoading, macroGoal]);
@@ -169,7 +182,7 @@ const MacroGoalPanel = () => {
         onClose={() => {
           if (!isLoading) setDialogOpen(false);
         }}
-        title="Edit Macro Goals"
+        title={`Edit Macro Goals${formHasChanges ? " •" : ""}`}
         dialogActions={
           <DialogFormActions
             onCancel={() => setDialogOpen(false)}
@@ -179,6 +192,7 @@ const MacroGoalPanel = () => {
                 : undefined
             }
             onSave={handleSave}
+            onSaveDisabled={!formHasChanges}
           />
         }
       >

@@ -29,8 +29,12 @@ const DialogFormActions: React.FC<DialogFormActionsProps> = ({
             onClick={onSave}
             color="primary"
             variant="contained"
+            sx={{
+              opacity: onSaveDisabled ? 0.6 : 1,
+              transition: "opacity 0.2s ease-in-out",
+            }}
           >
-            Save
+            {onSaveDisabled ? "No Changes" : "Save"}
           </Button>
         )}
         <Button onClick={onCancel} color="secondary">

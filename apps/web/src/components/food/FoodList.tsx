@@ -1,6 +1,7 @@
 "use client";
 
 import React, { Fragment, useCallback, useState } from "react";
+import useFormChangeDetection from "@/hooks/useFormChangeDetection";
 import {
   Typography,
   List,
@@ -67,6 +68,7 @@ const FoodList = () => {
   } = useFoods(debouncedSearch);
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
+  const [selectedFood, setSelectedFood] = useState<Food>(EMPTY_FOOD);
   const [editedFood, setEditedFood] = useState<Food>(EMPTY_FOOD);
 
   const {
@@ -78,6 +80,16 @@ const FoodList = () => {
   } = useToast();
 
   const { handleAsyncError } = useErrorHandler();
+
+  // Use change detection for the form
+  const { hasChanges: formHasChanges } = useFormChangeDetection(
+    selectedFood,
+    editedFood,
+    {
+      ignoreKeys: ["id", "created_at", "updated_at", "user_id"],
+      enableLogging: process.env.NODE_ENV === "development",
+    }
+  );
 
   const handleSaveFood = useCallback(
     async (food: Food) => {
@@ -116,6 +128,7 @@ const FoodList = () => {
       if (result) {
         const action = result === "updated" ? "updated" : "created";
         showToast(`Food ${action} successfully!`, "success");
+        setSelectedFood(EMPTY_FOOD);
         setEditedFood(EMPTY_FOOD);
         setIsFoodDialogOpen(false);
       }
@@ -133,6 +146,7 @@ const FoodList = () => {
 
       if (result) {
         showToast("Food deleted successfully!", "success");
+        setSelectedFood(EMPTY_FOOD);
         setEditedFood(EMPTY_FOOD);
         setIsFoodDialogOpen(false);
       }
@@ -141,6 +155,7 @@ const FoodList = () => {
   );
 
   const openEditDialog = (food: Food) => {
+    setSelectedFood(food);
     setEditedFood(food);
     setIsFoodDialogOpen(true);
   };
@@ -248,7 +263,7 @@ const FoodList = () => {
             setIsFoodDialogOpen(false);
           }
         }}
-        title={editedFood.id ? "Edit Food" : "Add Food"}
+        title={`${editedFood.id ? "Edit Food" : "Add Food"}${formHasChanges ? " •" : ""}`}
         aria-describedby="food-dialog-description"
         dialogActions={
           <DialogFormActions
@@ -265,6 +280,7 @@ const FoodList = () => {
                   : undefined
                 : () => handleSaveFood(editedFood)
             }
+            onSaveDisabled={!formHasChanges}
           />
         }
       >

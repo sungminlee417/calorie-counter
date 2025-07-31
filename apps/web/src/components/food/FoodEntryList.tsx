@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment, useCallback, useState } from "react";
-import isEqual from "lodash.isequal";
+import useFormChangeDetection from "@/hooks/useFormChangeDetection";
 import {
   Box,
   Typography,
@@ -117,6 +117,16 @@ const FoodEntryList = () => {
   } = useToast();
 
   const groupedEntries = groupByMealType(foodEntries);
+
+  // Use change detection for the form
+  const { hasChanges: formHasChanges } = useFormChangeDetection(
+    selectedEntry,
+    editedEntry,
+    {
+      ignoreKeys: ["id", "created_at", "updated_at", "user_id"],
+      enableLogging: process.env.NODE_ENV === "development",
+    }
+  );
 
   const handleSave = useCallback(
     async (foodEntry: FoodEntry | FoodEntryWithFood) => {
@@ -292,7 +302,7 @@ const FoodEntryList = () => {
             setOpenAddFromScratch(false);
           }
         }}
-        title={editedEntry.id ? "Edit Food Entry" : "Add Food Entry"}
+        title={`${editedEntry.id ? "Edit Food Entry" : "Add Food Entry"}${formHasChanges ? " •" : ""}`}
         dialogActions={
           <DialogFormActions
             onCancel={() => setOpenAddFromScratch(false)}
@@ -302,7 +312,7 @@ const FoodEntryList = () => {
                 : undefined
             }
             onSave={() => handleSave(editedEntry)}
-            onSaveDisabled={isEqual(selectedEntry, editedEntry)}
+            onSaveDisabled={!formHasChanges}
           />
         }
       >
