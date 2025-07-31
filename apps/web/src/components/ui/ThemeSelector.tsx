@@ -73,13 +73,33 @@ const ThemeSelector: React.FC = () => {
         arrow
       >
         <IconButton
-          color="inherit"
+          size="medium"
           onClick={handleClick}
           aria-label="Theme selector"
           aria-controls={open ? "theme-menu" : undefined}
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
-          sx={{ mr: 1 }}
+          sx={{
+            mr: { xs: 0.5, sm: 1 },
+            width: { xs: 36, sm: 40 },
+            height: { xs: 36, sm: 40 },
+            color: resolvedTheme === "dark" ? "grey.300" : "grey.700",
+            backgroundColor:
+              resolvedTheme === "dark"
+                ? "rgba(255, 255, 255, 0.08)"
+                : "rgba(0, 0, 0, 0.04)",
+            "&:hover": {
+              backgroundColor:
+                resolvedTheme === "dark"
+                  ? "rgba(255, 255, 255, 0.12)"
+                  : "rgba(0, 0, 0, 0.08)",
+              transform: "scale(1.05)",
+            },
+            transition: "all 0.2s ease-in-out",
+            "& svg": {
+              fontSize: { xs: 20, sm: 24 },
+            },
+          }}
         >
           {getCurrentIcon()}
         </IconButton>
@@ -99,6 +119,18 @@ const ThemeSelector: React.FC = () => {
           horizontal: "right",
         }}
         keepMounted
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            mt: 1,
+            minWidth: 200,
+            background:
+              resolvedTheme === "dark"
+                ? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
+                : "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
+            border: `1px solid ${resolvedTheme === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)"}`,
+          },
+        }}
       >
         {themeOptions.map((option) => (
           <MenuItem

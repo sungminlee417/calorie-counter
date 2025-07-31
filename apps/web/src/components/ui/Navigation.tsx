@@ -42,7 +42,9 @@ const Navigation = () => {
         boxShadow: UI_COLORS.shadows.medium,
       }}
     >
-      <Toolbar sx={{ py: 1 }}>
+      <Toolbar
+        sx={{ py: 1, px: { xs: 1, sm: 2 }, minHeight: { xs: 64, sm: 70 } }}
+      >
         {/* Logo and Brand Section */}
         <Box
           sx={{
@@ -50,20 +52,21 @@ const Navigation = () => {
             alignItems: "center",
             justifyContent: "start",
             flexGrow: 1,
-            gap: 2,
+            gap: { xs: 1, sm: 2 },
           }}
         >
           <Box
             sx={{
               position: "relative",
-              width: 60,
-              height: 60,
+              width: { xs: 40, sm: 60 },
+              height: { xs: 40, sm: 60 },
               borderRadius: 2,
               overflow: "hidden",
               background: `${MACRO_CHART_COLORS.calories}15`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              flexShrink: 0,
             }}
           >
             <Image
@@ -76,22 +79,31 @@ const Navigation = () => {
             />
           </Box>
 
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
             <Typography
               variant="h5"
               fontWeight="700"
               sx={{
+                fontSize: { xs: "1.1rem", sm: "1.5rem" },
                 background: `linear-gradient(45deg, ${MACRO_CHART_COLORS.calories}, ${MACRO_CHART_COLORS.carbs})`,
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 lineHeight: 1.2,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               Calorie Counter
             </Typography>
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                alignItems: "center",
+                gap: 0.5,
+                mt: 0.5,
+              }}
             >
               <LocalFireDepartment
                 sx={{
@@ -111,16 +123,24 @@ const Navigation = () => {
         </Box>
 
         {/* Right Side Actions */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: { xs: 0.5, sm: 1 },
+          }}
+        >
           <ThemeSelector />
 
           <IconButton
-            size="large"
+            size="medium"
             aria-label="account of current user"
             aria-controls="menu-appbar"
             aria-haspopup="true"
             onClick={handleMenu}
             sx={{
+              width: { xs: 36, sm: 40 },
+              height: { xs: 36, sm: 40 },
               backgroundColor: `${theme.palette.primary.main}15`,
               color: theme.palette.primary.main,
               "&:hover": {
@@ -130,7 +150,7 @@ const Navigation = () => {
               transition: "all 0.2s ease-in-out",
             }}
           >
-            <Person />
+            <Person sx={{ fontSize: { xs: 20, sm: 24 } }} />
           </IconButton>
 
           <Menu
