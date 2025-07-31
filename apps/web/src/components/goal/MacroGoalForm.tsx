@@ -5,8 +5,16 @@ import {
   Restaurant,
   LocalFireDepartment,
 } from "@mui/icons-material";
-import { Stack, TextField, InputAdornment } from "@mui/material";
+import {
+  Stack,
+  TextField,
+  InputAdornment,
+  Paper,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import React, { useEffect } from "react";
+import { MACRO_CHART_COLORS, UI_COLORS } from "@/constants/app";
 
 export interface MacroGoalFormProps {
   macroGoal: MacroGoal;
@@ -17,6 +25,7 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
   macroGoal,
   onChange,
 }) => {
+  const theme = useTheme();
   const handleChange =
     (field: keyof MacroGoal) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,70 +49,161 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
   }, [macroGoal.protein, macroGoal.fat, macroGoal.carbs, macroGoal, onChange]);
 
   return (
-    <Stack spacing={3} mt={1}>
-      <TextField
-        label="Calories (auto-calculated)"
-        type="number"
-        value={macroGoal.calories ?? 0}
-        disabled
-        fullWidth
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <LocalFireDepartment color="error" />
-            </InputAdornment>
-          ),
+    <Stack spacing={3}>
+      {/* Calories Section */}
+      <Paper
+        elevation={1}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          background: `${MACRO_CHART_COLORS.calories}08`,
+          border: `1px solid ${MACRO_CHART_COLORS.calories}22`,
         }}
-        helperText="Total calories based on macros"
-      />
+      >
+        <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+          <LocalFireDepartment sx={{ color: MACRO_CHART_COLORS.calories }} />
+          <Typography variant="h6" fontWeight="600">
+            Total Calories
+          </Typography>
+        </Stack>
 
-      <Stack direction="row" spacing={2}>
         <TextField
-          label="Protein (g)"
+          label="Calories (auto-calculated)"
           type="number"
-          value={macroGoal.protein ?? 0}
-          onChange={handleChange("protein")}
+          value={macroGoal.calories ?? 0}
+          disabled
           fullWidth
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <FitnessCenter color="primary" />
+                <LocalFireDepartment
+                  sx={{ color: MACRO_CHART_COLORS.calories }}
+                />
               </InputAdornment>
             ),
           }}
-          helperText="Protein intake per day"
-        />
-        <TextField
-          label="Fat (g)"
-          type="number"
-          value={macroGoal.fat ?? 0}
-          onChange={handleChange("fat")}
-          fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <EmojiNature sx={{ color: "#43a047" }} />
-              </InputAdornment>
-            ),
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 2,
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.05)"
+                  : "rgba(255,255,255,0.8)",
+            },
           }}
-          helperText="Fat intake per day"
+          helperText="Total calories calculated from your macro targets (Protein: 4 kcal/g, Carbs: 4 kcal/g, Fat: 9 kcal/g)"
         />
-        <TextField
-          label="Carbs (g)"
-          type="number"
-          value={macroGoal.carbs ?? 0}
-          onChange={handleChange("carbs")}
-          fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Restaurant sx={{ color: "#ff9800" }} />
-              </InputAdornment>
-            ),
-          }}
-          helperText="Carbohydrates intake per day"
-        />
-      </Stack>
+      </Paper>
+
+      {/* Macros Section */}
+      <Paper
+        elevation={1}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          background:
+            theme.palette.mode === "dark"
+              ? UI_COLORS.gradients.neutral.dark
+              : UI_COLORS.gradients.neutral.light,
+          border: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Typography variant="h6" fontWeight="600" mb={3}>
+          Macro Targets
+        </Typography>
+
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+          <TextField
+            label="Carbs (g)"
+            type="number"
+            value={macroGoal.carbs ?? 0}
+            onChange={handleChange("carbs")}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Restaurant sx={{ color: MACRO_CHART_COLORS.carbs }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: MACRO_CHART_COLORS.carbs,
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: MACRO_CHART_COLORS.carbs,
+                },
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: MACRO_CHART_COLORS.carbs,
+              },
+            }}
+            helperText="Daily carb target (4 kcal per gram)"
+          />
+
+          <TextField
+            label="Fat (g)"
+            type="number"
+            value={macroGoal.fat ?? 0}
+            onChange={handleChange("fat")}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmojiNature sx={{ color: MACRO_CHART_COLORS.fat }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: MACRO_CHART_COLORS.fat,
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: MACRO_CHART_COLORS.fat,
+                },
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: MACRO_CHART_COLORS.fat,
+              },
+            }}
+            helperText="Daily fat target (9 kcal per gram)"
+          />
+
+          <TextField
+            label="Protein (g)"
+            type="number"
+            value={macroGoal.protein ?? 0}
+            onChange={handleChange("protein")}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FitnessCenter sx={{ color: MACRO_CHART_COLORS.protein }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: MACRO_CHART_COLORS.protein,
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: MACRO_CHART_COLORS.protein,
+                },
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: MACRO_CHART_COLORS.protein,
+              },
+            }}
+            helperText="Daily protein target (4 kcal per gram)"
+          />
+        </Stack>
+      </Paper>
     </Stack>
   );
 };

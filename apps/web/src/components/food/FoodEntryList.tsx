@@ -19,8 +19,18 @@ import {
   Tab,
   Menu,
   MenuItem,
+  useTheme,
+  Fade,
+  Chip,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import {
+  Add,
+  LocalFireDepartment,
+  Restaurant,
+  EmojiNature,
+  FitnessCenter,
+  AccessTime,
+} from "@mui/icons-material";
 
 import useFoodEntries from "@/hooks/useFoodEntries";
 import { FoodEntry } from "@/types/supabase";
@@ -34,6 +44,7 @@ import { foodEntrySchema, MealType, mealTypes } from "@/types/food-entry";
 import Toast from "../ui/Toast";
 import useToast from "@/hooks/useToast";
 import FoodQuickAddList from "./FoodQuickAddList";
+import { MACRO_CHART_COLORS, UI_COLORS } from "@/constants/app";
 
 const EMPTY_FOOD_ENTRY: FoodEntry = {
   id: 0,
@@ -45,11 +56,44 @@ const EMPTY_FOOD_ENTRY: FoodEntry = {
   meal_type: "breakfast",
 };
 
-const mealIcons: Record<MealType, string> = {
-  breakfast: "🍳",
-  lunch: "🥪",
-  dinner: "🍽️",
-  snacks: "🍎",
+const getMealTypeInfo = (meal: MealType) => {
+  switch (meal) {
+    case "breakfast":
+      return {
+        icon: <LocalFireDepartment />,
+        color: MACRO_CHART_COLORS.calories,
+        label: "Breakfast",
+        emoji: "🍳",
+      };
+    case "lunch":
+      return {
+        icon: <Restaurant />,
+        color: MACRO_CHART_COLORS.carbs,
+        label: "Lunch",
+        emoji: "🥪",
+      };
+    case "dinner":
+      return {
+        icon: <EmojiNature />,
+        color: MACRO_CHART_COLORS.fat,
+        label: "Dinner",
+        emoji: "🍽️",
+      };
+    case "snacks":
+      return {
+        icon: <FitnessCenter />,
+        color: MACRO_CHART_COLORS.protein,
+        label: "Snacks",
+        emoji: "🍎",
+      };
+    default:
+      return {
+        icon: <AccessTime />,
+        color: "#666",
+        label: meal,
+        emoji: "⏰",
+      };
+  }
 };
 
 const groupByMealType = (
@@ -82,6 +126,7 @@ const groupByMealType = (
 };
 
 const FoodEntryList = () => {
+  const theme = useTheme();
   const { selectedDate } = useDate();
   const {
     createFoodEntry,
@@ -195,28 +240,88 @@ const FoodEntryList = () => {
   };
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-        <Typography variant="h6" flex={1}>
-          Food Entries
-        </Typography>
-        <Tooltip title="Add food entry">
-          <IconButton onClick={handleAddClick}>
-            <Add />
-          </IconButton>
-        </Tooltip>
+    <Fragment>
+      <Paper
+        elevation={2}
+        sx={{
+          borderRadius: 3,
+          background:
+            theme.palette.mode === "dark"
+              ? UI_COLORS.gradients.neutral.dark
+              : UI_COLORS.gradients.neutral.light,
+          border: `1px solid ${theme.palette.divider}`,
+          overflow: "hidden",
+        }}
+      >
+        {/* Header */}
+        <Box
+          sx={{
+            p: 3,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            background: `linear-gradient(90deg, ${MACRO_CHART_COLORS.calories}15, ${MACRO_CHART_COLORS.carbs}15, ${MACRO_CHART_COLORS.fat}15, ${MACRO_CHART_COLORS.protein}15)`,
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Restaurant
+              sx={{ color: MACRO_CHART_COLORS.carbs, fontSize: 28 }}
+            />
+            <Typography
+              variant="h5"
+              fontWeight="600"
+              sx={{
+                flex: 1,
+                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Daily Food Entries
+            </Typography>
+            <Tooltip title="Add food entry" arrow>
+              <IconButton
+                onClick={handleAddClick}
+                sx={{
+                  backgroundColor: `${theme.palette.primary.main}15`,
+                  color: theme.palette.primary.main,
+                  "&:hover": {
+                    backgroundColor: `${theme.palette.primary.main}25`,
+                    transform: "scale(1.05)",
+                  },
+                  transition: "all 0.2s ease-in-out",
+                }}
+              >
+                <Add />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Box>
 
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
+          PaperProps={{
+            sx: {
+              borderRadius: 2,
+              mt: 1,
+              boxShadow: UI_COLORS.shadows.medium,
+            },
+          }}
         >
           <MenuItem
             onClick={() => {
               setOpenAddFromScratch(true);
               handleMenuClose();
             }}
+            sx={{
+              gap: 1,
+              "&:hover": {
+                backgroundColor: `${MACRO_CHART_COLORS.carbs}15`,
+              },
+            }}
           >
+            <Add sx={{ color: MACRO_CHART_COLORS.carbs }} />
             Add from scratch
           </MenuItem>
           <MenuItem
@@ -224,71 +329,143 @@ const FoodEntryList = () => {
               setOpenQuickAdd(true);
               handleMenuClose();
             }}
+            sx={{
+              gap: 1,
+              "&:hover": {
+                backgroundColor: `${MACRO_CHART_COLORS.protein}15`,
+              },
+            }}
           >
+            <FitnessCenter sx={{ color: MACRO_CHART_COLORS.protein }} />
             Add from existing foods
           </MenuItem>
         </Menu>
-      </Stack>
 
-      <Paper
-        variant="outlined"
-        sx={{ borderRadius: 2, backgroundColor: "background.paper" }}
-      >
-        <Tabs
-          value={selectedMeal}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons={true}
-          allowScrollButtonsMobile
-          sx={{ px: 2, pt: 1 }}
-        >
-          {mealTypes.map((meal) => (
-            <Tab
-              key={meal}
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <span>{mealIcons[meal]}</span>
-                  <span style={{ textTransform: "capitalize" }}>{meal}</span>
-                </Box>
-              }
-              value={meal}
-            />
-          ))}
-        </Tabs>
+        {/* Meal Tabs */}
+        <Box sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
+          <Tabs
+            value={selectedMeal}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons={true}
+            allowScrollButtonsMobile
+            sx={{
+              "& .MuiTab-root": {
+                borderRadius: 2,
+                margin: 0.5,
+                minHeight: 48,
+                textTransform: "none",
+                fontWeight: 500,
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "action.hover",
+                  transform: "translateY(-1px)",
+                },
+                "&.Mui-selected": {
+                  backgroundColor: `${getMealTypeInfo(selectedMeal).color}15`,
+                  color: getMealTypeInfo(selectedMeal).color,
+                },
+              },
+            }}
+          >
+            {mealTypes.map((meal) => {
+              const mealInfo = getMealTypeInfo(meal);
+              return (
+                <Tab
+                  key={meal}
+                  label={
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Box sx={{ color: mealInfo.color }}>{mealInfo.icon}</Box>
+                      <Box>
+                        <Typography variant="body2" fontWeight="inherit">
+                          {mealInfo.label}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {groupedEntries[meal].length} item
+                          {groupedEntries[meal].length !== 1 ? "s" : ""}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  }
+                  value={meal}
+                />
+              );
+            })}
+          </Tabs>
+        </Box>
 
-        <Box sx={{ maxHeight: 320, overflowY: "auto", px: 1 }}>
+        {/* Content Area */}
+        <Box sx={{ maxHeight: 400, overflowY: "auto", p: 2 }}>
           {isLoading ? (
-            <List>
+            <Stack spacing={2}>
               {[...Array(4)].map((_, idx) => (
-                <Fragment key={idx}>
-                  <ListItem>
-                    <ListItemText
-                      primary={<Skeleton width="50%" />}
-                      secondary={<Skeleton width="30%" />}
-                    />
-                  </ListItem>
-                  {idx < 3 && <Divider component="li" />}
-                </Fragment>
+                <Fade in timeout={300 + idx * 100} key={idx}>
+                  <Paper
+                    elevation={1}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      background:
+                        theme.palette.mode === "dark" ? "#2a2a2a" : "#ffffff",
+                      border: `1px solid ${theme.palette.divider}`,
+                    }}
+                  >
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Skeleton variant="circular" width={40} height={40} />
+                      <Box flex={1}>
+                        <Skeleton width="60%" height={24} />
+                        <Skeleton width="40%" height={20} sx={{ mt: 0.5 }} />
+                      </Box>
+                      <Stack spacing={1}>
+                        <Skeleton width={60} height={20} />
+                        <Skeleton width={80} height={20} />
+                      </Stack>
+                    </Stack>
+                  </Paper>
+                </Fade>
               ))}
-            </List>
+            </Stack>
           ) : groupedEntries[selectedMeal].length === 0 ? (
-            <Typography p={2} color="text.secondary" fontStyle="italic">
-              No {selectedMeal} entries yet.
-            </Typography>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 4,
+                textAlign: "center",
+                borderRadius: 2,
+                background: `${getMealTypeInfo(selectedMeal).color}08`,
+                border: `1px dashed ${getMealTypeInfo(selectedMeal).color}44`,
+              }}
+            >
+              <Stack alignItems="center" spacing={2}>
+                <Box
+                  sx={{
+                    color: getMealTypeInfo(selectedMeal).color,
+                    fontSize: 48,
+                  }}
+                >
+                  {getMealTypeInfo(selectedMeal).icon}
+                </Box>
+                <Typography variant="h6" color="text.secondary">
+                  No {selectedMeal} entries yet
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Add your first {selectedMeal} item to get started!
+                </Typography>
+              </Stack>
+            </Paper>
           ) : (
-            <List>
+            <Stack spacing={1}>
               {groupedEntries[selectedMeal].map((entry, idx) => (
-                <Fragment key={entry.id}>
-                  <FoodEntryListItem
-                    foodEntry={entry as FoodEntryWithFood}
-                    onEdit={handleEditClick}
-                  />
-                  {idx < groupedEntries[selectedMeal].length - 1 && (
-                    <Divider component="li" />
-                  )}
-                </Fragment>
+                <Fade in timeout={200 + idx * 50} key={entry.id}>
+                  <Box>
+                    <FoodEntryListItem
+                      foodEntry={entry as FoodEntryWithFood}
+                      onEdit={handleEditClick}
+                    />
+                  </Box>
+                </Fade>
               ))}
-            </List>
+            </Stack>
           )}
         </Box>
       </Paper>
@@ -341,7 +518,7 @@ const FoodEntryList = () => {
       >
         {toastMessage}
       </Toast>
-    </Box>
+    </Fragment>
   );
 };
 

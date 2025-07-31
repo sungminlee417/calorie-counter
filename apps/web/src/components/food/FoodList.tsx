@@ -4,10 +4,6 @@ import React, { Fragment, useCallback, useState } from "react";
 import useFormChangeDetection from "@/hooks/useFormChangeDetection";
 import {
   Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
   Box,
   Stack,
   IconButton,
@@ -16,8 +12,11 @@ import {
   Tooltip,
   CircularProgress,
   TextField,
+  useTheme,
+  Fade,
+  InputAdornment,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, Search, Restaurant } from "@mui/icons-material";
 
 import useFoods from "@/hooks/useFoods";
 import useUser from "@/hooks/useUser";
@@ -25,7 +24,11 @@ import useDebounce from "@/hooks/useDebounce";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { Food } from "@/types/supabase";
 import { foodSchema } from "@/types/food";
-import { SEARCH_DEBOUNCE_DELAY } from "@/constants/app";
+import {
+  SEARCH_DEBOUNCE_DELAY,
+  MACRO_CHART_COLORS,
+  UI_COLORS,
+} from "@/constants/app";
 
 import Dialog from "../ui/Dialog";
 import FoodForm from "./FoodForm";
@@ -51,6 +54,7 @@ const EMPTY_FOOD: Food = {
 };
 
 const FoodList = () => {
+  const theme = useTheme();
   const { user } = useUser();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -167,92 +171,188 @@ const FoodList = () => {
   });
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-        <Typography variant="h6" flex={1}>
-          Foods
-        </Typography>
-
-        {/* Search input */}
-        <TextField
-          size="small"
-          placeholder="Search foods"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ width: 250, mr: 2 }}
-          inputProps={{
-            "aria-label": "Search foods",
-            "aria-describedby": "search-foods-description",
-          }}
-        />
-
-        <Tooltip title="Add new food">
-          <IconButton
-            onClick={() => setIsFoodDialogOpen(true)}
-            aria-label="Add new food"
-          >
-            <Add />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-
-      <Box
-        id="search-foods-description"
-        sx={{ sr: "only", position: "absolute", left: "-10000px" }}
-      >
-        Type to search through your food database
-      </Box>
-
+    <Fragment>
       <Paper
-        variant="outlined"
+        elevation={2}
         sx={{
-          maxHeight: 320,
-          overflowY: "auto",
-          borderRadius: 2,
-          px: 1,
-          backgroundColor: "background.paper",
+          borderRadius: 3,
+          background:
+            theme.palette.mode === "dark"
+              ? UI_COLORS.gradients.neutral.dark
+              : UI_COLORS.gradients.neutral.light,
+          border: `1px solid ${theme.palette.divider}`,
+          overflow: "hidden",
         }}
-        role="region"
-        aria-label="Foods list"
       >
-        {isLoading ? (
-          <List>
-            {[...Array(4)].map((_, idx) => (
-              <Fragment key={idx}>
-                <ListItem>
-                  <ListItemText
-                    primary={<Skeleton width="60%" />}
-                    secondary={<Skeleton width="80%" />}
+        {/* Header */}
+        <Box
+          sx={{
+            p: 3,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            background: `linear-gradient(90deg, ${MACRO_CHART_COLORS.carbs}15, ${MACRO_CHART_COLORS.fat}15)`,
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+            <Restaurant
+              sx={{ color: MACRO_CHART_COLORS.carbs, fontSize: 28 }}
+            />
+            <Typography
+              variant="h5"
+              fontWeight="600"
+              sx={{
+                flex: 1,
+                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Food Database
+            </Typography>
+            <Tooltip title="Add new food" arrow>
+              <IconButton
+                onClick={() => setIsFoodDialogOpen(true)}
+                aria-label="Add new food"
+                sx={{
+                  backgroundColor: `${theme.palette.primary.main}15`,
+                  color: theme.palette.primary.main,
+                  "&:hover": {
+                    backgroundColor: `${theme.palette.primary.main}25`,
+                    transform: "scale(1.05)",
+                  },
+                  transition: "all 0.2s ease-in-out",
+                }}
+              >
+                <Add />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+
+          {/* Search input */}
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search your food database..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search sx={{ color: MACRO_CHART_COLORS.carbs }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(255,255,255,0.8)",
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: MACRO_CHART_COLORS.carbs,
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: MACRO_CHART_COLORS.carbs,
+                },
+              },
+            }}
+            inputProps={{
+              "aria-label": "Search foods",
+              "aria-describedby": "search-foods-description",
+            }}
+          />
+        </Box>
+
+        <Box
+          id="search-foods-description"
+          sx={{ sr: "only", position: "absolute", left: "-10000px" }}
+        >
+          Type to search through your food database
+        </Box>
+
+        {/* Content Area */}
+        <Box
+          sx={{
+            maxHeight: 400,
+            overflowY: "auto",
+            p: 2,
+          }}
+          role="region"
+          aria-label="Foods list"
+        >
+          {isLoading ? (
+            <Stack spacing={2}>
+              {[...Array(4)].map((_, idx) => (
+                <Fade in timeout={300 + idx * 100} key={idx}>
+                  <Paper
+                    elevation={1}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      background:
+                        theme.palette.mode === "dark" ? "#2a2a2a" : "#ffffff",
+                      border: `1px solid ${theme.palette.divider}`,
+                    }}
+                  >
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Skeleton variant="circular" width={40} height={40} />
+                      <Box flex={1}>
+                        <Skeleton width="60%" height={24} />
+                        <Skeleton width="80%" height={20} sx={{ mt: 0.5 }} />
+                      </Box>
+                      <Skeleton variant="rectangular" width={24} height={24} />
+                    </Stack>
+                  </Paper>
+                </Fade>
+              ))}
+            </Stack>
+          ) : !foods?.length ? (
+            <Paper
+              elevation={0}
+              sx={{
+                p: 4,
+                textAlign: "center",
+                borderRadius: 2,
+                background: `${MACRO_CHART_COLORS.carbs}08`,
+                border: `1px dashed ${MACRO_CHART_COLORS.carbs}44`,
+              }}
+            >
+              <Stack alignItems="center" spacing={2}>
+                <Box sx={{ color: MACRO_CHART_COLORS.carbs, fontSize: 48 }}>
+                  <Restaurant />
+                </Box>
+                <Typography variant="h6" color="text.secondary">
+                  {searchTerm ? "No foods found" : "No foods in database"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {searchTerm
+                    ? `No results for "${searchTerm}". Try a different search term.`
+                    : "Add your first food item to get started!"}
+                </Typography>
+              </Stack>
+            </Paper>
+          ) : (
+            <Stack spacing={1}>
+              {foods.map((food, idx) => (
+                <Fade in timeout={200 + idx * 50} key={food.id}>
+                  <Box>
+                    <FoodListItem food={food} onEdit={openEditDialog} />
+                  </Box>
+                </Fade>
+              ))}
+              {isFetchingNextPage && (
+                <Box display="flex" justifyContent="center" py={2}>
+                  <CircularProgress
+                    size={24}
+                    sx={{ color: MACRO_CHART_COLORS.carbs }}
                   />
-                </ListItem>
-                {idx < 3 && <Divider component="li" />}
-              </Fragment>
-            ))}
-          </List>
-        ) : !foods?.length ? (
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ p: 2, textAlign: "center" }}
-          >
-            No foods found.
-          </Typography>
-        ) : (
-          <List>
-            {foods.map((food, idx) => (
-              <Fragment key={food.id}>
-                <FoodListItem food={food} onEdit={openEditDialog} />
-                {idx < foods.length - 1 && <Divider component="li" />}
-              </Fragment>
-            ))}
-            {isFetchingNextPage && (
-              <Box display="flex" justifyContent="center" py={2}>
-                <CircularProgress size={24} />
-              </Box>
-            )}
-            {hasNextPage && <div ref={bottomRef} />}
-          </List>
-        )}
+                </Box>
+              )}
+              {hasNextPage && <div ref={bottomRef} />}
+            </Stack>
+          )}
+        </Box>
       </Paper>
 
       <Dialog
@@ -305,7 +405,7 @@ const FoodList = () => {
       >
         {toastMessage}
       </Toast>
-    </Box>
+    </Fragment>
   );
 };
 
