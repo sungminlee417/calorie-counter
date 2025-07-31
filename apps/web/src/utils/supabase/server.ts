@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { validateEnvironmentWithChecks } from "@/utils/env-validation";
 
 export async function createClient() {
   // Get environment variables directly
@@ -9,7 +8,8 @@ export async function createClient() {
 
   // Validate environment variables are present
   if (!supabaseUrl || !supabaseAnonKey) {
-    const errorMsg = "Missing required Supabase environment variables (server-side)";
+    const errorMsg =
+      "Missing required Supabase environment variables (server-side)";
     console.error(errorMsg);
     throw new Error(errorMsg);
   }
