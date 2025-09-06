@@ -16,7 +16,7 @@ import {
   Fade,
   InputAdornment,
 } from "@mui/material";
-import { Add, Search, Restaurant } from "@mui/icons-material";
+import { Add, Search, Restaurant, SaveAlt } from "@mui/icons-material";
 
 import useFoods from "@/hooks/useFoods";
 import useUser from "@/hooks/useUser";
@@ -37,6 +37,8 @@ import DialogFormActions from "../ui/DialogFormActions";
 import Toast from "../ui/Toast";
 import useToast from "@/hooks/useToast";
 import useErrorHandler from "@/hooks/useErrorHandler";
+import useServerEnhancedFoods from "@/hooks/useServerEnhancedFoods";
+import { FoodSourceType, EnhancedFood } from "@/types/food-provider";
 
 const EMPTY_FOOD: Food = {
   id: 0,
@@ -60,16 +62,57 @@ const FoodList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm.trim(), SEARCH_DEBOUNCE_DELAY);
 
+  // Use enhanced foods with both internal and external providers by default
   const {
+    foods: enhancedFoods,
+    isLoading: isLoadingEnhanced,
+    fetchNextPage: fetchNextPageEnhanced,
+    hasNextPage: hasNextPageEnhanced,
+    isFetchingNextPage: isFetchingNextPageEnhanced,
+    saveExternalFood,
+  } = useServerEnhancedFoods({
+    search: debouncedSearch,
+    providers: [FoodSourceType.INTERNAL, FoodSourceType.FDC_USDA],
+    enableDeduplication: true,
+  });
+
+  // Fallback to client-side for internal foods (temporary debugging)
+  const {
+    foods: internalFoods,
+    isLoading: isLoadingInternal,
+    fetchNextPage: fetchNextPageInternal,
+    hasNextPage: hasNextPageInternal,
+    isFetchingNextPage: isFetchingNextPageInternal,
     createFood,
     deleteFood,
-    foods,
     updateFood,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
   } = useFoods(debouncedSearch);
+
+  // Use enhanced foods if available, otherwise fall back to internal foods converted to enhanced format
+  const finalFoods =
+    enhancedFoods.length > 0
+      ? enhancedFoods
+      : internalFoods.map((food) => ({
+          ...food,
+          source: FoodSourceType.INTERNAL,
+          external_id: undefined,
+          provider_metadata: { internalId: food.id },
+          serving_size: food.serving_size || 0,
+          serving_unit: food.serving_unit || "g",
+          brand: food.brand || undefined,
+          created_at: food.created_at || undefined,
+          updated_at: food.updated_at || undefined,
+        }));
+
+  const isLoading = isLoadingEnhanced && isLoadingInternal;
+  const fetchNextPage =
+    enhancedFoods.length > 0 ? fetchNextPageEnhanced : fetchNextPageInternal;
+  const hasNextPage =
+    enhancedFoods.length > 0 ? hasNextPageEnhanced : hasNextPageInternal;
+  const isFetchingNextPage =
+    enhancedFoods.length > 0
+      ? isFetchingNextPageEnhanced
+      : isFetchingNextPageInternal;
 
   const [isFoodDialogOpen, setIsFoodDialogOpen] = useState(false);
   const [selectedFood, setSelectedFood] = useState<Food>(EMPTY_FOOD);
@@ -158,9 +201,52 @@ const FoodList = () => {
     [deleteFood, showToast, handleAsyncError]
   );
 
-  const openEditDialog = (food: Food) => {
-    setSelectedFood(food);
-    setEditedFood(food);
+  const handleSaveExternalFood = useCallback(
+    async (food: EnhancedFood) => {
+      const result = await handleAsyncError(
+        () => saveExternalFood.mutateAsync(food),
+        "handleSaveExternalFood",
+        "Failed to save external food. Please try again."
+      );
+
+      if (result) {
+        showToast(`"${food.name}" saved to your database!`, "success");
+      }
+    },
+    [saveExternalFood, showToast, handleAsyncError]
+  );
+
+  const openEditDialog = (food: Food | EnhancedFood) => {
+    // Only allow editing internal foods
+    if ("source" in food && food.source !== FoodSourceType.INTERNAL) {
+      showToast(
+        "External foods cannot be edited. Save to your database first.",
+        "info"
+      );
+      return;
+    }
+
+    // Convert food to Food type for editing
+    const normalizedFood: Food =
+      "source" in food
+        ? {
+            // Enhanced food conversion
+            id: food.id || 0,
+            name: food.name,
+            brand: food.brand || null,
+            serving_size: food.serving_size || 0,
+            serving_unit: food.serving_unit || "g",
+            calories: food.calories,
+            protein: food.protein,
+            carbs: food.carbs,
+            fat: food.fat,
+            created_at: food.created_at || null,
+            updated_at: food.updated_at || null,
+            user_id: food.user_id || "",
+          }
+        : food;
+    setSelectedFood(normalizedFood);
+    setEditedFood(normalizedFood);
     setIsFoodDialogOpen(true);
   };
 
@@ -207,7 +293,7 @@ const FoodList = () => {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Food Database
+              Enhanced Food Database
             </Typography>
             <Tooltip title="Add new food" arrow>
               <IconButton
@@ -232,7 +318,7 @@ const FoodList = () => {
           <TextField
             fullWidth
             size="small"
-            placeholder="Search your food database..."
+            placeholder="Search across all food databases..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
@@ -268,7 +354,8 @@ const FoodList = () => {
           id="search-foods-description"
           sx={{ sr: "only", position: "absolute", left: "-10000px" }}
         >
-          Type to search through your food database
+          Type to search across your personal foods and the USDA nutrition
+          database
         </Box>
 
         {/* Content Area */}
@@ -307,7 +394,7 @@ const FoodList = () => {
                 </Fade>
               ))}
             </Stack>
-          ) : !foods?.length ? (
+          ) : !finalFoods?.length ? (
             <Paper
               elevation={0}
               sx={{
@@ -323,21 +410,55 @@ const FoodList = () => {
                   <Restaurant />
                 </Box>
                 <Typography variant="h6" color="text.secondary">
-                  {searchTerm ? "No foods found" : "No foods in database"}
+                  {searchTerm ? "No foods found" : "Start typing to search"}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {searchTerm
                     ? `No results for "${searchTerm}". Try a different search term.`
-                    : "Add your first food item to get started!"}
+                    : "Search across your personal foods and the USDA nutrition database"}
                 </Typography>
               </Stack>
             </Paper>
           ) : (
             <Stack spacing={1}>
-              {foods.map((food, idx) => (
-                <Fade in timeout={200 + idx * 50} key={food.id}>
+              {finalFoods.map((food, idx) => (
+                <Fade
+                  in
+                  timeout={200 + idx * 50}
+                  key={`${food.source}-${food.external_id || food.id}`}
+                >
                   <Box>
-                    <FoodListItem food={food} onEdit={openEditDialog} />
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Box flex={1}>
+                        <FoodListItem
+                          food={food}
+                          onEdit={openEditDialog}
+                          showSource={true}
+                        />
+                      </Box>
+                      {food.source !== FoodSourceType.INTERNAL && (
+                        <Tooltip title="Save to your database" arrow>
+                          <IconButton
+                            onClick={() => handleSaveExternalFood(food)}
+                            disabled={saveExternalFood.isPending}
+                            sx={{
+                              backgroundColor: `${MACRO_CHART_COLORS.fat}15`,
+                              color: MACRO_CHART_COLORS.fat,
+                              "&:hover": {
+                                backgroundColor: `${MACRO_CHART_COLORS.fat}25`,
+                                transform: "scale(1.05)",
+                              },
+                              "&:disabled": {
+                                opacity: 0.6,
+                              },
+                              transition: "all 0.2s ease-in-out",
+                            }}
+                          >
+                            <SaveAlt />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Stack>
                   </Box>
                 </Fade>
               ))}

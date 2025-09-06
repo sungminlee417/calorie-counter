@@ -17,15 +17,18 @@ import {
   FitnessCenter,
 } from "@mui/icons-material";
 import { Food } from "@/types/supabase";
+import { EnhancedFood, FoodSourceType } from "@/types/food-provider";
 import { MACRO_CHART_COLORS, UI_COLORS } from "@/constants/app";
+import FoodSourceBadge from "./FoodSourceBadge";
 
 interface FoodListItemProps {
-  food: Food;
-  onEdit: (food: Food) => void;
+  food: Food | EnhancedFood;
+  onEdit: (food: Food | EnhancedFood) => void;
+  showSource?: boolean;
 }
 
 const FoodListItem: React.FC<FoodListItemProps> = React.memo(
-  ({ food, onEdit }) => {
+  ({ food, onEdit, showSource = false }) => {
     const theme = useTheme();
 
     const handleEdit = () => {
@@ -72,9 +75,17 @@ const FoodListItem: React.FC<FoodListItemProps> = React.memo(
 
             {/* Food Details */}
             <Box flex={1}>
-              <Typography variant="subtitle1" fontWeight="600" gutterBottom>
-                {food.name}
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
+                <Typography variant="subtitle1" fontWeight="600">
+                  {food.name}
+                </Typography>
+                {showSource && "source" in food && (
+                  <FoodSourceBadge
+                    source={food.source as FoodSourceType}
+                    size="small"
+                  />
+                )}
+              </Stack>
 
               <Stack direction="row" alignItems="center" spacing={1} mb={1}>
                 <Typography variant="body2" color="text.secondary">
