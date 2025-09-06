@@ -1,8 +1,6 @@
-import { redirectIfAuthenticated } from "@/utils/auth";
 import AuthForm from "@/components/auth/AuthForm";
 
-const SignupPage = async () => {
-  await redirectIfAuthenticated();
+const SignupPage = () => {
   return <AuthForm mode="signup" />;
 };
 
