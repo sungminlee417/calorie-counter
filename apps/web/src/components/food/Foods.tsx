@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import {
   Typography,
   Box,
@@ -17,6 +17,8 @@ import {
   Fade,
   Skeleton,
   Button,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import {
   Search,
@@ -27,10 +29,10 @@ import {
   Storage,
 } from "@mui/icons-material";
 
-import useServerEnhancedFoods from "@/hooks/useServerEnhancedFoods";
+import useServerFoods from "@/hooks/useServerFoods";
 import useDebounce from "@/hooks/useDebounce";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
-import { FoodSourceType, EnhancedFood } from "@/types/food-provider";
+import { FoodSourceType, Food } from "@/types/food-provider";
 import {
   SEARCH_DEBOUNCE_DELAY,
   MACRO_CHART_COLORS,
@@ -42,7 +44,7 @@ const checkServerProviders = () => ({
   fdc: true, // Server-side API route handles the check
 });
 
-const EnhancedFoodList = () => {
+const Foods = () => {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProviders, setSelectedProviders] = useState<FoodSourceType[]>([
@@ -64,7 +66,7 @@ const EnhancedFoodList = () => {
     stats,
     getProviderInfo,
     saveExternalFood,
-  } = useServerEnhancedFoods({
+  } = useServerFoods({
     search: debouncedSearch,
     providers: selectedProviders,
     enableDeduplication,
@@ -87,7 +89,7 @@ const EnhancedFoodList = () => {
     );
   };
 
-  const handleSaveExternalFood = async (food: EnhancedFood) => {
+  const handleSaveExternalFood = async (food: Food) => {
     try {
       await saveExternalFood.mutateAsync(food);
     } catch (error) {
@@ -96,7 +98,13 @@ const EnhancedFoodList = () => {
   };
 
   return (
-    <Fragment>
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: "100%",
+        overflow: "hidden",
+      }}
+    >
       <Paper
         elevation={2}
         sx={{
@@ -107,6 +115,8 @@ const EnhancedFoodList = () => {
               : UI_COLORS.gradients.neutral.light,
           border: `1px solid ${theme.palette.divider}`,
           overflow: "hidden",
+          width: "100%",
+          maxWidth: "100%",
         }}
       >
         {/* Header */}
@@ -114,7 +124,7 @@ const EnhancedFoodList = () => {
           sx={{
             p: 3,
             borderBottom: `1px solid ${theme.palette.divider}`,
-            background: `linear-gradient(90deg, ${MACRO_CHART_COLORS.carbs}15, ${MACRO_CHART_COLORS.fat}15)`,
+            background: `linear-gradient(90deg, ${MACRO_CHART_COLORS.calories}15, ${MACRO_CHART_COLORS.carbs}15, ${MACRO_CHART_COLORS.fat}15, ${MACRO_CHART_COLORS.protein}15)`,
           }}
         >
           <Stack direction="row" alignItems="center" spacing={2} mb={2}>
@@ -132,24 +142,26 @@ const EnhancedFoodList = () => {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Enhanced Food Database
+              Food Database
             </Typography>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<TuneRounded />}
-              onClick={() => setShowFilters(!showFilters)}
-              sx={{
-                borderColor: MACRO_CHART_COLORS.carbs,
-                color: MACRO_CHART_COLORS.carbs,
-                "&:hover": {
-                  borderColor: MACRO_CHART_COLORS.calories,
-                  backgroundColor: `${MACRO_CHART_COLORS.carbs}08`,
-                },
-              }}
-            >
-              Filters
-            </Button>
+            <Tooltip title="Toggle filters" arrow>
+              <IconButton
+                onClick={() => setShowFilters(!showFilters)}
+                sx={{
+                  backgroundColor: `${theme.palette.primary.main}15`,
+                  color: theme.palette.primary.main,
+                  borderRadius: "50%", // Fully circular
+                  width: 40,
+                  height: 40,
+                  "&:hover": {
+                    backgroundColor: `${theme.palette.primary.main}25`,
+                  },
+                  transition: "all 0.2s ease-in-out",
+                }}
+              >
+                <TuneRounded />
+              </IconButton>
+            </Tooltip>
           </Stack>
 
           {/* Search Input */}
@@ -284,27 +296,42 @@ const EnhancedFoodList = () => {
                 theme.palette.mode === "dark" ? "#1a1a1a" : "#f8f9fa",
             }}
           >
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              sx={{ width: "100%", minWidth: 0 }}
+            >
               <Typography variant="caption" color="text.secondary">
                 {stats.totalResults} results
               </Typography>
-              {Object.entries(stats.sourceBreakdown).map(([source, count]) => (
-                <Stack
-                  key={source}
-                  direction="row"
-                  spacing={0.5}
-                  alignItems="center"
-                >
-                  <FoodSourceBadge
-                    source={source as FoodSourceType}
-                    variant="outlined"
-                    showTooltip={false}
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {count as number}
-                  </Typography>
-                </Stack>
-              ))}
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                flexWrap="wrap"
+                sx={{ minWidth: 0 }}
+              >
+                {Object.entries(stats.sourceBreakdown).map(
+                  ([source, count]) => (
+                    <Stack
+                      key={source}
+                      direction="row"
+                      spacing={0.5}
+                      alignItems="center"
+                    >
+                      <FoodSourceBadge
+                        source={source as FoodSourceType}
+                        variant="outlined"
+                        showTooltip={false}
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        {count as number}
+                      </Typography>
+                    </Stack>
+                  )
+                )}
+              </Stack>
             </Stack>
           </Box>
         )}
@@ -469,8 +496,8 @@ const EnhancedFoodList = () => {
           )}
         </Box>
       </Paper>
-    </Fragment>
+    </Box>
   );
 };
 
-export default EnhancedFoodList;
+export default Foods;

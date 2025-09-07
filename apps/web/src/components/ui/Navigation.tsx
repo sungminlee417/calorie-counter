@@ -4,10 +4,14 @@ import * as React from "react";
 import Image from "next/image";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { Box, Typography, useTheme } from "@mui/material";
+import {
+  ActionButtonGroup,
+  LogoContainer,
+  ActionButton,
+} from "@/components/styled";
 import { LocalFireDepartment, Logout, Person } from "@mui/icons-material";
 
 import { fetchLogout } from "@/lib/supabase/fetch-auth";
@@ -55,29 +59,22 @@ const Navigation = () => {
             gap: { xs: 1, sm: 2 },
           }}
         >
-          <Box
+          <LogoContainer
             sx={{
-              position: "relative",
-              width: { xs: 40, sm: 60 },
-              height: { xs: 40, sm: 60 },
-              borderRadius: 2,
-              overflow: "hidden",
               background: `${MACRO_CHART_COLORS.calories}15`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
             }}
           >
             <Image
               src="/logo.png"
               alt="Calorie Counter Logo"
-              height={50}
-              width={50}
-              style={{ objectFit: "contain" }}
+              fill
+              style={{
+                objectFit: "contain",
+                padding: "10%",
+              }}
               priority
             />
-          </Box>
+          </LogoContainer>
 
           <Box sx={{ minWidth: 0 }}>
             <Typography
@@ -123,35 +120,18 @@ const Navigation = () => {
         </Box>
 
         {/* Right Side Actions */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: { xs: 0.5, sm: 1 },
-          }}
-        >
+        <ActionButtonGroup>
           <ThemeSelector />
 
-          <IconButton
+          <ActionButton
             size="medium"
             aria-label="account of current user"
             aria-controls="menu-appbar"
             aria-haspopup="true"
             onClick={handleMenu}
-            sx={{
-              width: { xs: 36, sm: 40 },
-              height: { xs: 36, sm: 40 },
-              backgroundColor: `${theme.palette.primary.main}15`,
-              color: theme.palette.primary.main,
-              "&:hover": {
-                backgroundColor: `${theme.palette.primary.main}25`,
-                transform: "scale(1.05)",
-              },
-              transition: "all 0.2s ease-in-out",
-            }}
           >
             <Person sx={{ fontSize: { xs: 20, sm: 24 } }} />
-          </IconButton>
+          </ActionButton>
 
           <Menu
             id="menu-appbar"
@@ -194,7 +174,7 @@ const Navigation = () => {
               </Typography>
             </MenuItem>
           </Menu>
-        </Box>
+        </ActionButtonGroup>
       </Toolbar>
     </AppBar>
   );

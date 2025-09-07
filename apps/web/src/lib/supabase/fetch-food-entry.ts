@@ -27,10 +27,11 @@ export const fetchGetFoodEntries = async (
     .order("created_at", { ascending: false });
 
   if (date) {
-    const start = dayjs(date).startOf("day").toISOString();
-    const end = dayjs(date).add(1, "day").startOf("day").toISOString();
+    // Filter by logged_at date, handling timezone properly
+    const startOfDay = dayjs(date).startOf("day").toISOString();
+    const endOfDay = dayjs(date).endOf("day").toISOString();
 
-    query = query.gte("created_at", start).lt("created_at", end);
+    query = query.gte("logged_at", startOfDay).lte("logged_at", endOfDay);
   }
 
   const { data, error } = await query;
@@ -96,11 +97,8 @@ export const fetchUpdateFoodEntry = async (
 
   // If no changes detected, return the current entry without updating
   if (!changeResult.hasChanges) {
-    console.log("No changes detected for food entry, skipping database update");
     return currentEntry;
   }
-
-  console.log(`Updating food entry: ${changeResult.message}`);
 
   // Only update the fields that have actually changed
   const { data, error } = await supabase

@@ -14,10 +14,8 @@ export const useFormChangeDetection = <T extends ComparableObject>(
     enableLogging?: boolean;
   } = {}
 ) => {
-  const {
-    ignoreKeys = ["id", "created_at", "updated_at", "user_id"],
-    enableLogging = false,
-  } = options;
+  const { ignoreKeys = ["id", "created_at", "updated_at", "user_id"] } =
+    options;
 
   // Import change detection utility
   const getChangedFields = useCallback(async () => {
@@ -32,20 +30,14 @@ export const useFormChangeDetection = <T extends ComparableObject>(
     // Simple deep comparison for immediate UI feedback
     const hasChanges = !deepEqual(original, current, ignoreKeys);
 
-    if (enableLogging) {
-      console.log("Form change detection:", {
-        hasChanges,
-        original: filterObject(original, ignoreKeys),
-        current: filterObject(current, ignoreKeys),
-      });
-    }
+    // Form change detection logging removed for production
 
     return {
       hasChanges,
       isDirty: hasChanges,
       isClean: !hasChanges,
     };
-  }, [original, current, ignoreKeys, enableLogging]);
+  }, [original, current, ignoreKeys]);
 
   return {
     ...changeDetection,
@@ -122,22 +114,6 @@ const deepEqual = <T extends ComparableObject>(
   }
 
   return true;
-};
-
-/**
- * Filter object by removing ignored keys
- */
-const filterObject = <T extends ComparableObject>(
-  obj: T,
-  ignoreKeys: (keyof T)[]
-): Partial<T> => {
-  const filtered: Partial<T> = {};
-  for (const key in obj) {
-    if (!ignoreKeys.includes(key)) {
-      filtered[key] = obj[key];
-    }
-  }
-  return filtered;
 };
 
 export default useFormChangeDetection;

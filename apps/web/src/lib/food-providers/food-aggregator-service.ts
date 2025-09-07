@@ -1,5 +1,5 @@
 import {
-  EnhancedFood,
+  Food,
   FoodProviderResponse,
   FoodSearchOptions,
   FoodSourceType,
@@ -181,10 +181,7 @@ export class FoodAggregatorService {
   /**
    * Get a food by ID from the appropriate provider
    */
-  async getFoodById(
-    id: string,
-    source: FoodSourceType
-  ): Promise<EnhancedFood | null> {
+  async getFoodById(id: string, source: FoodSourceType): Promise<Food | null> {
     const provider = this.providers.get(source);
 
     if (!provider || !provider.isEnabled()) {
@@ -221,7 +218,7 @@ export class FoodAggregatorService {
     providerPriority?: Partial<Record<FoodSourceType, number>>
   ): FoodProviderResponse {
     // Collect all foods with their priorities
-    const allFoods: Array<{ food: EnhancedFood; priority: number }> = [];
+    const allFoods: Array<{ food: Food; priority: number }> = [];
 
     for (const result of results) {
       const priority =
@@ -274,9 +271,9 @@ export class FoodAggregatorService {
    * Remove duplicate foods based on similarity
    */
   private deduplicateFoods(
-    foods: Array<{ food: EnhancedFood; priority: number }>
-  ): Array<{ food: EnhancedFood; priority: number }> {
-    const deduplicated: Array<{ food: EnhancedFood; priority: number }> = [];
+    foods: Array<{ food: Food; priority: number }>
+  ): Array<{ food: Food; priority: number }> {
+    const deduplicated: Array<{ food: Food; priority: number }> = [];
 
     for (const candidate of foods) {
       const isDuplicate = deduplicated.some(
@@ -310,10 +307,7 @@ export class FoodAggregatorService {
   /**
    * Calculate similarity between two foods (0-1 scale)
    */
-  private calculateFoodSimilarity(
-    food1: EnhancedFood,
-    food2: EnhancedFood
-  ): number {
+  private calculateFoodSimilarity(food1: Food, food2: Food): number {
     // Simple similarity based on name matching
     const name1 = food1.name.toLowerCase().trim();
     const name2 = food2.name.toLowerCase().trim();
@@ -346,8 +340,8 @@ export class FoodAggregatorService {
    * Sort foods by the configured merge strategy
    */
   private sortFoodsByStrategy(
-    foods: Array<{ food: EnhancedFood; priority: number }>
-  ): Array<{ food: EnhancedFood; priority: number }> {
+    foods: Array<{ food: Food; priority: number }>
+  ): Array<{ food: Food; priority: number }> {
     switch (this.config.mergeStrategy) {
       case "priority":
         return foods.sort((a, b) => b.priority - a.priority);
@@ -365,7 +359,7 @@ export class FoodAggregatorService {
         // Group by source, then interleave
         const groupedBySource = new Map<
           FoodSourceType,
-          Array<{ food: EnhancedFood; priority: number }>
+          Array<{ food: Food; priority: number }>
         >();
 
         for (const item of foods) {
@@ -382,7 +376,7 @@ export class FoodAggregatorService {
         }
 
         // Interleave results
-        const interleaved: Array<{ food: EnhancedFood; priority: number }> = [];
+        const interleaved: Array<{ food: Food; priority: number }> = [];
         const sources = Array.from(groupedBySource.keys()).sort();
         const maxLength = Math.max(
           ...Array.from(groupedBySource.values()).map((group) => group.length)

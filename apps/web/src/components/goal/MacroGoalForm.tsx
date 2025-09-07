@@ -5,14 +5,8 @@ import {
   Restaurant,
   LocalFireDepartment,
 } from "@mui/icons-material";
-import {
-  Stack,
-  TextField,
-  InputAdornment,
-  Paper,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Stack, InputAdornment, Typography, useTheme } from "@mui/material";
+import { SmallCard, FormField } from "@/components/styled";
 import React, { useEffect } from "react";
 import { MACRO_CHART_COLORS, UI_COLORS } from "@/constants/app";
 
@@ -51,7 +45,7 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
   return (
     <Stack spacing={3}>
       {/* Calories Section */}
-      <Paper
+      <SmallCard
         elevation={1}
         sx={{
           p: 3,
@@ -67,7 +61,7 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
           </Typography>
         </Stack>
 
-        <TextField
+        <FormField
           label="Calories (auto-calculated)"
           type="number"
           value={macroGoal.calories ?? 0}
@@ -93,10 +87,10 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
           }}
           helperText="Total calories calculated from your macro targets (Protein: 4 kcal/g, Carbs: 4 kcal/g, Fat: 9 kcal/g)"
         />
-      </Paper>
+      </SmallCard>
 
       {/* Macros Section */}
-      <Paper
+      <SmallCard
         elevation={1}
         sx={{
           p: 3,
@@ -113,7 +107,7 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
         </Typography>
 
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          <TextField
+          <FormField
             label="Carbs (g)"
             type="number"
             value={macroGoal.carbs ?? 0}
@@ -143,7 +137,7 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
             helperText="Daily carb target (4 kcal per gram)"
           />
 
-          <TextField
+          <FormField
             label="Fat (g)"
             type="number"
             value={macroGoal.fat ?? 0}
@@ -173,7 +167,7 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
             helperText="Daily fat target (9 kcal per gram)"
           />
 
-          <TextField
+          <FormField
             label="Protein (g)"
             type="number"
             value={macroGoal.protein ?? 0}
@@ -203,7 +197,7 @@ const MacroGoalsForm: React.FC<MacroGoalFormProps> = ({
             helperText="Daily protein target (4 kcal per gram)"
           />
         </Stack>
-      </Paper>
+      </SmallCard>
     </Stack>
   );
 };

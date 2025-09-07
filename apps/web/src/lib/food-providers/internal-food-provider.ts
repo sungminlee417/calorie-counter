@@ -1,5 +1,5 @@
 import {
-  EnhancedFood,
+  Food,
   FoodProviderResponse,
   FoodSearchOptions,
   FoodSourceType,
@@ -9,7 +9,7 @@ import {
 } from "@/types/food-provider";
 import { BaseFoodProvider } from "./base-food-provider";
 import { fetchGetFoods } from "@/lib/supabase/fetch-food";
-import { Food } from "@/types/supabase";
+import { Food as SupabaseFood } from "@/types/supabase";
 
 /**
  * Food provider for internal Supabase database
@@ -40,10 +40,8 @@ export class InternalFoodProvider extends BaseFoodProvider {
       // Call existing Supabase function
       const foods = await fetchGetFoods(pageSize, offset, query);
 
-      // Transform to enhanced foods
-      const enhancedFoods = foods.map((food) =>
-        this.transformToEnhancedFood(food)
-      );
+      // Transform to foods
+      const transformedFoods = foods.map((food) => this.transformToFood(food));
 
       // Create pagination metadata
       const pagination: PaginationMetadata = {
@@ -56,7 +54,7 @@ export class InternalFoodProvider extends BaseFoodProvider {
       };
 
       return {
-        foods: enhancedFoods,
+        foods: transformedFoods,
         pagination,
         source: this.sourceType,
       };
@@ -65,7 +63,7 @@ export class InternalFoodProvider extends BaseFoodProvider {
     }
   }
 
-  async getFoodById(id: string): Promise<EnhancedFood | null> {
+  async getFoodById(id: string): Promise<Food | null> {
     try {
       // We need to add a function to fetch individual foods by ID
       // For now, we'll search with a specific query that might match
@@ -82,16 +80,16 @@ export class InternalFoodProvider extends BaseFoodProvider {
         return null;
       }
 
-      return this.transformToEnhancedFood(food);
+      return this.transformToFood(food);
     } catch (error) {
       this.handleError(error, "getFoodById");
     }
   }
 
   /**
-   * Transform internal Food type to EnhancedFood
+   * Transform internal Food type to Food
    */
-  protected transformToEnhancedFood(food: Food): EnhancedFood {
+  protected transformToFood(food: SupabaseFood): Food {
     return {
       // Core food properties
       name: food.name,
@@ -124,15 +122,18 @@ export class InternalFoodProvider extends BaseFoodProvider {
    */
   async createFood(
     foodData: Omit<
-      EnhancedFood,
+      Food,
       "id" | "created_at" | "updated_at" | "source" | "external_id"
     >
-  ): Promise<EnhancedFood> {
+  ): Promise<Food> {
     try {
       const { fetchCreateFood } = await import("@/lib/supabase/fetch-food");
 
-      // Transform enhanced food back to internal format
-      const internalFood: Omit<Food, "id" | "created_at" | "updated_at"> = {
+      // Transform food back to internal format
+      const internalFood: Omit<
+        SupabaseFood,
+        "id" | "created_at" | "updated_at"
+      > = {
         name: foodData.name,
         brand: foodData.brand || null,
         serving_size: foodData.serving_size,
@@ -145,7 +146,7 @@ export class InternalFoodProvider extends BaseFoodProvider {
       };
 
       const createdFood = await fetchCreateFood(internalFood);
-      return this.transformToEnhancedFood(createdFood);
+      return this.transformToFood(createdFood);
     } catch (error) {
       this.handleError(error, "createFood");
     }
@@ -154,7 +155,7 @@ export class InternalFoodProvider extends BaseFoodProvider {
   /**
    * Update an existing internal food
    */
-  async updateFood(foodData: EnhancedFood): Promise<EnhancedFood> {
+  async updateFood(foodData: Food): Promise<Food> {
     try {
       if (!foodData.id) {
         throw new FoodProviderError(
@@ -166,8 +167,8 @@ export class InternalFoodProvider extends BaseFoodProvider {
 
       const { fetchUpdateFood } = await import("@/lib/supabase/fetch-food");
 
-      // Transform enhanced food back to internal format
-      const internalFood: Food = {
+      // Transform food back to internal format
+      const internalFood: SupabaseFood = {
         id: foodData.id,
         name: foodData.name,
         brand: foodData.brand || null,
@@ -183,7 +184,7 @@ export class InternalFoodProvider extends BaseFoodProvider {
       };
 
       const updatedFood = await fetchUpdateFood(internalFood);
-      return this.transformToEnhancedFood(updatedFood);
+      return this.transformToFood(updatedFood);
     } catch (error) {
       this.handleError(error, "updateFood");
     }

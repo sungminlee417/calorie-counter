@@ -75,7 +75,7 @@ const FoodSourceBadge: React.FC<FoodSourceBadgeProps> = ({
           color: config.color,
         },
         "& .MuiChip-label": {
-          paddingLeft: showIcon ? 0 : 1,
+          paddingLeft: showIcon ? 0.5 : 1,
           paddingRight: 1,
         },
         "&:hover": {

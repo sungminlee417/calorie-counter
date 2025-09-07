@@ -1,12 +1,6 @@
 import React from "react";
-import {
-  TextField,
-  Stack,
-  Paper,
-  Typography,
-  InputAdornment,
-  useTheme,
-} from "@mui/material";
+import { Stack, Typography, InputAdornment, useTheme } from "@mui/material";
+import { FormContainer, SmallCard, FormField } from "@/components/styled";
 import {
   Restaurant,
   LocalFireDepartment,
@@ -39,20 +33,9 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
   };
 
   return (
-    <Stack spacing={3}>
+    <FormContainer>
       {/* Basic Information Section */}
-      <Paper
-        elevation={1}
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          background:
-            theme.palette.mode === "dark"
-              ? UI_COLORS.gradients.neutral.dark
-              : UI_COLORS.gradients.neutral.light,
-          border: `1px solid ${theme.palette.divider}`,
-        }}
-      >
+      <SmallCard>
         <Stack direction="row" alignItems="center" spacing={2} mb={3}>
           <Restaurant sx={{ color: MACRO_CHART_COLORS.carbs }} />
           <Typography variant="h6" fontWeight="600">
@@ -61,7 +44,7 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
         </Stack>
 
         <Stack spacing={2}>
-          <TextField
+          <FormField
             label="Food Name"
             name="name"
             value={food.name}
@@ -77,7 +60,6 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
                 "&:hover .MuiOutlinedInput-notchedOutline": {
                   borderColor: MACRO_CHART_COLORS.carbs,
                 },
@@ -92,22 +74,17 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
             helperText="Enter the food name"
           />
 
-          <TextField
+          <FormField
             label="Brand (Optional)"
             name="brand"
             value={food.brand ?? ""}
             onChange={handleChange}
             fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-              },
-            }}
             helperText="Optional brand or manufacturer"
           />
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <TextField
+            <FormField
               label="Serving Size"
               name="serving_size"
               type="number"
@@ -122,34 +99,23 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
                   </InputAdornment>
                 ),
               }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
               helperText="Quantity per serving"
             />
-            <TextField
+            <FormField
               label="Serving Unit"
               name="serving_unit"
               value={food.serving_unit}
               onChange={handleChange}
               fullWidth
               required
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
               helperText="Unit (e.g., g, oz, piece)"
             />
           </Stack>
         </Stack>
-      </Paper>
+      </SmallCard>
 
       {/* Calories Section */}
-      <Paper
-        elevation={1}
+      <SmallCard
         sx={{
           p: 3,
           borderRadius: 3,
@@ -164,7 +130,7 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
           </Typography>
         </Stack>
 
-        <TextField
+        <FormField
           label="Calories"
           name="calories"
           type="number"
@@ -201,11 +167,10 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
           }}
           helperText="Energy per serving (kcal)"
         />
-      </Paper>
+      </SmallCard>
 
       {/* Macronutrients Section */}
-      <Paper
-        elevation={1}
+      <SmallCard
         sx={{
           p: 3,
           borderRadius: 3,
@@ -221,7 +186,7 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
         </Typography>
 
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          <TextField
+          <FormField
             label="Carbs (g)"
             name="carbs"
             type="number"
@@ -253,7 +218,7 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
             helperText="Carbohydrates per serving"
           />
 
-          <TextField
+          <FormField
             label="Fat (g)"
             name="fat"
             type="number"
@@ -285,7 +250,7 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
             helperText="Fat content per serving"
           />
 
-          <TextField
+          <FormField
             label="Protein (g)"
             name="protein"
             type="number"
@@ -317,8 +282,8 @@ const FoodForm: React.FC<FoodDialogProps> = ({ food, onChange }) => {
             helperText="Protein content per serving"
           />
         </Stack>
-      </Paper>
-    </Stack>
+      </SmallCard>
+    </FormContainer>
   );
 };
 

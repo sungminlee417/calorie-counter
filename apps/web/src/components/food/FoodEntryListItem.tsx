@@ -162,9 +162,9 @@ const FoodEntryListItem: React.FC<FoodEntryListItemProps> = React.memo(
                 sx={{
                   backgroundColor: `${theme.palette.primary.main}15`,
                   color: theme.palette.primary.main,
+                  borderRadius: "50%", // Fully circular
                   "&:hover": {
                     backgroundColor: `${theme.palette.primary.main}25`,
-                    transform: "scale(1.1)",
                   },
                   transition: "all 0.2s ease-in-out",
                 }}

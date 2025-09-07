@@ -22,7 +22,7 @@ export const fetchGetMacroGoal = async (): Promise<MacroGoal | null> => {
     return null;
   }
 
-  return data ?? [];
+  return data ?? null;
 };
 
 export const fetchCreateMacroGoal = async (
@@ -79,11 +79,8 @@ export const fetchUpdateMacroGoal = async (
 
   // If no changes detected, return the current macro goal without updating
   if (!changeResult.hasChanges) {
-    console.log("No changes detected for macro goal, skipping database update");
     return currentMacroGoal;
   }
-
-  console.log(`Updating macro goal: ${changeResult.message}`);
 
   // Only update the fields that have actually changed
   const { data, error } = await supabase

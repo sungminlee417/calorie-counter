@@ -1,10 +1,10 @@
-import { Food } from "@/types/supabase";
-import { EnhancedFood, FoodSourceType } from "@/types/food-provider";
+import { Food as SupabaseFood } from "@/types/supabase";
+import { Food, FoodSourceType } from "@/types/food-provider";
 
 /**
- * Convert a standard Food to EnhancedFood
+ * Convert a standard Food to Food
  */
-export function foodToEnhanced(food: Food): EnhancedFood {
+export function foodToEnhanced(food: SupabaseFood): Food {
   return {
     // Core food properties
     name: food.name,
@@ -32,33 +32,33 @@ export function foodToEnhanced(food: Food): EnhancedFood {
 }
 
 /**
- * Convert an EnhancedFood to standard Food (for internal foods only)
+ * Convert a Food to standard Food (for internal foods only)
  */
-export function enhancedToFood(enhancedFood: EnhancedFood): Food {
-  if (enhancedFood.source !== FoodSourceType.INTERNAL) {
+export function enhancedToFood(food: Food): SupabaseFood {
+  if (food.source !== FoodSourceType.INTERNAL) {
     throw new Error("Cannot convert external food to internal Food type");
   }
 
   return {
-    id: enhancedFood.id || 0,
-    name: enhancedFood.name,
-    brand: enhancedFood.brand || null,
-    serving_size: enhancedFood.serving_size || 0,
-    serving_unit: enhancedFood.serving_unit || "g",
-    calories: enhancedFood.calories,
-    protein: enhancedFood.protein,
-    carbs: enhancedFood.carbs,
-    fat: enhancedFood.fat,
-    created_at: enhancedFood.created_at || null,
-    updated_at: enhancedFood.updated_at || null,
-    user_id: enhancedFood.user_id || "",
+    id: food.id || 0,
+    name: food.name,
+    brand: food.brand || null,
+    serving_size: food.serving_size || 0,
+    serving_unit: food.serving_unit || "g",
+    calories: food.calories,
+    protein: food.protein,
+    carbs: food.carbs,
+    fat: food.fat,
+    created_at: food.created_at || null,
+    updated_at: food.updated_at || null,
+    user_id: food.user_id || "",
   };
 }
 
 /**
  * Check if a food item is from an external source
  */
-export function isExternalFood(food: EnhancedFood): boolean {
+export function isExternalFood(food: Food): boolean {
   return food.source !== FoodSourceType.INTERNAL;
 }
 
@@ -77,9 +77,9 @@ export function getSourceDisplayName(source: FoodSourceType): string {
 }
 
 /**
- * Create an empty enhanced food for forms
+ * Create an empty food for forms
  */
-export function createEmptyEnhancedFood(): EnhancedFood {
+export function createEmptyFood(): Food {
   return {
     name: "",
     brand: undefined,

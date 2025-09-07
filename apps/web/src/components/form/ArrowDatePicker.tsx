@@ -7,17 +7,8 @@ import {
   Paper,
   Tooltip,
   useTheme,
-  Chip,
-  Fade,
-  Zoom,
 } from "@mui/material";
-import {
-  ChevronLeft,
-  ChevronRight,
-  CalendarToday,
-  Today,
-  Event,
-} from "@mui/icons-material";
+import { ChevronLeft, ChevronRight, Today } from "@mui/icons-material";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import isToday from "dayjs/plugin/isToday";
@@ -114,31 +105,20 @@ const ArrowDatePicker: React.FC<ArrowDatePickerProps> = ({
     <Paper
       elevation={2}
       sx={{
-        p: 2,
-        borderRadius: 3,
+        p: 1.5,
+        borderRadius: 2,
         background:
           theme.palette.mode === "dark"
             ? "linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%)"
             : "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
         border: `1px solid ${theme.palette.divider}`,
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        gap: 2,
+        gap: 1,
         position: "relative",
-        overflow: "hidden",
         transition: "all 0.3s ease-in-out",
         "&:hover": {
-          boxShadow: theme.shadows[4],
-          transform: "translateY(-1px)",
-        },
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 3,
-          background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+          boxShadow: theme.shadows[3],
         },
         ...sx,
       }}
@@ -147,17 +127,6 @@ const ArrowDatePicker: React.FC<ArrowDatePickerProps> = ({
       role="group"
       aria-label="Date picker"
     >
-      {/* Calendar Icon */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          color: theme.palette.primary.main,
-        }}
-      >
-        <CalendarToday sx={{ fontSize: 20 }} />
-      </Box>
-
       {/* Previous Day Button */}
       <Tooltip title="Previous day (← arrow key)" arrow>
         <span>
@@ -194,66 +163,35 @@ const ArrowDatePicker: React.FC<ArrowDatePickerProps> = ({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          minWidth: 140,
-          position: "relative",
+          width: 180, // Fixed width to prevent size changes
+          px: 1,
         }}
       >
-        <Fade
-          in={!isAnimating}
-          timeout={300}
-          style={{
-            transitionDelay: isAnimating ? "0ms" : "150ms",
+        <Typography
+          variant="body1"
+          fontWeight="600"
+          sx={{
+            lineHeight: 1,
+            color: theme.palette.text.primary,
           }}
         >
-          <Box sx={{ textAlign: "center" }}>
-            <Typography
-              variant="h6"
-              fontWeight="600"
-              sx={{
-                background: `linear-gradient(45deg, ${theme.palette.text.primary}, ${theme.palette.text.secondary})`,
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                lineHeight: 1.2,
-              }}
-            >
-              {formattedDate}
-            </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{
-                display: "block",
-                mt: 0.5,
-                fontWeight: 500,
-              }}
-            >
-              {dayOfWeek}
-            </Typography>
-          </Box>
-        </Fade>
-
-        {/* Date Label Chip */}
-        {dateLabel && (
-          <Zoom in timeout={400}>
-            <Chip
-              size="small"
-              label={dateLabel}
-              icon={dateLabel === "Today" ? <Today /> : <Event />}
-              color={dateLabel === "Today" ? "primary" : "default"}
-              sx={{
-                position: "absolute",
-                top: -8,
-                right: -20,
-                fontSize: "0.7rem",
-                height: 20,
-                "& .MuiChip-icon": {
-                  fontSize: 12,
-                },
-              }}
-            />
-          </Zoom>
-        )}
+          {formattedDate}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            display: "block",
+            mt: 0.25,
+            fontWeight: 500,
+            height: 16, // Fixed height to prevent layout shift
+            color:
+              dateLabel === "Today"
+                ? theme.palette.primary.main
+                : theme.palette.text.secondary,
+          }}
+        >
+          {dateLabel || dayOfWeek}
+        </Typography>
       </Box>
 
       {/* Next Day Button */}
@@ -287,7 +225,7 @@ const ArrowDatePicker: React.FC<ArrowDatePickerProps> = ({
       </Tooltip>
 
       {/* Quick Actions */}
-      {showQuickActions && !selectedDayjs.isToday() && (
+      {showQuickActions && (
         <Tooltip title="Jump to today (Home key)" arrow>
           <IconButton
             size="small"
@@ -296,7 +234,9 @@ const ArrowDatePicker: React.FC<ArrowDatePickerProps> = ({
             sx={{
               ml: 1,
               borderRadius: 2,
-              backgroundColor: theme.palette.primary.main + "10",
+              backgroundColor: selectedDayjs.isToday()
+                ? theme.palette.primary.main + "20"
+                : theme.palette.primary.main + "10",
               color: theme.palette.primary.main,
               transition: "all 0.2s ease-in-out",
               "&:hover": {

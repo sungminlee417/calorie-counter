@@ -1,11 +1,11 @@
 import { Metadata } from "next";
-import EnhancedFoodList from "@/components/food/EnhancedFoodList";
+import Foods from "@/components/food/Foods";
 
 export const metadata: Metadata = {
-  title: "Food Search - Calorie Counter",
+  title: "Food Database - Calorie Counter",
   description: "Search for foods across multiple nutrition databases",
 };
 
 export default function FoodSearchPage() {
-  return <EnhancedFoodList />;
+  return <Foods />;
 }

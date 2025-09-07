@@ -22,6 +22,7 @@ import {
   useTheme,
   Fade,
   Chip,
+  Button,
 } from "@mui/material";
 import {
   Add,
@@ -30,6 +31,7 @@ import {
   EmojiNature,
   FitnessCenter,
   AccessTime,
+  ContentCopy,
 } from "@mui/icons-material";
 
 import useFoodEntries from "@/hooks/useFoodEntries";
@@ -53,6 +55,7 @@ const EMPTY_FOOD_ENTRY: FoodEntry = {
   quantity: 1,
   created_at: null,
   updated_at: null,
+  logged_at: new Date().toISOString(),
   meal_type: "breakfast",
 };
 
@@ -136,6 +139,13 @@ const FoodEntryList = () => {
     isLoading,
   } = useFoodEntries(selectedDate);
 
+  // Get yesterday's date
+  const yesterdayDate = new Date(selectedDate);
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+
+  // Get yesterday's entries (pass Date object, not string)
+  const { foodEntries: yesterdayEntries } = useFoodEntries(yesterdayDate);
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openAddFromScratch, setOpenAddFromScratch] = useState(false);
   const [openQuickAdd, setOpenQuickAdd] = useState(false);
@@ -162,6 +172,69 @@ const FoodEntryList = () => {
   } = useToast();
 
   const groupedEntries = groupByMealType(foodEntries);
+  const groupedYesterdayEntries = groupByMealType(yesterdayEntries);
+
+  // Check if current meal has no entries
+  const currentMealHasNoEntries = groupedEntries[selectedMeal].length === 0;
+  const yesterdayMealHasEntries =
+    groupedYesterdayEntries[selectedMeal].length > 0;
+
+  // Copy yesterday's entries for specific meal type
+  const handleCopyYesterdayMeal = useCallback(
+    async (mealType: MealType) => {
+      const yesterdayMealEntries = groupedYesterdayEntries[mealType];
+      if (!yesterdayMealEntries || yesterdayMealEntries.length === 0) return;
+
+      try {
+        for (const entry of yesterdayMealEntries) {
+          // Extract only the food entry fields, excluding any joined data
+          const { id, created_at, updated_at, foods, ...entryData } =
+            entry as FoodEntryWithFood;
+          await createFoodEntry.mutateAsync({
+            ...entryData,
+            logged_at: selectedDate.toISOString(),
+          });
+        }
+        showToast(
+          `Copied ${yesterdayMealEntries.length} ${mealType} entries from yesterday!`,
+          "success"
+        );
+      } catch {
+        showToast(
+          `Failed to copy ${mealType} entries from yesterday.`,
+          "error"
+        );
+      }
+    },
+    [groupedYesterdayEntries, createFoodEntry, selectedDate, showToast]
+  );
+
+  // Copy all of yesterday's entries
+  const handleCopyAllFromYesterday = useCallback(async () => {
+    if (!yesterdayEntries || yesterdayEntries.length === 0) return;
+
+    try {
+      for (const entry of yesterdayEntries) {
+        // Extract only the food entry fields, excluding any joined data
+        const { id, created_at, updated_at, foods, ...entryData } =
+          entry as FoodEntryWithFood;
+        await createFoodEntry.mutateAsync({
+          ...entryData,
+          logged_at: selectedDate.toISOString(),
+        });
+      }
+      showToast(
+        `Copied all ${yesterdayEntries.length} entries from yesterday!`,
+        "success"
+      );
+    } catch {
+      showToast("Failed to copy entries from yesterday.", "error");
+    }
+  }, [yesterdayEntries, createFoodEntry, selectedDate, showToast]);
+
+  // Check if we should show the "copy all" button
+  const hasNoEntries = foodEntries?.length === 0;
+  const hasYesterdayEntries = yesterdayEntries && yesterdayEntries.length > 0;
 
   // Use change detection for the form
   const { hasChanges: formHasChanges } = useFormChangeDetection(
@@ -278,15 +351,43 @@ const FoodEntryList = () => {
             >
               Daily Food Entries
             </Typography>
+
+            {/* Copy All From Yesterday Button */}
+            {hasNoEntries && hasYesterdayEntries && (
+              <Tooltip
+                title={`Copy all ${yesterdayEntries?.length} entries from yesterday`}
+                arrow
+              >
+                <IconButton
+                  onClick={handleCopyAllFromYesterday}
+                  sx={{
+                    backgroundColor: `${MACRO_CHART_COLORS.fat}15`,
+                    color: MACRO_CHART_COLORS.fat,
+                    borderRadius: "50%",
+                    width: 40,
+                    height: 40,
+                    "&:hover": {
+                      backgroundColor: `${MACRO_CHART_COLORS.fat}25`,
+                    },
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                >
+                  <ContentCopy />
+                </IconButton>
+              </Tooltip>
+            )}
+
             <Tooltip title="Add food entry" arrow>
               <IconButton
                 onClick={handleAddClick}
                 sx={{
                   backgroundColor: `${theme.palette.primary.main}15`,
                   color: theme.palette.primary.main,
+                  borderRadius: "50%", // Fully circular
+                  width: 40,
+                  height: 40,
                   "&:hover": {
                     backgroundColor: `${theme.palette.primary.main}25`,
-                    transform: "scale(1.05)",
                   },
                   transition: "all 0.2s ease-in-out",
                 }}
@@ -451,6 +552,27 @@ const FoodEntryList = () => {
                 <Typography variant="body2" color="text.secondary">
                   Add your first {selectedMeal} item to get started!
                 </Typography>
+
+                {/* Show Copy Yesterday button for specific meal type */}
+                {currentMealHasNoEntries && yesterdayMealHasEntries && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<ContentCopy />}
+                    onClick={() => handleCopyYesterdayMeal(selectedMeal)}
+                    sx={{
+                      mt: 2,
+                      borderColor: getMealTypeInfo(selectedMeal).color,
+                      color: getMealTypeInfo(selectedMeal).color,
+                      "&:hover": {
+                        backgroundColor: `${getMealTypeInfo(selectedMeal).color}15`,
+                        borderColor: getMealTypeInfo(selectedMeal).color,
+                      },
+                    }}
+                  >
+                    Copy Yesterday&apos;s {getMealTypeInfo(selectedMeal).label}{" "}
+                    ({groupedYesterdayEntries[selectedMeal].length})
+                  </Button>
+                )}
               </Stack>
             </Paper>
           ) : (

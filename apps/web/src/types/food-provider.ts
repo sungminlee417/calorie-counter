@@ -9,8 +9,8 @@ export enum FoodSourceType {
   // NUTRITIONIX = "nutritionix",
 }
 
-// Enhanced food schema with source metadata
-export const enhancedFoodSchema = z.object({
+// Food schema with source metadata
+export const foodSchema = z.object({
   // Core food properties (from existing schema)
   name: z.string().min(1).describe("The common name or title of the food item"),
   brand: z
@@ -63,7 +63,7 @@ export const enhancedFoodSchema = z.object({
   user_id: z.string().optional().describe("User who created this food item"),
 });
 
-export type EnhancedFood = z.infer<typeof enhancedFoodSchema>;
+export type Food = z.infer<typeof foodSchema>;
 
 // Pagination metadata interface
 export interface PaginationMetadata {
@@ -77,7 +77,7 @@ export interface PaginationMetadata {
 
 // Unified response format for all providers
 export interface FoodProviderResponse {
-  foods: EnhancedFood[];
+  foods: Food[];
   pagination: PaginationMetadata;
   source: FoodSourceType;
 }

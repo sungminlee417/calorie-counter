@@ -1,5 +1,5 @@
 import {
-  EnhancedFood,
+  Food,
   FoodProviderResponse,
   FoodSearchOptions,
   FoodSourceType,
@@ -72,10 +72,8 @@ export class FDCFoodProvider extends BaseFoodProvider {
         sortOrder,
       });
 
-      // Transform to enhanced foods
-      const enhancedFoods = response.foods.map((food) =>
-        this.transformToEnhancedFood(food)
-      );
+      // Transform to foods
+      const foods = response.foods.map((food) => this.transformToFood(food));
 
       // Create pagination metadata
       const pagination: PaginationMetadata = {
@@ -88,7 +86,7 @@ export class FDCFoodProvider extends BaseFoodProvider {
       };
 
       return {
-        foods: enhancedFoods,
+        foods: foods,
         pagination,
         source: this.sourceType,
       };
@@ -97,7 +95,7 @@ export class FDCFoodProvider extends BaseFoodProvider {
     }
   }
 
-  async getFoodById(id: string): Promise<EnhancedFood | null> {
+  async getFoodById(id: string): Promise<Food | null> {
     try {
       await this.checkRateLimit();
 
@@ -112,16 +110,16 @@ export class FDCFoodProvider extends BaseFoodProvider {
         return null;
       }
 
-      return this.transformToEnhancedFood(foodData);
+      return this.transformToFood(foodData);
     } catch (error) {
       this.handleError(error, "getFoodById");
     }
   }
 
   /**
-   * Transform FDC food data to enhanced food format
+   * Transform FDC food data to food format
    */
-  protected transformToEnhancedFood(fdcFood: unknown): EnhancedFood {
+  protected transformToFood(fdcFood: unknown): Food {
     const food = fdcFood as FDCFoodData;
 
     // Extract nutrient values

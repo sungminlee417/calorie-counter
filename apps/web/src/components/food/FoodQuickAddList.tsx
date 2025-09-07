@@ -19,13 +19,17 @@ import { FoodEntry } from "@/types/supabase";
 import { foodEntrySchema, MealType } from "@/types/food-entry";
 import useToast from "@/hooks/useToast";
 import Toast from "../ui/Toast";
+import { useDate } from "@/context/DateContext";
+import dayjs from "dayjs";
 
 export interface FoodQuickAddListProps {
   mealType: MealType;
 }
 
 const FoodQuickAddList: React.FC<FoodQuickAddListProps> = ({ mealType }) => {
-  const { createFoodEntry, foodEntries, isLoading } = useFoodEntries();
+  const { selectedDate } = useDate();
+  const { createFoodEntry, foodEntries, isLoading } =
+    useFoodEntries(selectedDate);
 
   const {
     handleCloseToast,
@@ -43,6 +47,7 @@ const FoodQuickAddList: React.FC<FoodQuickAddListProps> = ({ mealType }) => {
       const result = foodEntrySchema.safeParse({
         ...rest,
         meal_type: mealType,
+        logged_at: dayjs(selectedDate).startOf("day").toISOString(),
       });
       if (!result.success) {
         showToast("Invalid food entry data. Please check your input.", "error");
@@ -53,13 +58,17 @@ const FoodQuickAddList: React.FC<FoodQuickAddListProps> = ({ mealType }) => {
         await createFoodEntry.mutateAsync({
           ...rest,
           meal_type: mealType,
+          logged_at: dayjs(selectedDate).startOf("day").toISOString(),
         } as Omit<FoodEntry, "id" | "created_at" | "updated_at">);
-        showToast("Food entry created successfully!", "success");
+        showToast(
+          `Food entry added to ${dayjs(selectedDate).format("MMM D, YYYY")}!`,
+          "success"
+        );
       } catch {
         showToast("Failed to save food entry.", "error");
       }
     },
-    [createFoodEntry, mealType, showToast]
+    [createFoodEntry, mealType, selectedDate, showToast]
   );
 
   return (

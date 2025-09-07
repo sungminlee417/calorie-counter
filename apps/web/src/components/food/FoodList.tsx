@@ -6,16 +6,21 @@ import {
   Typography,
   Box,
   Stack,
-  IconButton,
-  Skeleton,
-  Paper,
   Tooltip,
   CircularProgress,
-  TextField,
   useTheme,
   Fade,
   InputAdornment,
+  Paper,
 } from "@mui/material";
+import {
+  MediumStack,
+  ContentWrapper,
+  CustomSkeleton,
+  SmallCard,
+  ActionButton,
+  SearchField,
+} from "@/components/styled";
 import { Add, Search, Restaurant, SaveAlt } from "@mui/icons-material";
 
 import useFoods from "@/hooks/useFoods";
@@ -37,8 +42,13 @@ import DialogFormActions from "../ui/DialogFormActions";
 import Toast from "../ui/Toast";
 import useToast from "@/hooks/useToast";
 import useErrorHandler from "@/hooks/useErrorHandler";
-import useServerEnhancedFoods from "@/hooks/useServerEnhancedFoods";
-import { FoodSourceType, EnhancedFood } from "@/types/food-provider";
+import useServerFoods from "@/hooks/useServerFoods";
+import { FoodSourceType, Food as ProviderFood } from "@/types/food-provider";
+import { MealType } from "@/types/food-entry";
+import { useDate } from "@/context/DateContext";
+import useFoodEntries from "@/hooks/useFoodEntries";
+import { FoodEntry } from "@/types/supabase";
+import dayjs from "dayjs";
 
 const EMPTY_FOOD: Food = {
   id: 0,
@@ -58,6 +68,8 @@ const EMPTY_FOOD: Food = {
 const FoodList = () => {
   const theme = useTheme();
   const { user } = useUser();
+  const { selectedDate } = useDate();
+  const { createFoodEntry } = useFoodEntries(selectedDate);
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm.trim(), SEARCH_DEBOUNCE_DELAY);
@@ -70,7 +82,7 @@ const FoodList = () => {
     hasNextPage: hasNextPageEnhanced,
     isFetchingNextPage: isFetchingNextPageEnhanced,
     saveExternalFood,
-  } = useServerEnhancedFoods({
+  } = useServerFoods({
     search: debouncedSearch,
     providers: [FoodSourceType.INTERNAL, FoodSourceType.FDC_USDA],
     enableDeduplication: true,
@@ -202,7 +214,7 @@ const FoodList = () => {
   );
 
   const handleSaveExternalFood = useCallback(
-    async (food: EnhancedFood) => {
+    async (food: ProviderFood) => {
       const result = await handleAsyncError(
         () => saveExternalFood.mutateAsync(food),
         "handleSaveExternalFood",
@@ -216,7 +228,39 @@ const FoodList = () => {
     [saveExternalFood, showToast, handleAsyncError]
   );
 
-  const openEditDialog = (food: Food | EnhancedFood) => {
+  const handleAddFoodEntry = useCallback(
+    async (food: Food | ProviderFood, mealType: MealType) => {
+      if (!user) {
+        showToast("Please log in to add food entries.", "error");
+        return;
+      }
+
+      const foodEntry: Omit<FoodEntry, "id" | "created_at" | "updated_at"> = {
+        food_id: food.id || 0,
+        user_id: user.id,
+        quantity: 1,
+        meal_type: mealType,
+        logged_at: dayjs(selectedDate).startOf("day").toISOString(),
+      };
+
+      const result = await handleAsyncError(
+        () => createFoodEntry.mutateAsync(foodEntry),
+        "handleAddFoodEntry",
+        "Failed to add food entry. Please try again."
+      );
+
+      if (result) {
+        const mealLabel = mealType.charAt(0).toUpperCase() + mealType.slice(1);
+        showToast(
+          `Added "${food.name}" to ${mealLabel} on ${dayjs(selectedDate).format("MMM D, YYYY")}`,
+          "success"
+        );
+      }
+    },
+    [createFoodEntry, selectedDate, user, showToast, handleAsyncError]
+  );
+
+  const openEditDialog = (food: Food | ProviderFood) => {
     // Only allow editing internal foods
     if ("source" in food && food.source !== FoodSourceType.INTERNAL) {
       showToast(
@@ -271,14 +315,13 @@ const FoodList = () => {
         }}
       >
         {/* Header */}
-        <Box
+        <ContentWrapper
           sx={{
-            p: 3,
             borderBottom: `1px solid ${theme.palette.divider}`,
             background: `linear-gradient(90deg, ${MACRO_CHART_COLORS.carbs}15, ${MACRO_CHART_COLORS.fat}15)`,
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+          <MediumStack direction="row" alignItems="center" mb={2}>
             <Restaurant
               sx={{ color: MACRO_CHART_COLORS.carbs, fontSize: 28 }}
             />
@@ -293,29 +336,20 @@ const FoodList = () => {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Enhanced Food Database
+              Food Database
             </Typography>
             <Tooltip title="Add new food" arrow>
-              <IconButton
+              <ActionButton
                 onClick={() => setIsFoodDialogOpen(true)}
                 aria-label="Add new food"
-                sx={{
-                  backgroundColor: `${theme.palette.primary.main}15`,
-                  color: theme.palette.primary.main,
-                  "&:hover": {
-                    backgroundColor: `${theme.palette.primary.main}25`,
-                    transform: "scale(1.05)",
-                  },
-                  transition: "all 0.2s ease-in-out",
-                }}
               >
                 <Add />
-              </IconButton>
+              </ActionButton>
             </Tooltip>
-          </Stack>
+          </MediumStack>
 
           {/* Search input */}
-          <TextField
+          <SearchField
             fullWidth
             size="small"
             placeholder="Search across all food databases..."
@@ -330,11 +364,6 @@ const FoodList = () => {
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(255,255,255,0.8)",
                 "&:hover .MuiOutlinedInput-notchedOutline": {
                   borderColor: MACRO_CHART_COLORS.carbs,
                 },
@@ -348,7 +377,7 @@ const FoodList = () => {
               "aria-describedby": "search-foods-description",
             }}
           />
-        </Box>
+        </ContentWrapper>
 
         <Box
           id="search-foods-description"
@@ -359,48 +388,48 @@ const FoodList = () => {
         </Box>
 
         {/* Content Area */}
-        <Box
+        <ContentWrapper
           sx={{
             maxHeight: 400,
             overflowY: "auto",
-            p: 2,
           }}
           role="region"
           aria-label="Foods list"
         >
           {isLoading ? (
-            <Stack spacing={2}>
+            <MediumStack>
               {[...Array(4)].map((_, idx) => (
                 <Fade in timeout={300 + idx * 100} key={idx}>
-                  <Paper
-                    elevation={1}
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      background:
-                        theme.palette.mode === "dark" ? "#2a2a2a" : "#ffffff",
-                      border: `1px solid ${theme.palette.divider}`,
-                    }}
-                  >
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                      <Skeleton variant="circular" width={40} height={40} />
+                  <SmallCard elevation={1}>
+                    <MediumStack direction="row" alignItems="center">
+                      <CustomSkeleton
+                        variant="circular"
+                        width={40}
+                        height={40}
+                      />
                       <Box flex={1}>
-                        <Skeleton width="60%" height={24} />
-                        <Skeleton width="80%" height={20} sx={{ mt: 0.5 }} />
+                        <CustomSkeleton width="60%" height={24} />
+                        <CustomSkeleton
+                          width="80%"
+                          height={20}
+                          sx={{ mt: 0.5 }}
+                        />
                       </Box>
-                      <Skeleton variant="rectangular" width={24} height={24} />
-                    </Stack>
-                  </Paper>
+                      <CustomSkeleton
+                        variant="rectangular"
+                        width={24}
+                        height={24}
+                      />
+                    </MediumStack>
+                  </SmallCard>
                 </Fade>
               ))}
-            </Stack>
+            </MediumStack>
           ) : !finalFoods?.length ? (
-            <Paper
+            <SmallCard
               elevation={0}
               sx={{
-                p: 4,
                 textAlign: "center",
-                borderRadius: 2,
                 background: `${MACRO_CHART_COLORS.carbs}08`,
                 border: `1px dashed ${MACRO_CHART_COLORS.carbs}44`,
               }}
@@ -418,7 +447,7 @@ const FoodList = () => {
                     : "Search across your personal foods and the USDA nutrition database"}
                 </Typography>
               </Stack>
-            </Paper>
+            </SmallCard>
           ) : (
             <Stack spacing={1}>
               {finalFoods.map((food, idx) => (
@@ -433,12 +462,13 @@ const FoodList = () => {
                         <FoodListItem
                           food={food}
                           onEdit={openEditDialog}
+                          onAddEntry={handleAddFoodEntry}
                           showSource={true}
                         />
                       </Box>
                       {food.source !== FoodSourceType.INTERNAL && (
                         <Tooltip title="Save to your database" arrow>
-                          <IconButton
+                          <ActionButton
                             onClick={() => handleSaveExternalFood(food)}
                             disabled={saveExternalFood.isPending}
                             sx={{
@@ -446,16 +476,14 @@ const FoodList = () => {
                               color: MACRO_CHART_COLORS.fat,
                               "&:hover": {
                                 backgroundColor: `${MACRO_CHART_COLORS.fat}25`,
-                                transform: "scale(1.05)",
                               },
                               "&:disabled": {
                                 opacity: 0.6,
                               },
-                              transition: "all 0.2s ease-in-out",
                             }}
                           >
                             <SaveAlt />
-                          </IconButton>
+                          </ActionButton>
                         </Tooltip>
                       )}
                     </Stack>
@@ -473,7 +501,7 @@ const FoodList = () => {
               {hasNextPage && <div ref={bottomRef} />}
             </Stack>
           )}
-        </Box>
+        </ContentWrapper>
       </Paper>
 
       <Dialog

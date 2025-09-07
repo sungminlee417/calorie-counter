@@ -5,17 +5,13 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 
-import {
-  EnhancedFood,
-  FoodSourceType,
-  FoodProviderError,
-} from "@/types/food-provider";
+import { Food, FoodSourceType, FoodProviderError } from "@/types/food-provider";
 import { PAGE_SIZE } from "@/constants/app";
 
 /**
  * Options for the server-side enhanced foods hook
  */
-export interface UseServerEnhancedFoodsOptions {
+export interface UseServerFoodsOptions {
   search?: string;
   providers?: FoodSourceType[];
   enableDeduplication?: boolean;
@@ -25,9 +21,7 @@ export interface UseServerEnhancedFoodsOptions {
  * Server-side version of enhanced foods hook that uses API routes
  * Keeps API keys secure and provides better caching/performance
  */
-const useServerEnhancedFoods = (
-  options: UseServerEnhancedFoodsOptions = {}
-) => {
+const useServerFoods = (options: UseServerFoodsOptions = {}) => {
   const {
     search = "",
     providers = [FoodSourceType.INTERNAL, FoodSourceType.FDC_USDA],
@@ -103,7 +97,7 @@ const useServerEnhancedFoods = (
 
   // Save external food to internal database
   const saveExternalFood = useMutation({
-    mutationFn: async (externalFood: EnhancedFood) => {
+    mutationFn: async (externalFood: Food) => {
       if (externalFood.source === FoodSourceType.INTERNAL) {
         throw new FoodProviderError(
           "Food is already in internal database",
@@ -222,4 +216,4 @@ const useServerEnhancedFoods = (
   };
 };
 
-export default useServerEnhancedFoods;
+export default useServerFoods;

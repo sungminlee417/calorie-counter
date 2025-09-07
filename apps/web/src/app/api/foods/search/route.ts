@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FDCApiClient } from "@/lib/food-providers/fdc-api-client";
 import {
   FoodSourceType,
-  EnhancedFood,
+  Food,
   FoodProviderResponse,
   PaginationMetadata,
   FDC_NUTRIENT_IDS,
@@ -36,11 +36,7 @@ export async function POST(request: NextRequest) {
         const supabase = await createClient();
 
         // Check if user is authenticated
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-        console.log("API Route - User:", user?.id, "Auth Error:", authError);
+        await supabase.auth.getUser();
 
         const offset = (page - 1) * Math.min(pageSize, 15);
         const limit = Math.min(pageSize, 15);
@@ -63,7 +59,7 @@ export async function POST(request: NextRequest) {
           throw new Error(error.message);
         }
 
-        const enhancedFoods: EnhancedFood[] = (foods || []).map((food) => ({
+        const transformedFoods: Food[] = (foods || []).map((food) => ({
           name: food.name,
           brand: food.brand || undefined,
           serving_size: food.serving_size || 0,
@@ -82,7 +78,7 @@ export async function POST(request: NextRequest) {
         }));
 
         results.push({
-          foods: enhancedFoods,
+          foods: transformedFoods,
           pagination: {
             page,
             pageSize: Math.min(pageSize, 15),
@@ -110,7 +106,7 @@ export async function POST(request: NextRequest) {
           pageSize: Math.min(pageSize, 25),
         });
 
-        const enhancedFoods: EnhancedFood[] = fdcResponse.foods.map((food) => {
+        const transformedFoods: Food[] = fdcResponse.foods.map((food) => {
           // Extract nutrients
           const nutrients = {
             calories: 0,
@@ -177,7 +173,7 @@ export async function POST(request: NextRequest) {
         });
 
         results.push({
-          foods: enhancedFoods,
+          foods: transformedFoods,
           pagination: {
             page: fdcResponse.currentPage,
             pageSize: Math.min(pageSize, 25),
@@ -194,7 +190,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Merge results
-    const allFoods: EnhancedFood[] = [];
+    const allFoods: Food[] = [];
     for (const result of results) {
       allFoods.push(...result.foods);
     }
@@ -275,8 +271,8 @@ function cleanFoodName(description: string): string {
   return cleaned || "Unknown Food";
 }
 
-function deduplicateFoods(foods: EnhancedFood[]): EnhancedFood[] {
-  const deduplicated: EnhancedFood[] = [];
+function deduplicateFoods(foods: Food[]): Food[] {
+  const deduplicated: Food[] = [];
   const threshold = 0.8;
 
   for (const candidate of foods) {

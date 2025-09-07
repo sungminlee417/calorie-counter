@@ -173,9 +173,11 @@ const MacroGoalPanel = () => {
                 sx={{
                   backgroundColor: `${theme.palette.primary.main}15`,
                   color: theme.palette.primary.main,
+                  borderRadius: "50%", // Fully circular
+                  width: 40,
+                  height: 40,
                   "&:hover": {
                     backgroundColor: `${theme.palette.primary.main}25`,
-                    transform: "scale(1.05)",
                   },
                   transition: "all 0.2s ease-in-out",
                 }}

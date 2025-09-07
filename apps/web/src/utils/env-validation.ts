@@ -21,25 +21,15 @@ export const validateEnvironmentVariables = (): EnvConfig => {
   // This prevents errors when environment variables haven't loaded yet
   if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
     // Give it a moment for Next.js to load env vars
-    const allNextPublicVars = Object.keys(process.env).filter(k => k.startsWith("NEXT_PUBLIC_"));
+    const allNextPublicVars = Object.keys(process.env).filter((k) =>
+      k.startsWith("NEXT_PUBLIC_")
+    );
     if (allNextPublicVars.length === 0) {
-      console.log("⏳ Environment variables not loaded yet, using fallback...");
       throw new Error("Environment variables not yet loaded");
     }
   }
 
   const errors: string[] = [];
-
-  // Debug logging for development
-  if (process.env.NODE_ENV === "development") {
-    console.log("Environment validation - checking variables:");
-    console.log("NODE_ENV:", process.env.NODE_ENV);
-    console.log("All NEXT_PUBLIC_ vars:", Object.keys(process.env).filter(k => k.startsWith("NEXT_PUBLIC_")));
-    for (const varName of requiredClientVars) {
-      const value = process.env[varName];
-      console.log(`${varName}: ${value ? "SET" : "MISSING"}`);
-    }
-  }
 
   // Check required client-side variables
   for (const varName of requiredClientVars) {
@@ -55,7 +45,7 @@ export const validateEnvironmentVariables = (): EnvConfig => {
     )
       .filter((key) => key.startsWith("NEXT_PUBLIC_"))
       .join(", ")}`;
-    
+
     // In development, just warn but don't throw - let the fallback handle it
     if (process.env.NODE_ENV === "development") {
       console.warn("⚠️  Environment validation warning:", errorMessage);

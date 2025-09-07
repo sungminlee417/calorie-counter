@@ -5,23 +5,23 @@ import {
   Box,
   Typography,
   Stack,
-  LinearProgress,
-  Skeleton,
   useTheme,
   Paper,
-  Chip,
-  Tooltip,
   Fade,
   Zoom,
+  CircularProgress,
 } from "@mui/material";
+import {
+  LargeCard,
+  MediumStack,
+  SmallCard,
+  CustomSkeleton,
+} from "@/components/styled";
 import {
   LocalFireDepartment,
   Restaurant,
   EmojiNature,
   FitnessCenter,
-  TrendingUp,
-  CheckCircle,
-  Warning,
 } from "@mui/icons-material";
 
 import useFoodEntries from "@/hooks/useFoodEntries";
@@ -29,6 +29,207 @@ import useMacroGoal from "@/hooks/useMacroGoal";
 import { useDate } from "@/context/DateContext";
 import { MACRO_CHART_COLORS, MACRO_CALORIES } from "@/constants/app";
 import ArrowDatePicker from "../form/ArrowDatePicker";
+
+const CircularProgressWithLabel = ({
+  value,
+  current,
+  goal,
+  unit,
+  color,
+  icon,
+  name,
+  size = 120,
+}: {
+  value: number;
+  current: number;
+  goal: number | null;
+  unit: string;
+  color: string;
+  icon: React.ReactNode;
+  name: string;
+  size?: number | { xs: number; lg: number };
+}) => {
+  const theme = useTheme();
+  const isOverGoal = value > 100;
+  const displayValue = Math.min(value, 100);
+
+  // Handle responsive size - use theme breakpoints to get actual size
+  const getActualSize = () => {
+    if (typeof size === "object") {
+      return size.lg; // Default to large size, we'll handle responsive via CSS
+    }
+    return size;
+  };
+  const actualSize = getActualSize();
+
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        p: 2,
+      }}
+    >
+      <Box
+        sx={{
+          position: "relative",
+          mb: 1,
+          // Responsive scaling using CSS transform
+          transform:
+            typeof size === "object"
+              ? {
+                  xs: `scale(${size.xs / size.lg})`,
+                  lg: "scale(1)",
+                }
+              : "scale(1)",
+          transformOrigin: "center",
+        }}
+      >
+        {/* Background circle */}
+        <CircularProgress
+          variant="determinate"
+          value={100}
+          size={actualSize}
+          thickness={4}
+          sx={{
+            color: theme.palette.mode === "dark" ? "#333" : "#f0f0f0",
+            position: "absolute",
+          }}
+        />
+
+        {/* Main progress circle */}
+        <CircularProgress
+          variant="determinate"
+          value={displayValue}
+          size={actualSize}
+          thickness={4}
+          sx={{
+            color: isOverGoal ? "#d32f2f" : color, // Use distinct red color for overflow
+            transform: "rotate(-90deg)!important",
+            "& .MuiCircularProgress-circle": {
+              strokeLinecap: "round",
+            },
+          }}
+        />
+
+        {/* Overflow indicator - inner pulsing circle with different color */}
+        {isOverGoal && (
+          <CircularProgress
+            variant="determinate"
+            value={100}
+            size={actualSize - 12}
+            thickness={3}
+            sx={{
+              color: "#ff9800", // Orange color to contrast with red
+              position: "absolute",
+              top: 6,
+              left: 6,
+              transform: "rotate(-90deg)!important",
+              "& .MuiCircularProgress-circle": {
+                strokeLinecap: "round",
+                strokeDasharray: "8 4!important",
+                animation: "pulse 1.5s ease-in-out infinite",
+              },
+              "@keyframes pulse": {
+                "0%": {
+                  opacity: 0.3,
+                },
+                "50%": {
+                  opacity: 0.8,
+                },
+                "100%": {
+                  opacity: 0.3,
+                },
+              },
+            }}
+          />
+        )}
+
+        <Box
+          sx={{
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            position: "absolute",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          <Box
+            sx={{
+              color: isOverGoal ? "#d32f2f" : color, // Use distinct red color for overflow
+              fontSize: 20,
+              mb: 0.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {icon}
+          </Box>
+          <Typography
+            variant="body2"
+            fontWeight="600"
+            textAlign="center"
+            sx={{ color: isOverGoal ? "#d32f2f" : "inherit" }} // Use distinct red color for overflow
+          >
+            {current.toFixed(1)}
+            <Typography
+              component="span"
+              variant="caption"
+              color="text.secondary"
+            >
+              {unit}
+            </Typography>
+          </Typography>
+          {goal && (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              textAlign="center"
+            >
+              /{goal.toFixed(0)}
+              {unit}
+            </Typography>
+          )}
+        </Box>
+      </Box>
+      <Typography
+        variant="body2"
+        fontWeight="500"
+        color="text.primary"
+        textAlign="center"
+        sx={{
+          color: isOverGoal ? "#d32f2f" : "text.primary", // Use distinct red color for overflow
+        }}
+      >
+        {name}
+      </Typography>
+      {goal && (
+        <Typography
+          variant="caption"
+          textAlign="center"
+          sx={{
+            color:
+              value >= 95 && value <= 105
+                ? "success.main"
+                : value > 105
+                  ? "error.main"
+                  : "text.secondary",
+            fontWeight: isOverGoal ? 600 : 400,
+          }}
+        >
+          {value.toFixed(0)}%{isOverGoal && " ⚠️"}
+        </Typography>
+      )}
+    </Box>
+  );
+};
 
 const MacrosChart = () => {
   const { selectedDate, setSelectedDate } = useDate();
@@ -88,123 +289,18 @@ const MacrosChart = () => {
     },
   ];
 
-  // Helper function to get status based on progress
-  const getStatusInfo = (value: number, goal: number | null) => {
-    if (!goal)
-      return { status: "no-goal", icon: <TrendingUp />, color: "info" };
-
-    const percentage = (value / goal) * 100;
-
-    if (percentage >= 95 && percentage <= 105) {
-      return { status: "perfect", icon: <CheckCircle />, color: "success" };
-    } else if (percentage > 105) {
-      return { status: "over", icon: <Warning />, color: "warning" };
-    } else if (percentage >= 80) {
-      return { status: "close", icon: <TrendingUp />, color: "info" };
-    } else {
-      return { status: "under", icon: <TrendingUp />, color: "grey" };
-    }
-  };
-
-  // Enhanced progress bar component
-  const EnhancedProgressBar = ({
-    value,
-    color,
-    goal,
-    current,
-    name,
-    unit,
-  }: {
-    value: number;
-    color: string;
-    goal: number | null;
-    current: number;
-    name: string;
-    unit: string;
-  }) => {
-    const clampedValue = Math.min(Math.max(value || 0, 0), 100);
-
-    return (
-      <Tooltip
-        title={
-          goal
-            ? `${name}: ${current.toFixed(1)}${unit} of ${goal.toFixed(1)}${unit} (${value.toFixed(1)}%)`
-            : `${name}: ${current.toFixed(1)}${unit}`
-        }
-        placement="top"
-        arrow
-      >
-        <Box
-          sx={{
-            position: "relative",
-            cursor: "pointer",
-            "&:hover": {
-              transform: "translateY(-1px)",
-              transition: "transform 0.2s ease-in-out",
-            },
-          }}
-        >
-          <LinearProgress
-            variant="determinate"
-            value={clampedValue}
-            sx={{
-              height: 12,
-              borderRadius: 6,
-              backgroundColor:
-                theme.palette.mode === "dark" ? "#2a2a2a" : "#f0f0f0",
-              "& .MuiLinearProgress-bar": {
-                backgroundColor: color,
-                borderRadius: 6,
-              },
-            }}
-          />
-          {value > 100 && (
-            <Box
-              sx={{
-                position: "absolute",
-                right: -2,
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: 6,
-                height: 16,
-                backgroundColor: "warning.main",
-                borderRadius: 1,
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-              }}
-            />
-          )}
-        </Box>
-      </Tooltip>
-    );
-  };
-
   if (isLoading) {
     return (
-      <Paper
-        elevation={2}
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          background:
-            theme.palette.mode === "dark"
-              ? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
-              : "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
-        }}
-      >
+      <LargeCard elevation={2}>
         {/* Header skeleton */}
-        <Stack direction="row" alignItems="center" mb={3} spacing={2}>
-          <Skeleton variant="circular" width={32} height={32} />
-          <Skeleton variant="text" width={200} height={32} />
-        </Stack>
+        <MediumStack direction="row" alignItems="center" mb={3}>
+          <CustomSkeleton variant="circular" width={32} height={32} />
+          <CustomSkeleton variant="text" width={200} height={32} />
+        </MediumStack>
 
         {/* Date picker skeleton */}
         <Box display="flex" justifyContent="center" mb={3}>
-          <Skeleton
-            variant="rectangular"
-            width={180}
-            height={40}
-            sx={{ borderRadius: 2 }}
-          />
+          <CustomSkeleton variant="rectangular" width={180} height={40} />
         </Box>
 
         {/* Calories progress skeleton */}
@@ -216,21 +312,12 @@ const MacrosChart = () => {
             mb={1}
           >
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Skeleton variant="circular" width={20} height={20} />
-              <Skeleton variant="text" width={80} />
+              <CustomSkeleton variant="circular" width={20} height={20} />
+              <CustomSkeleton variant="text" width={80} />
             </Stack>
-            <Skeleton
-              variant="rectangular"
-              width={60}
-              height={24}
-              sx={{ borderRadius: 1 }}
-            />
+            <CustomSkeleton variant="rectangular" width={60} height={24} />
           </Stack>
-          <Skeleton
-            variant="rectangular"
-            height={12}
-            sx={{ borderRadius: 6 }}
-          />
+          <CustomSkeleton variant="rectangular" height={12} />
         </Box>
 
         {/* Macro skeletons */}
@@ -240,11 +327,11 @@ const MacrosChart = () => {
               <Paper
                 elevation={1}
                 sx={{
-                  p: 2,
                   borderRadius: 2,
                   background:
                     theme.palette.mode === "dark" ? "#2a2a2a" : "#ffffff",
                   border: `1px solid ${theme.palette.divider}`,
+                  p: 2,
                 }}
               >
                 <Stack
@@ -254,53 +341,27 @@ const MacrosChart = () => {
                   mb={1}
                 >
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <Skeleton variant="circular" width={20} height={20} />
-                    <Skeleton variant="text" width={60} />
+                    <CustomSkeleton variant="circular" width={20} height={20} />
+                    <CustomSkeleton variant="text" width={60} />
                   </Stack>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <Skeleton variant="text" width={80} />
-                    <Skeleton variant="circular" width={16} height={16} />
+                    <CustomSkeleton variant="text" width={80} />
+                    <CustomSkeleton variant="circular" width={16} height={16} />
                   </Stack>
                 </Stack>
-                <Skeleton
-                  variant="rectangular"
-                  height={12}
-                  sx={{ borderRadius: 6 }}
-                />
+                <CustomSkeleton variant="rectangular" height={12} />
               </Paper>
             </Fade>
           ))}
         </Stack>
-      </Paper>
+      </LargeCard>
     );
   }
 
   return (
-    <Paper
-      elevation={2}
-      sx={{
-        p: 3,
-        borderRadius: 3,
-        background:
-          theme.palette.mode === "dark"
-            ? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
-            : "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
-        border: `1px solid ${theme.palette.divider}`,
-        position: "relative",
-        overflow: "hidden",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 4,
-          background: `linear-gradient(90deg, ${MACRO_CHART_COLORS.carbs}, ${MACRO_CHART_COLORS.fat}, ${MACRO_CHART_COLORS.protein})`,
-        },
-      }}
-    >
+    <LargeCard elevation={2}>
       {/* Header with icon */}
-      <Stack direction="row" alignItems="center" mb={3} spacing={2}>
+      <MediumStack direction="row" alignItems="center" mb={3}>
         <LocalFireDepartment
           sx={{
             color: MACRO_CHART_COLORS.calories,
@@ -320,7 +381,7 @@ const MacrosChart = () => {
         >
           Daily Nutrition
         </Typography>
-      </Stack>
+      </MediumStack>
 
       {/* Date picker - centered for all screens */}
       <Box display="flex" justifyContent="center" mb={3}>
@@ -330,216 +391,82 @@ const MacrosChart = () => {
         />
       </Box>
 
-      {/* Calories Summary Card */}
+      {/* Responsive Circular Progress Layout */}
       <Fade in timeout={300}>
-        <Paper
-          elevation={1}
-          sx={{
-            p: 2.5,
-            mb: 3,
-            borderRadius: 2,
-            background:
-              theme.palette.mode === "dark"
-                ? `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%)`
-                : `linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)`,
-            border: `1px solid ${theme.palette.divider}`,
-            position: "relative",
-          }}
-        >
-          <Stack
-            direction="row"
+        <SmallCard elevation={1}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            gap={3}
             alignItems="center"
-            justifyContent="space-between"
-            mb={2}
+            justifyContent="center"
           >
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <LocalFireDepartment
-                sx={{ color: MACRO_CHART_COLORS.calories, fontSize: 20 }}
-              />
-              <Typography variant="h6" fontWeight="500">
-                Calories
-              </Typography>
-            </Stack>
-            {macroGoal && (
-              <Chip
-                size="small"
-                label={
-                  getStatusInfo(macros?.calories ?? 0, goalCalories).status
-                }
-                color={
-                  getStatusInfo(macros?.calories ?? 0, goalCalories).color as
-                    | "success"
-                    | "warning"
-                    | "info"
-                    | "error"
-                }
-                icon={getStatusInfo(macros?.calories ?? 0, goalCalories).icon}
-                sx={{ textTransform: "capitalize" }}
-              />
-            )}
-          </Stack>
-
-          <Typography variant="h4" fontWeight="700" mb={1}>
-            {(macros?.calories ?? 0).toFixed(0)}
-            <Typography
-              component="span"
-              variant="body1"
-              color="text.secondary"
-              ml={1}
+            {/* All progress circles centered together */}
+            <Box
+              display="flex"
+              flexDirection={{ xs: "column", sm: "row" }}
+              gap={{ xs: 2, sm: 3 }}
+              alignItems="center"
+              justifyContent="center"
+              flexWrap="wrap"
             >
-              {macroGoal ? `/ ${goalCalories.toFixed(0)} kcal` : "kcal"}
-            </Typography>
-          </Typography>
+              {/* Calories */}
+              <Box display="flex" justifyContent="center">
+                <CircularProgressWithLabel
+                  value={
+                    goalCalories
+                      ? ((macros?.calories ?? 0) / goalCalories) * 100
+                      : 0
+                  }
+                  current={macros?.calories ?? 0}
+                  goal={goalCalories || null}
+                  unit="kcal"
+                  color={MACRO_CHART_COLORS.calories}
+                  icon={<LocalFireDepartment />}
+                  name="Calories"
+                  size={{ xs: 130, lg: 130 }}
+                />
+              </Box>
 
-          {macroGoal && (
-            <EnhancedProgressBar
-              value={
-                goalCalories
-                  ? ((macros?.calories ?? 0) / goalCalories) * 100
-                  : 0
-              }
-              color={MACRO_CHART_COLORS.calories}
-              goal={goalCalories}
-              current={macros?.calories ?? 0}
-              name="Calories"
-              unit=" kcal"
-            />
-          )}
+              {/* Macros */}
+              {macroList.map((macro, index) => {
+                const progress = macro.goal
+                  ? (macro.value / macro.goal) * 100
+                  : 0;
+
+                return (
+                  <Zoom in timeout={400 + index * 100} key={macro.name}>
+                    <Box display="flex" justifyContent="center">
+                      <CircularProgressWithLabel
+                        value={progress}
+                        current={macro.value}
+                        goal={macro.goal}
+                        unit={macro.unit}
+                        color={macro.color}
+                        icon={macro.icon}
+                        name={macro.name}
+                        size={{ xs: 120, lg: 120 }}
+                      />
+                    </Box>
+                  </Zoom>
+                );
+              })}
+            </Box>
+          </Box>
 
           {!macroGoal && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              fontStyle="italic"
-              sx={{ mt: 1 }}
-            >
-              Set macro goals to track progress
-            </Typography>
-          )}
-        </Paper>
-      </Fade>
-
-      {/* Macros Grid */}
-      <Stack spacing={2}>
-        {macroList.map((macro, index) => {
-          const progress = macro.goal ? (macro.value / macro.goal) * 100 : 0; // Show 0% when no goal is set
-
-          const statusInfo = getStatusInfo(macro.value, macro.goal);
-
-          return (
-            <Zoom in timeout={400 + index * 100} key={macro.name}>
-              <Paper
-                elevation={1}
-                sx={{
-                  p: 2.5,
-                  borderRadius: 2,
-                  background: macro.gradient,
-                  border: `1px solid ${macro.color}22`,
-                  position: "relative",
-                  transition: "all 0.3s ease-in-out",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: `0 8px 25px ${macro.color}15`,
-                    border: `1px solid ${macro.color}44`,
-                  },
-                }}
+            <Box mt={2} textAlign="center">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                fontStyle="italic"
               >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  mb={2}
-                >
-                  <Stack direction="row" alignItems="center" spacing={1.5}>
-                    {macro.icon}
-                    <Typography variant="h6" fontWeight="500">
-                      {macro.name}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography variant="body1" fontWeight="600">
-                      {macro.value.toFixed(1)}
-                      {macro.unit}
-                      {macro.goal && (
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          color="text.secondary"
-                          ml={0.5}
-                        >
-                          / {macro.goal.toFixed(1)}
-                          {macro.unit}
-                        </Typography>
-                      )}
-                    </Typography>
-                    {macro.goal && (
-                      <Tooltip title={`${statusInfo.status.replace("-", " ")}`}>
-                        <Box
-                          sx={{
-                            color: `${statusInfo.color}.main`,
-                            display: "flex",
-                          }}
-                        >
-                          {statusInfo.icon}
-                        </Box>
-                      </Tooltip>
-                    )}
-                  </Stack>
-                </Stack>
-
-                {macro.goal ? (
-                  <EnhancedProgressBar
-                    value={Math.max(progress, 0)}
-                    color={macro.color}
-                    goal={macro.goal}
-                    current={macro.value}
-                    name={macro.name}
-                    unit={macro.unit}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      height: 12,
-                      borderRadius: 6,
-                      backgroundColor:
-                        theme.palette.mode === "dark" ? "#2a2a2a" : "#f0f0f0",
-                      position: "relative",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        fontSize: "0.6rem",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      No goal set
-                    </Typography>
-                  </Box>
-                )}
-
-                {!macro.goal && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mt: 1, display: "block" }}
-                  >
-                    {total > 0
-                      ? `${((macro.value / total) * 100).toFixed(1)}% of today's intake`
-                      : "Set macro goals to track progress"}
-                  </Typography>
-                )}
-              </Paper>
-            </Zoom>
-          );
-        })}
-      </Stack>
+                Set macro goals to track progress
+              </Typography>
+            </Box>
+          )}
+        </SmallCard>
+      </Fade>
 
       {/* Summary footer */}
       <Box mt={3} pt={2} borderTop={`1px solid ${theme.palette.divider}`}>
@@ -556,7 +483,7 @@ const MacrosChart = () => {
           </Typography>
         </Stack>
       </Box>
-    </Paper>
+    </LargeCard>
   );
 };
 

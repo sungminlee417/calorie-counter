@@ -1,82 +1,107 @@
-import React from "react";
+import React, { useState } from "react";
 import {
-  IconButton,
   Typography,
   Tooltip,
-  Paper,
-  Stack,
   Box,
-  Chip,
-  useTheme,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import {
+  ListItem,
+  MediumStack,
+  SmallStack,
+  ActionButton,
+  IconContainer,
+} from "@/components/styled";
+import {
   Edit,
-  LocalFireDepartment,
   Restaurant,
-  EmojiNature,
-  FitnessCenter,
+  Add,
+  WbSunny,
+  LunchDining,
+  DinnerDining,
+  Cookie,
 } from "@mui/icons-material";
-import { Food } from "@/types/supabase";
-import { EnhancedFood, FoodSourceType } from "@/types/food-provider";
-import { MACRO_CHART_COLORS, UI_COLORS } from "@/constants/app";
+import { Food, FoodSourceType } from "@/types/food-provider";
+import { MACRO_CHART_COLORS } from "@/constants/app";
 import FoodSourceBadge from "./FoodSourceBadge";
+import { MealType } from "@/types/food-entry";
 
 interface FoodListItemProps {
-  food: Food | EnhancedFood;
-  onEdit: (food: Food | EnhancedFood) => void;
+  food: Food;
+  onEdit: (food: Food) => void;
+  onAddEntry?: (food: Food, mealType: MealType) => void;
   showSource?: boolean;
 }
 
+const mealOptions = [
+  { value: "breakfast" as MealType, label: "Breakfast", icon: <WbSunny /> },
+  { value: "lunch" as MealType, label: "Lunch", icon: <LunchDining /> },
+  { value: "dinner" as MealType, label: "Dinner", icon: <DinnerDining /> },
+  { value: "snacks" as MealType, label: "Snacks", icon: <Cookie /> },
+];
+
 const FoodListItem: React.FC<FoodListItemProps> = React.memo(
-  ({ food, onEdit, showSource = false }) => {
-    const theme = useTheme();
+  ({ food, onEdit, onAddEntry, showSource = false }) => {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleEdit = () => {
       onEdit(food);
     };
 
+    const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleMealSelect = (mealType: MealType) => {
+      onAddEntry?.(food, mealType);
+      setAnchorEl(null);
+    };
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
     return (
-      <Paper
-        elevation={1}
-        sx={{
-          borderRadius: 2,
-          background:
-            theme.palette.mode === "dark"
-              ? UI_COLORS.gradients.neutral.dark
-              : UI_COLORS.gradients.neutral.light,
-          border: `1px solid ${theme.palette.divider}`,
-          transition: "all 0.2s ease-in-out",
-          "&:hover": {
-            transform: "translateY(-1px)",
-            boxShadow: UI_COLORS.shadows.medium,
-            borderColor: MACRO_CHART_COLORS.carbs,
-          },
-        }}
-        role="listitem"
-      >
-        <Box sx={{ p: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={2}>
+      <ListItem elevation={1} role="listitem" sx={{ p: 2.5 }}>
+        <Box>
+          <MediumStack direction="row" alignItems="center" spacing={2}>
             {/* Food Icon */}
-            <Box
+            <IconContainer
               sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
                 background: `${MACRO_CHART_COLORS.carbs}15`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                width: 36,
+                height: 36,
               }}
             >
               <Restaurant
-                sx={{ color: MACRO_CHART_COLORS.carbs, fontSize: 20 }}
+                sx={{ color: MACRO_CHART_COLORS.carbs, fontSize: 18 }}
               />
-            </Box>
+            </IconContainer>
 
             {/* Food Details */}
             <Box flex={1}>
-              <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
-                <Typography variant="subtitle1" fontWeight="600">
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 1,
+                  mb: 0.5,
+                  flexWrap: "wrap",
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="600"
+                  sx={{
+                    wordBreak: "break-word",
+                    lineHeight: 1.3,
+                    flex: "1 1 auto",
+                    minWidth: 0,
+                  }}
+                >
                   {food.name}
                 </Typography>
                 {showSource && "source" in food && (
@@ -85,9 +110,9 @@ const FoodListItem: React.FC<FoodListItemProps> = React.memo(
                     size="small"
                   />
                 )}
-              </Stack>
+              </Box>
 
-              <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+              <SmallStack direction="row" alignItems="center" mb={0.5}>
                 <Typography variant="body2" color="text.secondary">
                   {food.serving_size} {food.serving_unit}
                 </Typography>
@@ -101,87 +126,102 @@ const FoodListItem: React.FC<FoodListItemProps> = React.memo(
                     </Typography>
                   </>
                 )}
-              </Stack>
+              </SmallStack>
 
-              {/* Macro Chips */}
-              <Stack
-                direction="row"
-                spacing={0.5}
-                flexWrap="wrap"
-                sx={{ gap: 0.5 }}
-              >
-                <Chip
-                  size="small"
-                  icon={<LocalFireDepartment />}
-                  label={`${food.calories} kcal`}
-                  sx={{
-                    height: 20,
-                    fontSize: "0.7rem",
-                    backgroundColor: `${MACRO_CHART_COLORS.calories}15`,
-                    color: MACRO_CHART_COLORS.calories,
-                    "& .MuiChip-icon": { fontSize: 12 },
-                  }}
-                />
-                <Chip
-                  size="small"
-                  icon={<Restaurant />}
-                  label={`${food.carbs}g C`}
-                  sx={{
-                    height: 20,
-                    fontSize: "0.7rem",
-                    backgroundColor: `${MACRO_CHART_COLORS.carbs}15`,
-                    color: MACRO_CHART_COLORS.carbs,
-                    "& .MuiChip-icon": { fontSize: 12 },
-                  }}
-                />
-                <Chip
-                  size="small"
-                  icon={<EmojiNature />}
-                  label={`${food.fat}g F`}
-                  sx={{
-                    height: 20,
-                    fontSize: "0.7rem",
-                    backgroundColor: `${MACRO_CHART_COLORS.fat}15`,
-                    color: MACRO_CHART_COLORS.fat,
-                    "& .MuiChip-icon": { fontSize: 12 },
-                  }}
-                />
-                <Chip
-                  size="small"
-                  icon={<FitnessCenter />}
-                  label={`${food.protein}g P`}
-                  sx={{
-                    height: 20,
-                    fontSize: "0.7rem",
-                    backgroundColor: `${MACRO_CHART_COLORS.protein}15`,
-                    color: MACRO_CHART_COLORS.protein,
-                    "& .MuiChip-icon": { fontSize: 12 },
-                  }}
-                />
-              </Stack>
+              {/* Simplified Macro Display */}
+              <Typography variant="caption" color="text.secondary">
+                <Box
+                  component="span"
+                  sx={{ color: MACRO_CHART_COLORS.calories, fontWeight: 500 }}
+                >
+                  {food.calories} kcal
+                </Box>
+                {" • "}
+                <Box
+                  component="span"
+                  sx={{ color: MACRO_CHART_COLORS.protein }}
+                >
+                  P: {food.protein}g
+                </Box>
+                {" • "}
+                <Box component="span" sx={{ color: MACRO_CHART_COLORS.carbs }}>
+                  C: {food.carbs}g
+                </Box>
+                {" • "}
+                <Box component="span" sx={{ color: MACRO_CHART_COLORS.fat }}>
+                  F: {food.fat}g
+                </Box>
+              </Typography>
             </Box>
 
-            {/* Edit Button */}
-            <Tooltip title="Edit food" arrow>
-              <IconButton
-                onClick={handleEdit}
-                aria-label={`Edit ${food.name}`}
-                sx={{
-                  backgroundColor: `${theme.palette.primary.main}15`,
-                  color: theme.palette.primary.main,
-                  "&:hover": {
-                    backgroundColor: `${theme.palette.primary.main}25`,
-                    transform: "scale(1.1)",
-                  },
-                  transition: "all 0.2s ease-in-out",
-                }}
-              >
-                <Edit />
-              </IconButton>
-            </Tooltip>
-          </Stack>
+            {/* Simplified Action Buttons */}
+            <SmallStack direction="row" spacing={0.5}>
+              {onAddEntry && (
+                <>
+                  <Tooltip title="Add to meal" arrow>
+                    <ActionButton
+                      onClick={handleAddClick}
+                      aria-label={`Add ${food.name} to entries`}
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        minWidth: 32,
+                        borderRadius: "50%", // Fully circular
+                        "& svg": { fontSize: 18 },
+                      }}
+                    >
+                      <Add />
+                    </ActionButton>
+                  </Tooltip>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                  >
+                    {mealOptions.map((option) => (
+                      <MenuItem
+                        key={option.value}
+                        onClick={() => handleMealSelect(option.value)}
+                        sx={{ py: 1 }}
+                      >
+                        <ListItemIcon
+                          sx={{ minWidth: 36, color: MACRO_CHART_COLORS.carbs }}
+                        >
+                          {option.icon}
+                        </ListItemIcon>
+                        <ListItemText primary={option.label} />
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </>
+              )}
+              <Tooltip title="Edit" arrow>
+                <ActionButton
+                  onClick={handleEdit}
+                  aria-label={`Edit ${food.name}`}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    minWidth: 32,
+                    borderRadius: "50%", // Fully circular
+                    "& svg": { fontSize: 18 },
+                  }}
+                >
+                  <Edit />
+                </ActionButton>
+              </Tooltip>
+            </SmallStack>
+          </MediumStack>
         </Box>
-      </Paper>
+      </ListItem>
     );
   }
 );

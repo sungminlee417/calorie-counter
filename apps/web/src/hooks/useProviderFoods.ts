@@ -5,11 +5,7 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 
-import {
-  EnhancedFood,
-  FoodSourceType,
-  FoodProviderError,
-} from "@/types/food-provider";
+import { Food, FoodSourceType, FoodProviderError } from "@/types/food-provider";
 import { AggregatedSearchOptions } from "@/lib/food-providers/food-aggregator-service";
 import { getFoodAggregator } from "@/lib/food-providers";
 import { InternalFoodProvider } from "@/lib/food-providers/internal-food-provider";
@@ -18,7 +14,7 @@ import { PAGE_SIZE } from "@/constants/app";
 /**
  * Options for the enhanced foods hook
  */
-export interface UseEnhancedFoodsOptions {
+export interface UseProviderFoodsOptions {
   search?: string;
   providers?: FoodSourceType[];
   searchAllProviders?: boolean;
@@ -29,7 +25,7 @@ export interface UseEnhancedFoodsOptions {
  * Enhanced version of useFoods hook that works with multiple food providers
  * Provides unified search across internal database and external APIs
  */
-const useEnhancedFoods = (options: UseEnhancedFoodsOptions = {}) => {
+const useProviderFoods = (options: UseProviderFoodsOptions = {}) => {
   const {
     search = "",
     providers,
@@ -105,7 +101,7 @@ const useEnhancedFoods = (options: UseEnhancedFoodsOptions = {}) => {
   const getFoodById = async (
     id: string,
     source: FoodSourceType
-  ): Promise<EnhancedFood | null> => {
+  ): Promise<Food | null> => {
     return await aggregator.getFoodById(id, source);
   };
 
@@ -113,7 +109,7 @@ const useEnhancedFoods = (options: UseEnhancedFoodsOptions = {}) => {
   const createFood = useMutation({
     mutationFn: async (
       newFood: Omit<
-        EnhancedFood,
+        Food,
         "id" | "created_at" | "updated_at" | "source" | "external_id"
       >
     ) => {
@@ -137,7 +133,7 @@ const useEnhancedFoods = (options: UseEnhancedFoodsOptions = {}) => {
 
   // Update food (only for internal provider)
   const updateFood = useMutation({
-    mutationFn: async (updatedFood: EnhancedFood) => {
+    mutationFn: async (updatedFood: Food) => {
       if (updatedFood.source !== FoodSourceType.INTERNAL) {
         throw new FoodProviderError(
           "Only internal foods can be updated",
@@ -185,7 +181,7 @@ const useEnhancedFoods = (options: UseEnhancedFoodsOptions = {}) => {
 
   // Save external food to internal database
   const saveExternalFood = useMutation({
-    mutationFn: async (externalFood: EnhancedFood) => {
+    mutationFn: async (externalFood: Food) => {
       if (externalFood.source === FoodSourceType.INTERNAL) {
         throw new FoodProviderError(
           "Food is already in internal database",
@@ -294,4 +290,4 @@ const useEnhancedFoods = (options: UseEnhancedFoodsOptions = {}) => {
   };
 };
 
-export default useEnhancedFoods;
+export default useProviderFoods;

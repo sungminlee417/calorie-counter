@@ -81,11 +81,8 @@ export const fetchUpdateFood = async (
 
   // If no changes detected, return the current food without updating
   if (!changeResult.hasChanges) {
-    console.log("No changes detected for food, skipping database update");
     return currentFood;
   }
-
-  console.log(`Updating food: ${changeResult.message}`);
 
   // Only update the fields that have actually changed
   const { data, error } = await supabase

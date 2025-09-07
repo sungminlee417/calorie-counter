@@ -1,5 +1,5 @@
 import {
-  EnhancedFood,
+  Food,
   FoodProviderResponse,
   FoodSearchOptions,
   FoodSourceType,
@@ -32,9 +32,9 @@ export abstract class BaseFoodProvider {
   /**
    * Get a specific food by its ID in the provider's system
    * @param id The food ID in the provider's system
-   * @returns Promise resolving to enhanced food or null if not found
+   * @returns Promise resolving to food or null if not found
    */
-  abstract getFoodById(id: string): Promise<EnhancedFood | null>;
+  abstract getFoodById(id: string): Promise<Food | null>;
 
   /**
    * Get provider configuration
@@ -114,11 +114,11 @@ export abstract class BaseFoodProvider {
   }
 
   /**
-   * Transform provider-specific food data to enhanced food format
+   * Transform provider-specific food data to food format
    * Must be implemented by each provider
    */
-  protected abstract transformToEnhancedFood(
+  protected abstract transformToFood(
     providerFood: unknown,
     metadata?: Record<string, unknown>
-  ): EnhancedFood;
+  ): Food;
 }
